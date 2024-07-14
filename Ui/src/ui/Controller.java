@@ -142,7 +142,7 @@ public class Controller{
         Ui.showBoard((DtoBoard)Engine.getActiveBoard(), false);
         do{
             response = new GuesserResponse();
-            Ui.showIdentification(i_Identification);
+            Ui.showIdentification(i_Identification, guessCount);
             Ui.getResponse(response);
 
             if(response.getCardId() == EndGuessId){

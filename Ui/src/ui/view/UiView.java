@@ -207,12 +207,13 @@ public class UiView implements UiViewInterface, ChoiceNotifier, UiActionConst , 
     }
 
     @Override
-    public void showIdentification(Identification i_CurrentIdentification) {
+    public void showIdentification(Identification i_CurrentIdentification, int i_GuessesLeft) {
         if(Data.getNextInput() != InputHandling.GUESSER)
             Data.setNextInput(InputHandling.GUESSER);
 
         System.out.println("Identification: " + i_CurrentIdentification.getIdentification() +
-                "\nNumber of related words: " + i_CurrentIdentification.getRelated());
+                "\nNumber of related words: " + i_CurrentIdentification.getRelated() +
+                "\nNumber of guesses left: " + i_GuessesLeft);
     }
 
     @Override
