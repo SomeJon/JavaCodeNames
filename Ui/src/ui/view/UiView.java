@@ -1,9 +1,9 @@
 package ui.view;
 
-import dto.type.board.DtoBoard;
-import dto.type.data.DtoActiveGameStatus;
-import dto.type.data.DtoGameDetails;
-import dto.type.data.DtoGuessResult;
+import dto.type.out.board.DtoBoard;
+import dto.type.out.data.DtoActiveGameStatus;
+import dto.type.out.data.DtoGameDetails;
+import dto.type.out.data.DtoGuessResult;
 import engine.board.card.Card;
 import engine.board.card.GroupCard;
 import engine.board.card.GroupNeutral;
@@ -16,12 +16,12 @@ import engine.exception.loadxml.OutOfBoundLoad;
 import engine.exception.loadxml.TeamNamesNotUnique;
 import engine.exception.turn.GuessOutOfRangeException;
 import engine.exception.turn.IdentificationException;
-import engine.response.Response;
+import dto.type.in.response.Response;
 import ui.MenuAction;
 import ui.view.input.InputHandling;
 import ui.interfaces.UiActionConst;
 import ui.interfaces.UiViewInterface;
-import ui.menu.console.*;
+import console.*;
 
 import java.io.Serializable;
 import java.util.*;

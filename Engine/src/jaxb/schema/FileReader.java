@@ -3,7 +3,7 @@ package jaxb.schema;
 import engine.data.GameData;
 import engine.data.GameStatus;
 import engine.data.Team;
-import jaxb.schema.generated.ECNGame;
+import jaxb.schema.generated.ex01.ECNGame;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -13,7 +13,7 @@ import java.nio.file.Files;
 import java.util.*;
 
 public class FileReader {
-    private static final String JAXB_XML_GAME_PACKAGE_NAME = "jaxb.schema.generated";
+    private static final String JAXB_XML_GAME_PACKAGE_NAME_EX01 = "jaxb.schema.generated";
 
     public static void ReadXml(File i_File, GameData i_DataHolder) throws JAXBException, IOException {
 
@@ -37,7 +37,7 @@ public class FileReader {
 
     }
     private static ECNGame deserializeFrom(InputStream in) throws JAXBException {
-        JAXBContext jc = JAXBContext.newInstance(JAXB_XML_GAME_PACKAGE_NAME);
+        JAXBContext jc = JAXBContext.newInstance(JAXB_XML_GAME_PACKAGE_NAME_EX01);
         Unmarshaller u = jc.createUnmarshaller();
         return (ECNGame) u.unmarshal(in);
     }

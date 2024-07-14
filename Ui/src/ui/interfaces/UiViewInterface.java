@@ -1,13 +1,13 @@
 package ui.interfaces;
 
-import dto.type.board.DtoBoard;
-import dto.type.data.DtoActiveGameStatus;
-import dto.type.data.DtoGameDetails;
-import dto.type.data.DtoGuessResult;
+import dto.type.out.board.DtoBoard;
+import dto.type.out.data.DtoActiveGameStatus;
+import dto.type.out.data.DtoGameDetails;
+import dto.type.out.data.DtoGuessResult;
 import engine.board.card.GroupTeam;
 import engine.data.Identification;
 import engine.exception.CodeNameException;
-import engine.response.Response;
+import dto.type.in.response.Response;
 import ui.MenuAction;
 
 public interface UiViewInterface {

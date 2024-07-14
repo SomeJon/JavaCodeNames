@@ -1,6 +1,6 @@
 package ui.save;
 
-import engine.response.Response;
+import dto.type.in.response.Response;
 
 public class FileLocationResponse implements Response {
     private String FileLocation;

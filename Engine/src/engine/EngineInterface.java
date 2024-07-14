@@ -1,13 +1,13 @@
 package engine;
 
 import dto.Dto;
-import dto.type.data.DtoActiveGameStatus;
-import dto.type.data.DtoGroupTeam;
+import dto.type.out.data.DtoActiveGameStatus;
+import dto.type.out.data.DtoGroupTeam;
 import engine.board.card.Card;
 import engine.data.Identification;
-import engine.response.GuesserResponse;
-import engine.response.IdentificationResponse;
-import engine.response.Response;
+import dto.type.in.response.GuesserResponse;
+import dto.type.in.response.IdentificationResponse;
+import dto.type.in.response.Response;
 
 import javax.xml.bind.JAXBException;
 import java.io.IOException;

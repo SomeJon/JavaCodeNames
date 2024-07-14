@@ -1,9 +1,9 @@
 package ui.view.input;
 
-import engine.response.GuesserResponse;
-import engine.response.IdentificationResponse;
-import engine.response.LoadXmlResponse;
-import engine.response.Response;
+import dto.type.in.response.GuesserResponse;
+import dto.type.in.response.IdentificationResponse;
+import dto.type.in.response.LoadXmlResponse;
+import dto.type.in.response.Response;
 import ui.Controller;
 import ui.save.FileLocationResponse;
 import ui.view.UiView;

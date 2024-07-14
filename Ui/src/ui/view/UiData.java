@@ -1,6 +1,6 @@
 package ui.view;
 
-import ui.menu.console.MainMenu;
+import console.MainMenu;
 import ui.view.input.InputHandling;
 import ui.interfaces.UiActionConst;
 

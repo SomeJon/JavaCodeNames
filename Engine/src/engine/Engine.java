@@ -1,8 +1,8 @@
 package engine;
 
 import dto.Dto;
-import dto.type.board.DtoBoard;
-import dto.type.data.*;
+import dto.type.out.board.DtoBoard;
+import dto.type.out.data.*;
 import engine.board.Board;
 import engine.board.card.Card;
 import engine.board.card.GroupCard;
@@ -13,10 +13,10 @@ import engine.data.Identification;
 import engine.exception.turn.CardFlippedException;
 import engine.exception.turn.GuessOutOfRangeException;
 import engine.exception.turn.IdentificationException;
-import engine.response.GuesserResponse;
-import engine.response.IdentificationResponse;
-import engine.response.LoadXmlResponse;
-import engine.response.Response;
+import dto.type.in.response.GuesserResponse;
+import dto.type.in.response.IdentificationResponse;
+import dto.type.in.response.LoadXmlResponse;
+import dto.type.in.response.Response;
 import jaxb.schema.FileReader;
 
 import javax.xml.bind.JAXBException;
