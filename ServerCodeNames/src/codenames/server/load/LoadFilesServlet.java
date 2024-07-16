@@ -3,9 +3,8 @@ package codenames.server.load;
 
 import codenames.ServerUtils;
 import codenames.SessionUtils;
-import codenames.constant.response.Responses;
+import constant.response.Responses;
 import data.server.controllers.ServerManager;
-import data.server.data.ePermission;
 import data.user.User;
 import dto.type.in.response.LoadFilesResponse;
 import dto.type.out.server.DtoResponse;

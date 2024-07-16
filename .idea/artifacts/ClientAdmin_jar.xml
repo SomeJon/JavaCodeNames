@@ -1,0 +1,17 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="ClientAdmin:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/ClientAdmin_jar</output-path>
+    <root id="archive" name="ClientAdmin.jar">
+      <element id="module-output" name="ClientAdmin" />
+      <element id="module-output" name="ConsoleMenu" />
+      <element id="module-output" name="Dto" />
+      <element id="module-output" name="Engine" />
+      <element id="module-output" name="CodeNamesExceptions" />
+      <element id="module-output" name="Consts" />
+      <element id="module-output" name="ClientCommon" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/jetbrains/annotations/24.0.0/annotations-24.0.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../../../Program Files/Java/addon/okhttp-4.9.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../../../Program Files/Java/addon/okio-2.8.0.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

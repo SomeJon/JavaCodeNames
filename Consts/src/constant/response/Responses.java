@@ -1,4 +1,4 @@
-package codenames.constant.response;
+package constant.response;
 
 public class Responses {
     public static final String CREATED = "Has been created";

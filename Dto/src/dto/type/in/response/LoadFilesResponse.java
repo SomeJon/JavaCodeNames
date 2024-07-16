@@ -2,7 +2,6 @@ package dto.type.in.response;
 
 import dto.type.out.server.DtoServerInfo;
 
-import java.io.File;
 import java.io.InputStream;
 
 public class LoadFilesResponse implements Response {

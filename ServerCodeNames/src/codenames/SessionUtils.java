@@ -1,7 +1,6 @@
 package codenames;
 
-import codenames.constant.attribute.AttributeNames;
-import data.server.data.ePermission;
+import constant.attribute.AttributeNames;
 import data.user.User;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;

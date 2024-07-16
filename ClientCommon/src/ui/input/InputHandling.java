@@ -1,12 +1,6 @@
-package ui.view.input;
+package ui.input;
 
-import dto.type.in.response.GuesserResponse;
-import dto.type.in.response.IdentificationResponse;
-import dto.type.in.response.LoadXmlResponse;
-import dto.type.in.response.Response;
-import ui.Controller;
-import ui.save.FileLocationResponse;
-import ui.view.UiView;
+import dto.type.in.response.*;
 
 import java.io.File;
 import java.util.InputMismatchException;
@@ -23,24 +17,30 @@ public enum InputHandling {
             File file = new File(path);
 
             if (!file.isFile()) {
-                UiView.errorPrint("A file was not found at the given path!");
+                errorPrint("A file was not found at the given path!");
             } else if (!path.endsWith(".xml")) {
-                UiView.errorPrint("File path does not lead to an xml file!");
+                errorPrint("File path does not lead to an xml file!");
             } else {
-                o_Response.loadResponse(new LoadXmlResponse(file));
+                o_Response.loadResponse(new LoadFileResponse(file));
             }
         }
     },
-    FILE_PATH_SAVE{
+    FILE_PATH_TXT{
         @Override
         public void getInput(Response o_Response) {
             Scanner scanner = new Scanner(System.in);
 
-            System.out.print("Enter a full file path, include the name of the file: ");
+            System.out.print("Enter a full txt file path: ");
             String path = scanner.nextLine();
-            path = path + ".cn";
+            File file = new File(path);
 
-            o_Response.loadResponse(new FileLocationResponse(path));
+            if (!file.isFile()) {
+                errorPrint("A file was not found at the given path!");
+            } else if (!path.endsWith(".txt")) {
+                errorPrint("File path does not lead to a txt file!");
+            } else {
+                o_Response.loadResponse(new LoadFileResponse(file));
+            }
         }
     },
     IDENTIFICATION{
@@ -49,8 +49,9 @@ public enum InputHandling {
             Scanner scanner = new Scanner(System.in);
             boolean continueLoop;
 
-            System.out.println("Please enter an identification word and number of related words after");
-            System.out.print("Identification word: ");
+            String toPrint = "Please enter an identification word and number of related words after\n" +
+                    "Identification word: ";
+            System.out.print(toPrint);
             String identificationWord = scanner.nextLine();
             int numberOfRelatedWords = 0;
 
@@ -62,7 +63,7 @@ public enum InputHandling {
                 } catch (InputMismatchException e) {
                     continueLoop = true;
                     scanner.nextLine();
-                    UiView.errorPrint("Non Number entered! please try again");
+                    errorPrint("Non Number entered! please try again");
                 }
             } while (continueLoop);
 
@@ -78,22 +79,49 @@ public enum InputHandling {
             
             do {
                 System.out.print("Please enter the number of the guessed card, or enter " +
-                        Controller.EndGuessId + " to end guessing: ");
+                        EndGuessId + " to end guessing: ");
                 try {
                     CardId = scanner.nextInt();
                     continueLoop = false;
                 } catch (InputMismatchException e) {
                     continueLoop = true;
                     scanner.nextLine();
-                    UiView.errorPrint("Non Number entered! please try again");
+                    errorPrint("None Number entered! please try again");
                 }
             } while (continueLoop);
 
             System.out.println();
             o_Response.loadResponse(new GuesserResponse(CardId));
         }
+    },
+    GET_GAME_ID{
+        @Override
+        public void getInput(Response o_Response) {
+            Scanner scanner = new Scanner(System.in);
+            boolean continueLoop;
+            int Int = 0;
+
+            do {
+                System.out.print("Please chose a game by entering its id: "); //todo handle errors
+                try {
+                    Int = scanner.nextInt();
+                    continueLoop = false;
+                } catch (InputMismatchException e) {
+                    continueLoop = true;
+                    scanner.nextLine();
+                    errorPrint("None Number entered! please try again");
+                }
+            } while (continueLoop);
+
+            System.out.println();
+            o_Response.loadResponse(new IntResponse(Int));
+        }
     };
 
-
+    private final static int EndGuessId = 0;
     public abstract void getInput(Response o_Response);
+    private static void errorPrint(String errorMessage){
+        String toPrint = "\n!!!An error occurred!!!\n" + errorMessage + "\n!!!!!!\n";
+        System.out.println(toPrint);
+    }
 }

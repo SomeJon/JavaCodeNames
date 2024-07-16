@@ -1,4 +1,4 @@
-package codenames.constant.attribute;
+package constant.attribute;
 
 public class AttributeNames {
     public static final String USER = "user";

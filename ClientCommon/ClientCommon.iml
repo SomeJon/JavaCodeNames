@@ -7,9 +7,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="ConsoleMenu" />
     <orderEntry type="module" module-name="Dto" />
-    <orderEntry type="module" module-name="Consts" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
@@ -22,17 +20,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://C:/Program Files/Java/addon/okio-2.8.0.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module" module-name="ClientCommon" />
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://C:/Program Files/Java/addon/kotlin-stdlib-1.4.10.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/jetbrains/annotations/24.0.0/annotations-24.0.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

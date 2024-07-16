@@ -2,8 +2,8 @@ package codenames.server.login.admin;
 
 import codenames.ServerUtils;
 import codenames.SessionUtils;
-import codenames.constant.attribute.AttributeNames;
-import codenames.constant.response.Responses;
+import constant.attribute.AttributeNames;
+import constant.response.Responses;
 import data.server.controllers.ServerManager;
 import data.user.User;
 import dto.type.out.server.DtoResponse;
@@ -41,6 +41,7 @@ public class AdminLoginServlet extends HttpServlet {
                 }
                 catch(AdminOn error){
                     errorMsg = "Another admin is already online!";
+                    result.put(Responses.CREATED, false);
                     response.setStatus(HttpServletResponse.SC_CONFLICT);
                 }
             }
@@ -52,6 +53,7 @@ public class AdminLoginServlet extends HttpServlet {
                 boolean adminOn = manager.isAdminOn();
                 if (adminOn) {
                     errorMsg = "Another admin is already connected!";
+                    result.put(Responses.CREATED, false);
                     response.setStatus(HttpServletResponse.SC_CONFLICT);
                 }
                 else{

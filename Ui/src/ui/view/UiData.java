@@ -1,7 +1,6 @@
 package ui.view;
 
 import console.MainMenu;
-import ui.view.input.InputHandling;
 import ui.interfaces.UiActionConst;
 
 import java.io.Serializable;

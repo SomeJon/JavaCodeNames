@@ -3,7 +3,7 @@ package codenames.server.logout;
 
 import codenames.ServerUtils;
 import codenames.SessionUtils;
-import codenames.constant.response.Responses;
+import constant.response.Responses;
 import data.server.controllers.ServerManager;
 import data.user.User;
 import dto.type.out.server.DtoResponse;
