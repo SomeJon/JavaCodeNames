@@ -76,9 +76,10 @@ public class ServerTeam {
                         break;
                 }
                 openRole.ifPresent(role -> role.setUser(i_User));
+                i_User.setConnectedTeam(this);
             }
             else{
-                throw new NoSpot(); //todo: add more info on error
+                throw new NoSpot();
             }
         }
         finally{
@@ -98,5 +99,20 @@ public class ServerTeam {
         }
 
         return returnValue;
+    }
+
+    public void removeUser(User i_User){
+        Lock.writeLock().lock();
+        for(Role role : Guessers){
+            if(role.getUser() == i_User){
+                role.setUser(null);
+            }
+        }
+        for(Role role : Identifiers){
+            if(role.getUser() == i_User){
+                role.setUser(null);
+            }
+        }
+        Lock.writeLock().unlock();
     }
 }

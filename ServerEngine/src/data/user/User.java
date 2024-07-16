@@ -2,16 +2,27 @@ package data.user;
 
 
 import data.server.data.ePermission;
+import data.server.data.group.ServerTeam;
 
 public class User {
-    private boolean JoinedGame = false;
     private final String Name;
-    private int GameId = 0;
+    private int GameId;
     private final ePermission PermissionLevel;
+    private ServerTeam ConnectedTeam;
 
     public User(String i_Name, ePermission i_PermissionLevel) {
         Name = i_Name;
         PermissionLevel = i_PermissionLevel;
+        ConnectedTeam = null;
+        GameId = 0;
+    }
+
+    public ServerTeam getConnectedTeam() {
+        return ConnectedTeam;
+    }
+
+    public void setConnectedTeam(ServerTeam i_ConnectedTeam) {
+        ConnectedTeam = i_ConnectedTeam;
     }
 
     public String getName() {
@@ -28,14 +39,6 @@ public class User {
 
     public Boolean isAdmin() {
         return PermissionLevel == ePermission.Admin;
-    }
-
-    public boolean isJoinedGame() {
-        return JoinedGame;
-    }
-
-    public void setJoinedGame(boolean i_JoinedGame) {
-        JoinedGame = i_JoinedGame;
     }
 
     public ePermission getPermissionLevel() {

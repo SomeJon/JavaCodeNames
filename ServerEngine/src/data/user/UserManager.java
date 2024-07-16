@@ -63,10 +63,17 @@ public class UserManager {
         return user;
     }
 
-    public void removeUser(User user) {
+    public boolean removeUser(User user) {
+        boolean ret;
+
         Lock.writeLock().lock();
-        Users.remove(user);
+        ret = Users.remove(user);
         Lock.writeLock().unlock();
+
+        if(user.getConnectedTeam() != null)
+            user.getConnectedTeam().removeUser(user);
+
+        return ret;
     }
 
     public Boolean isAdminOn() {

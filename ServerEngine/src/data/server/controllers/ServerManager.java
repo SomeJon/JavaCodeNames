@@ -34,6 +34,10 @@ public class ServerManager {
         return Data.getUserManager().addNormalUser(i_UserName);
     }
 
+    public boolean removeUser(User i_User){
+        return Data.getUserManager().removeUser(i_User);
+    }
+
     public void loadSubServerData(LoadFilesResponse i_Response) throws JAXBException, IOException {
         Engine toAdd = new Engine(new GameData());
         toAdd.loadFiles(i_Response);
@@ -61,10 +65,7 @@ public class ServerManager {
 
         if(i_User.getPermissionLevel() == ePermission.Admin)
             ret = true;
-        else if(i_User.isJoinedGame() && i_User.getGameId() == i_ServerId)
-            ret = true;
-        else
-            ret = false;
+        else ret = i_User.getConnectedTeam() != null && i_User.getGameId() == i_ServerId;
 
         return ret;
     }
