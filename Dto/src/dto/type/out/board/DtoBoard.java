@@ -3,7 +3,7 @@ package dto.type.out.board;
 import dto.Dto;
 import dto.type.out.board.card.DtoCard;
 import dto.type.out.board.card.DtoGroupCard;
-import dto.type.out.data.DtoGroupTeam;
+import dto.type.out.board.card.DtoGroupTeam;
 import engine.board.Board;
 import engine.board.Position;
 import engine.board.card.Card;

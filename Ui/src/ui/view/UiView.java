@@ -1,9 +1,14 @@
 package ui.view;
 
 import dto.type.out.board.DtoBoard;
+import dto.type.out.board.card.DtoCard;
+import dto.type.out.board.card.DtoGroupCard;
+import dto.type.out.board.card.DtoGroupNeutral;
+import dto.type.out.board.card.DtoGroupTeam;
 import dto.type.out.data.DtoActiveGameStatus;
 import dto.type.out.data.DtoGameDetails;
 import dto.type.out.data.DtoGuessResult;
+import dto.type.out.data.DtoTeam;
 import engine.board.card.Card;
 import engine.board.card.GroupCard;
 import engine.board.card.GroupNeutral;
@@ -69,7 +74,7 @@ public class UiView implements UiViewInterface, ChoiceNotifier, UiActionConst , 
 
     @Override
     public void showBoard(DtoBoard i_ReceivedBoard, boolean i_Visible) {
-        Card[][] board = i_ReceivedBoard.getBoard();
+        DtoCard[][] board = i_ReceivedBoard.getBoard();
         int rows = i_ReceivedBoard.getNumOfRows();
         List<String> secondLines;
 
@@ -113,7 +118,7 @@ public class UiView implements UiViewInterface, ChoiceNotifier, UiActionConst , 
 
     @Override
     public void updateBoard(DtoBoard i_ReceivedBoard) {
-        Card[][] board = i_ReceivedBoard.getBoard();
+        DtoCard[][] board = i_ReceivedBoard.getBoard();
         int rows = i_ReceivedBoard.getNumOfRows();
 
         if(!Data.isActiveGame()) {
@@ -179,7 +184,7 @@ public class UiView implements UiViewInterface, ChoiceNotifier, UiActionConst , 
 
     @Override
     public void showGameDetails(DtoGameDetails i_ReceivedGameStatus) {
-        List<Team> teams = i_ReceivedGameStatus.getTeams();
+        List<DtoTeam> teams = i_ReceivedGameStatus.getTeams();
 
         System.out.println("\n*******Current game details*******");
         System.out.println("Current word bank size: " +
@@ -199,7 +204,7 @@ public class UiView implements UiViewInterface, ChoiceNotifier, UiActionConst , 
     }
 
     @Override
-    public void showTeam(GroupTeam i_PlayingTeam) {
+    public void showTeam(DtoGroupTeam i_PlayingTeam) {
         System.out.println("--------------------------" +
                 "\n" + i_PlayingTeam.getName() + " Current score " +
                 i_PlayingTeam.getCardsFlipped() + "/" + i_PlayingTeam.getCards() +
@@ -217,12 +222,11 @@ public class UiView implements UiViewInterface, ChoiceNotifier, UiActionConst , 
     }
 
     @Override
-    public void guessResult(DtoGuessResult i_ReceivedGuessResult, int i_GuessLeft, GroupTeam i_PlayingTeam) {
+    public void guessResult(DtoGuessResult i_ReceivedGuessResult, int i_GuessLeft, DtoGroupTeam i_PlayingTeam) {
         System.out.println("You flipped a Card!");
         switch(i_ReceivedGuessResult){
             case SUCCESSFUL_GUESS:
                 System.out.println("The card belonged to your team, and received a point!");
-                i_PlayingTeam.cardDown();
                 if(i_GuessLeft > 0){
                     System.out.println("You can guess " + i_GuessLeft + " more times!");
                 }
@@ -242,7 +246,7 @@ public class UiView implements UiViewInterface, ChoiceNotifier, UiActionConst , 
 
                 break;
             case BLACK_HIT:
-                GroupTeam teamLost = i_ReceivedGuessResult.getGroupTeam().getPlayingTeam();
+                DtoGroupTeam teamLost = i_ReceivedGuessResult.getGroupTeam();
                 System.out.println("Black card was flipped!" +
                         "\n" + teamLost.getName() + " Lost the game!");
                 break;
@@ -264,7 +268,7 @@ public class UiView implements UiViewInterface, ChoiceNotifier, UiActionConst , 
     }
 
     @Override
-    public void victoryHandler(GroupTeam i_WinnerTeam) {
+    public void victoryHandler(DtoGroupTeam i_WinnerTeam) {
         Menu menu = Data.getMainMenu().getStartMenu();
         int sizeOfMenu = menu.getMenuItems().size();
 
@@ -283,8 +287,8 @@ public class UiView implements UiViewInterface, ChoiceNotifier, UiActionConst , 
     @Override
     public void showActiveGameStatus(DtoActiveGameStatus i_Data) {
         DtoBoard board = i_Data.getBoard();
-        List<GroupTeam> groupTeams = board.getGroupTeams();
-        GroupTeam currentGroupTeam = i_Data.getNextPlayingTeam();
+        List<DtoGroupTeam> groupTeams = board.getGroupTeams();
+        DtoGroupTeam currentGroupTeam = i_Data.getNextPlayingTeam();
 
         System.out.println("Board:");
         showBoard(board, true);
@@ -295,13 +299,13 @@ public class UiView implements UiViewInterface, ChoiceNotifier, UiActionConst , 
         PauseConsole.pause();
     }
 
-    private List<String> createLines(Card[][] i_Board, int i_NumOfRows,
+    private List<String> createLines(DtoCard[][] i_Board, int i_NumOfRows,
                                      boolean i_First, boolean i_Visible){
         List<String> lines = new ArrayList<>();
 
         for(int i = 0; i < i_NumOfRows; i++){
             StringBuilder line = new StringBuilder();
-            for(Card card : i_Board[i]){
+            for(DtoCard card : i_Board[i]){
                 if(card.getGroup() == null){
                     line.append("|").append(alignString("", Data.getCardLineSize()));
                 }
@@ -321,21 +325,21 @@ public class UiView implements UiViewInterface, ChoiceNotifier, UiActionConst , 
         return lines;
     }
 
-    private String firstCardLine(Card i_Card){
+    private String firstCardLine(DtoCard i_Card){
         return alignString(i_Card.getText(), Data.getCardLineSize());
     }
 
-    private String secondCardLine(Card i_Card, boolean i_Visible){
+    private String secondCardLine(DtoCard i_Card, boolean i_Visible){
         String endText;
         String text;
         String groupName;
 
-        GroupCard group = i_Card.getGroup();
+        DtoGroupCard group = i_Card.getGroup();
 
-        if(group instanceof GroupTeam){
-            groupName = "(" + ((GroupTeam)group).getName() + ")";
+        if(group instanceof DtoGroupTeam){
+            groupName = "(" + ((DtoGroupTeam)group).getName() + ")";
         }
-        else if(((GroupNeutral)group).isBlack()){
+        else if(((DtoGroupNeutral)group).isBlack()){
             groupName = "(" + BLACK + ")";
         }
         else{
@@ -387,7 +391,7 @@ public class UiView implements UiViewInterface, ChoiceNotifier, UiActionConst , 
     }
 
     private void updateBuildingData(DtoBoard i_ReceivedBoard) {
-        Card[][] cardMatrix = i_ReceivedBoard.getBoard();
+        DtoCard[][] cardMatrix = i_ReceivedBoard.getBoard();
         int maxWordSize = getMaxWordLengthInCards(cardMatrix);
         int maxIdDigits = ((Integer)i_ReceivedBoard.getBoardSize()).toString().length();
         int maxTeamName = getMaxTeamName(i_ReceivedBoard.getCardGroups());
@@ -401,13 +405,13 @@ public class UiView implements UiViewInterface, ChoiceNotifier, UiActionConst , 
         Data.setCardLineSize(maxLineLength, i_ReceivedBoard.getNumOfColumns());
     }
 
-    private int getMaxWordLengthInCards(Card[][] i_CardMatrix) {
+    private int getMaxWordLengthInCards(DtoCard[][] i_CardMatrix) {
         int maxWordSize = 0;
 
-        for(Card[] cardsRow : i_CardMatrix){
+        for(DtoCard[] cardsRow : i_CardMatrix){
             Optional<Integer> maxInRow = Arrays.stream(cardsRow)
                     .filter(Objects::nonNull)
-                    .map(Card::getText)
+                    .map(DtoCard::getText)
                     .map(String::length)
                     .max(Integer::compareTo);
 
@@ -419,11 +423,11 @@ public class UiView implements UiViewInterface, ChoiceNotifier, UiActionConst , 
         return maxWordSize;
     }
 
-    private Integer getMaxTeamName(List<GroupCard> i_CardGroup) {
+    private Integer getMaxTeamName(List<DtoGroupCard> i_CardGroup) {
         return i_CardGroup.stream()
-                .filter(c -> c instanceof GroupTeam)
-                .map(GroupTeam.class::cast)
-                .map(GroupTeam::getName)
+                .filter(c -> c instanceof DtoGroupTeam)
+                .map(DtoGroupTeam.class::cast)
+                .map(DtoGroupTeam::getName)
                 .map(String::length)
                 .max(Integer::compareTo)
                 .orElse(0);

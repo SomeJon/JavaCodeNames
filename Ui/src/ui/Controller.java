@@ -2,10 +2,10 @@ package ui;
 
 import dto.Dto;
 import dto.type.out.board.DtoBoard;
+import dto.type.out.board.card.DtoGroupTeam;
 import dto.type.out.data.DtoGameDetails;
 import dto.type.out.data.DtoGameEndResult;
 import dto.type.out.data.DtoGuessResult;
-import dto.type.out.data.DtoGroupTeam;
 import engine.EngineInterface;
 import engine.board.card.GroupTeam;
 import engine.data.Identification;
@@ -107,7 +107,7 @@ public class Controller{
         IdentificationResponse response;
         boolean loopContinue;
         Identification currentIdentification = null;
-        GroupTeam playingTeam = ((DtoGroupTeam)Engine.getActiveTeam()).getPlayingTeam();
+        DtoGroupTeam playingTeam = (DtoGroupTeam)Engine.getActiveTeam();
         DtoBoard playingBoard = (DtoBoard)Engine.getActiveBoard();
 
         Ui.showTeam(playingTeam);
@@ -132,7 +132,7 @@ public class Controller{
     private void playGuesserTurn(Identification i_Identification){
         boolean loopContinue = false;
         GuesserResponse response;
-        GroupTeam playingTeam = ((DtoGroupTeam)Engine.getActiveTeam()).getPlayingTeam();
+        DtoGroupTeam playingTeam = ((DtoGroupTeam)Engine.getActiveTeam());
         Dto engineResult;
         DtoGuessResult guessResult;
         boolean gameEnded = false;
@@ -147,7 +147,7 @@ public class Controller{
 
             if(response.getCardId() == EndGuessId){
                 loopContinue = false;
-                Ui.showTeam(((DtoGroupTeam) Engine.getActiveTeam()).getPlayingTeam());
+                Ui.showTeam(((DtoGroupTeam) Engine.getActiveTeam()));
             }
             else {
                 try {
@@ -159,6 +159,7 @@ public class Controller{
                         guessResult = (DtoGuessResult) engineResult;
                         engineResult = null;
                     }
+                    playingTeam = ((DtoGroupTeam)Engine.getActiveTeam());
                     loopContinue = guessResultHandler(guessResult, (DtoGameEndResult) engineResult,
                             guessCount, playingTeam);
                     guessCount--;
@@ -176,7 +177,7 @@ public class Controller{
     }
 
     private boolean guessResultHandler(DtoGuessResult i_GuessResult, DtoGameEndResult i_EndResult,
-                                       int i_GuessLeft, GroupTeam i_CurrentTeam){
+                                       int i_GuessLeft, DtoGroupTeam i_CurrentTeam){
         boolean gameEnded = i_EndResult != null;
         boolean loopContinue = false;
 
@@ -186,7 +187,7 @@ public class Controller{
         }
         else if(i_GuessResult != DtoGuessResult.BLACK_HIT && i_GuessLeft > 1) {
                 loopContinue = true;
-                Ui.showTeam(((DtoGroupTeam) Engine.getActiveTeam()).getPlayingTeam());
+                Ui.showTeam(((DtoGroupTeam) Engine.getActiveTeam()));
         }
 
         return loopContinue;

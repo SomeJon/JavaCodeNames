@@ -1,6 +1,7 @@
 package ui.interfaces;
 
 import dto.type.out.board.DtoBoard;
+import dto.type.out.board.card.DtoGroupTeam;
 import dto.type.out.data.DtoActiveGameStatus;
 import dto.type.out.data.DtoGameDetails;
 import dto.type.out.data.DtoGuessResult;
@@ -21,10 +22,10 @@ public interface UiViewInterface {
     public void addFileData();
     public void exceptionHandler(CodeNameException i_ReceivedError, boolean i_TryAgain);
     public void showGameDetails(DtoGameDetails i_ReceivedGameStatus);
-    public void showTeam(GroupTeam i_PlayingTeam);
+    public void showTeam(DtoGroupTeam i_PlayingTeam);
     public void showIdentification(Identification i_CurrentIdentification, int i_GuessesLeft);
-    public void guessResult(DtoGuessResult i_ReceivedGuessResult, int i_GuessLeft, GroupTeam i_PlayingTeam);
-    public void victoryHandler(GroupTeam i_WinnerTeam);
+    public void guessResult(DtoGuessResult i_ReceivedGuessResult, int i_GuessLeft, DtoGroupTeam i_PlayingTeam);
+    public void victoryHandler(DtoGroupTeam i_WinnerTeam);
     public void showActiveGameStatus(DtoActiveGameStatus i_Data);
     public void successLoad();
 }

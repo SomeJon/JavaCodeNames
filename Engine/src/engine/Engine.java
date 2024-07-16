@@ -3,6 +3,7 @@ package engine;
 import dto.Dto;
 import dto.type.in.response.*;
 import dto.type.out.board.DtoBoard;
+import dto.type.out.board.card.DtoGroupTeam;
 import dto.type.out.data.*;
 import engine.board.Board;
 import engine.board.card.Card;

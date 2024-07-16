@@ -16,4 +16,8 @@ public class DtoGroupTeam extends DtoGroupCard{
     public DtoTeam getTeam() {
         return Team;
     }
+
+    public String getName(){
+        return Team.getName();
+    }
 }

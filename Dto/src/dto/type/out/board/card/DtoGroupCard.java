@@ -29,5 +29,7 @@ public abstract class DtoGroupCard implements Dto {
         if(groupCard instanceof GroupNeutral){
             return new DtoGroupNeutral((GroupNeutral)groupCard);
         }
+
+        return null;
     }
 }

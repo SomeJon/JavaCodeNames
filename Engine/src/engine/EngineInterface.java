@@ -1,8 +1,8 @@
 package engine;
 
 import dto.Dto;
+import dto.type.out.board.card.DtoGroupTeam;
 import dto.type.out.data.DtoActiveGameStatus;
-import dto.type.out.data.DtoGroupTeam;
 import engine.board.card.Card;
 import engine.data.Identification;
 import dto.type.in.response.GuesserResponse;
