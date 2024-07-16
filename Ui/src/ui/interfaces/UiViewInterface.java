@@ -6,7 +6,7 @@ import dto.type.out.data.DtoGameDetails;
 import dto.type.out.data.DtoGuessResult;
 import engine.board.card.GroupTeam;
 import engine.data.Identification;
-import engine.exception.CodeNameException;
+import exception.CodeNameException;
 import dto.type.in.response.Response;
 import ui.MenuAction;
 

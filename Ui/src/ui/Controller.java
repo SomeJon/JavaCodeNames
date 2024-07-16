@@ -9,7 +9,7 @@ import dto.type.out.data.DtoGroupTeam;
 import engine.EngineInterface;
 import engine.board.card.GroupTeam;
 import engine.data.Identification;
-import engine.exception.CodeNameException;
+import exception.CodeNameException;
 import dto.type.in.response.GuesserResponse;
 import dto.type.in.response.IdentificationResponse;
 import dto.type.in.response.LoadXmlResponse;
@@ -83,7 +83,7 @@ public class Controller{
 
         if(xmlResponse.receivedResponse()){
             try {
-                Engine.loadXml(xmlResponse);
+                Engine.loadFiles(xmlResponse);
                 Ui.addFileData();
             } catch (CodeNameException e) {
                 Ui.exceptionHandler(e, false);

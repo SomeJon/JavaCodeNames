@@ -1,7 +1,7 @@
 package engine.data;
 
-import engine.exception.loadxml.OutOfBoundLoad;
-import engine.exception.loadxml.TeamNamesNotUnique;
+import exception.loadxml.OutOfBoundLoad;
+import exception.loadxml.TeamNamesNotUnique;
 
 import java.io.Serializable;
 import java.util.List;

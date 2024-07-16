@@ -13,7 +13,7 @@ import javax.xml.bind.JAXBException;
 import java.io.IOException;
 
 public interface EngineInterface{
-        public void loadXml(Response i_LoadXml) throws JAXBException, IOException;
+        public void loadFiles(Response i_LoadFiles) throws JAXBException, IOException;
         public Dto getStatus();
         public void startGame();
         public Dto getActiveBoard();

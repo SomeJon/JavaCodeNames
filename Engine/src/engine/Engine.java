@@ -1,6 +1,7 @@
 package engine;
 
 import dto.Dto;
+import dto.type.in.response.*;
 import dto.type.out.board.DtoBoard;
 import dto.type.out.data.*;
 import engine.board.Board;
@@ -10,14 +11,11 @@ import engine.board.card.GroupNeutral;
 import engine.board.card.GroupTeam;
 import engine.data.GameData;
 import engine.data.Identification;
-import engine.exception.turn.CardFlippedException;
-import engine.exception.turn.GuessOutOfRangeException;
-import engine.exception.turn.IdentificationException;
-import dto.type.in.response.GuesserResponse;
-import dto.type.in.response.IdentificationResponse;
-import dto.type.in.response.LoadXmlResponse;
-import dto.type.in.response.Response;
+import exception.turn.CardFlippedException;
+import exception.turn.GuessOutOfRangeException;
+import exception.turn.IdentificationException;
 import jaxb.schema.FileReader;
+import jaxb.schema.FileReaderEx02;
 
 import javax.xml.bind.JAXBException;
 import java.io.File;
@@ -28,16 +26,22 @@ public class Engine implements EngineInterface, Serializable {
 
     private final GameData Data;
 
-    public Engine() {
-        Data = new GameData();
+    public Engine(GameData i_Data) {
+        Data = i_Data;
     }
 
     @Override
-    public void loadXml(Response i_LoadXml) throws JAXBException, IOException {
-        LoadXmlResponse loadXml = (LoadXmlResponse) i_LoadXml;
-
-        File responseFile = loadXml.getInputFile();
-        FileReader.ReadXml(responseFile, Data);
+    public void loadFiles(Response i_LoadFiles) throws JAXBException, IOException {
+        if(i_LoadFiles instanceof LoadFilesResponse) {
+            LoadFilesResponse response = (LoadFilesResponse) i_LoadFiles;
+            FileReaderEx02.ReadFiles(response.getXmlInputStream(),
+                    response.getTxtInputStream(), Data, response.getDtoToLoad());
+        }
+        else {
+            LoadXmlResponse loadXml = (LoadXmlResponse) i_LoadFiles;
+            File responseFile = loadXml.getXmlFile();
+            FileReader.ReadXml(responseFile, Data);
+        }
     }
 
     @Override

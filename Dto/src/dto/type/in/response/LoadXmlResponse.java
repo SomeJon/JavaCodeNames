@@ -3,27 +3,27 @@ package dto.type.in.response;
 import java.io.File;
 
 public class LoadXmlResponse implements Response{
-    private File InputFile;
+    private File InputXmlFile;
 
     public LoadXmlResponse() {
-        InputFile = null;
+        InputXmlFile = null;
     }
 
     public LoadXmlResponse(File inputFile) {
-        InputFile = inputFile;
+        InputXmlFile = inputFile;
     }
 
-    public File getInputFile() {
-        return InputFile;
+    public File getXmlFile() {
+        return InputXmlFile;
     }
 
     @Override
     public void loadResponse(Response i_Response) {
-        InputFile = ((LoadXmlResponse)i_Response).InputFile;
+        InputXmlFile = ((LoadXmlResponse)i_Response).InputXmlFile;
     }
 
     @Override
     public boolean receivedResponse() {
-        return InputFile != null;
+        return InputXmlFile != null;
     }
 }

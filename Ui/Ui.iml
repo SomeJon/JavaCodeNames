@@ -10,5 +10,6 @@
     <orderEntry type="module" module-name="Engine" />
     <orderEntry type="module" module-name="Dto" />
     <orderEntry type="module" module-name="ConsoleMenu" />
+    <orderEntry type="module" module-name="CodeNamesExceptions" />
   </component>
 </module>

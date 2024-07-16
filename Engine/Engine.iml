@@ -8,5 +8,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="Dto" />
+    <orderEntry type="module" module-name="CodeNamesExceptions" />
   </component>
 </module>

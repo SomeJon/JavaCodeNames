@@ -1,7 +1,7 @@
 package engine.data;
 
 import engine.board.Board;
-import engine.exception.loadxml.OutOfBoundLoad;
+import exception.loadxml.OutOfBoundLoad;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Set;
