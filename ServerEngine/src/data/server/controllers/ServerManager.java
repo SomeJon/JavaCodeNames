@@ -18,17 +18,20 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class ServerManager {
-    private final ServerData ServerData = new ServerData();
+    private final ServerData Data = new ServerData();
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
     private final List<SubServer> subServers = new ArrayList<>();
 
     public User adminEntry() throws AdminOn {
-
-        return ServerData.getUserManager().addAdmin();
+        return Data.getUserManager().addAdmin();
     }
 
     public boolean isAdminOn() {
-        return ServerData.getUserManager().isAdminOn();
+        return Data.getUserManager().isAdminOn();
+    }
+
+    public User userEntry(String i_UserName){
+        return Data.getUserManager().addNormalUser(i_UserName);
     }
 
     public void loadSubServerData(LoadFilesResponse i_Response) throws JAXBException, IOException {

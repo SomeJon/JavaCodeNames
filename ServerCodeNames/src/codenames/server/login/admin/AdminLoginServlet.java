@@ -51,7 +51,7 @@ public class AdminLoginServlet extends HttpServlet {
 
                 boolean adminOn = manager.isAdminOn();
                 if (adminOn) {
-                    errorMsg = "Another admin went online while you were away!";
+                    errorMsg = "Another admin is already connected!";
                     response.setStatus(HttpServletResponse.SC_CONFLICT);
                 }
                 else{

@@ -4,6 +4,7 @@ import dto.type.out.server.DtoServerInfo;
 import engine.data.GameData;
 import engine.data.GameStatus;
 import engine.data.Team;
+import exception.server.TxtFileNotMatch;
 import jaxb.schema.ex02.generated.ECNGame;
 import jaxb.schema.ex02.generated.ECNTeam;
 import jaxb.schema.ex02.generated.ECNTeams;
@@ -11,7 +12,6 @@ import jaxb.schema.ex02.generated.ECNTeams;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -19,15 +19,16 @@ import java.util.*;
 public class FileReaderEx02 {
     private static final String JAXB_XML_GAME_PACKAGE_NAME = "jaxb.schema.ex02.generated";
 
-    public static void ReadFiles(InputStream i_XmlFile, InputStream i_WordDict,
-                                        GameData i_DataHolder, DtoServerInfo i_DtoToFill) throws JAXBException, IOException {
+    public static void ReadFiles(InputStream i_XmlFile, InputStream i_WordDict, String i_TxtName,
+                                        GameData i_DataHolder, DtoServerInfo O_DtoToFill) throws JAXBException, IOException {
         ECNGame gameData = deserializeFrom(i_XmlFile);
         String gameName = gameData.getName();
         String nameOfDict = gameData.getECNDictionaryFile(); //todo check this line
-        i_DtoToFill.setServerName(gameName);
-        i_DtoToFill.setDictFileName(nameOfDict);
-        System.out.println(nameOfDict);
+        O_DtoToFill.setServerName(gameName);
+        O_DtoToFill.setDictFileName(nameOfDict);
 
+        if(!Objects.equals(nameOfDict, i_TxtName))
+            throw new TxtFileNotMatch(i_TxtName, nameOfDict);
         String[] words;
         Set<String> wordsSet;
         //todo add check name of word dict
@@ -37,7 +38,7 @@ public class FileReaderEx02 {
                 .split("[ \t\n]+");
         wordsSet = new HashSet<String>(Arrays.asList(words));
 
-        GameStatus status = loadStatus(gameData, wordsSet.size(), wordsSet.size(), i_DtoToFill);
+        GameStatus status = loadStatus(gameData, wordsSet.size(), wordsSet.size(), O_DtoToFill);
 
         int columns = gameData.getECNBoard().getECNLayout().getColumns();
         int rows = gameData.getECNBoard().getECNLayout().getRows();
