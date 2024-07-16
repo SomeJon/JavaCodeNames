@@ -1,4 +1,4 @@
-package client.action;
+package user.client.action;
 
 public enum Action {
     SHOW_GAMES,

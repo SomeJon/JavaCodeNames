@@ -11,8 +11,8 @@ public class IntResponse implements Response {
         Int = null;
     }
 
-    public IntResponse(int cardId) {
-        this.Int = cardId;
+    public IntResponse(int i_Int) {
+        this.Int = i_Int;
     }
 
     @Override

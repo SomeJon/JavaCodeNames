@@ -1,6 +1,6 @@
-package client;
+package admin.client;
 
-import client.data.ClientData;
+import admin.client.data.ClientData;
 
 import java.io.IOException;
 

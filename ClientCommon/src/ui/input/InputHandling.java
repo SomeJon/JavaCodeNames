@@ -116,6 +116,18 @@ public enum InputHandling {
             System.out.println();
             o_Response.loadResponse(new IntResponse(Int));
         }
+    },
+    GET_NAME{
+        @Override
+        public void getInput(Response o_Response) {
+            Scanner scanner = new Scanner(System.in);
+
+            String toPrint = "Please enter a username: ";
+            System.out.print(toPrint);
+            String Name = scanner.nextLine();
+
+            o_Response.loadResponse(new StringResponse(Name));
+        }
     };
 
     private final static int EndGuessId = 0;
