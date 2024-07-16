@@ -1,6 +1,7 @@
 package dto.type.out.data;
 
 import dto.Dto;
+import dto.type.out.board.card.DtoGroupTeam;
 
 public enum DtoGuessResult implements Dto {
     SUCCESSFUL_GUESS,

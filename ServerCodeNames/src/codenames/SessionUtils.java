@@ -22,4 +22,8 @@ public class SessionUtils {
 
         return user;
     }
+
+    public static void clearSession (HttpServletRequest request) {
+        request.getSession().invalidate();
+    }
 }

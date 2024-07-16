@@ -1,6 +1,9 @@
 package dto.type.out.board;
 
 import dto.Dto;
+import dto.type.out.board.card.DtoCard;
+import dto.type.out.board.card.DtoGroupCard;
+import dto.type.out.data.DtoGroupTeam;
 import engine.board.Board;
 import engine.board.Position;
 import engine.board.card.Card;
@@ -12,9 +15,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class DtoBoard implements Dto {
-    private final Card[][] Board;
-    private final List<GroupCard> CardGroups;
-    private final List<GroupTeam> GroupTeams;
+    private final DtoCard[][] Board;
+    private final List<DtoGroupCard> CardGroups;
+    private final List<DtoGroupTeam> GroupTeams;
     private final int NumOfColumns;
     private final int NumOfRows;
 
@@ -22,15 +25,15 @@ public class DtoBoard implements Dto {
         return NumOfRows * NumOfColumns;
     }
 
-    public Card[][] getBoard() {
+    public DtoCard[][] getBoard() {
         return Board;
     }
 
-    public List<GroupCard> getCardGroups() {
+    public List<DtoGroupCard> getCardGroups() {
         return CardGroups;
     }
 
-    public List<GroupTeam> getGroupTeams() {
+    public List<DtoGroupTeam> getGroupTeams() {
         return GroupTeams;
     }
 
@@ -45,27 +48,33 @@ public class DtoBoard implements Dto {
     public DtoBoard(Board i_Board) {
         NumOfColumns = i_Board.getNumOfColumns();
         NumOfRows = i_Board.getNumOfRows();
-        Board = new Card[NumOfRows][NumOfColumns];
+        Board = new DtoCard[NumOfRows][NumOfColumns];
         int index = 1;
-        CardGroups = i_Board.getCardGroups().stream()
+
+        List<GroupCard> cardGroups = i_Board.getCardGroups().stream()
                 .map(GroupCard::getCopy)
+                .collect(Collectors.toList());
+
+        CardGroups = cardGroups.stream()
+                .map(DtoGroupCard::getGroupCard)
                 .collect(Collectors.toList());
 
         GroupTeams = i_Board.getGroupTeams().stream()
                 .map(GroupTeam::getCopy)
-                .map(GroupTeam.class::cast)
+                .map(DtoGroupCard::getGroupCard)
+                .map(DtoGroupTeam.class::cast)
                 .collect(Collectors.toList());
 
         for(Card[] cardRow:i_Board.getBoard()){
             for(Card card:cardRow){
                 Position pos = Position.getPostion(index, NumOfColumns);
-                Card cardToAdd;
+                DtoCard cardToAdd;
                 if(card.getGroup() == null) {
-                    cardToAdd = new Card("", null);
+                    cardToAdd = new DtoCard(new Card("", null));
                 }
                 else {
-                    cardToAdd = new Card(card.getText(),
-                            CardGroups.get(CardGroups.indexOf(card.getGroup())), card.getID(), card.isFlipped());
+                    cardToAdd = new DtoCard(new Card(card.getText(),
+                            cardGroups.get(cardGroups.indexOf(card.getGroup())), card.getID(), card.isFlipped()));
                 }
                 Board[pos.getRow()][pos.getCol()] = cardToAdd;
                 index++;

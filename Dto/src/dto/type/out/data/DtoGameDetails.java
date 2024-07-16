@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class DtoGameDetails implements Dto {
-    private final List<Team> Teams;
+    private final List<DtoTeam> Teams;
     private final Integer NumOfWords;
     private final Integer NumOfBlackWords;
     private final Integer NumOfCards;
@@ -16,7 +16,7 @@ public class DtoGameDetails implements Dto {
 
     public DtoGameDetails(GameStatus i_Status) {
         Teams = i_Status.getTeams().stream()
-                .map(Team::new)
+                .map(DtoTeam::new)
                 .collect(Collectors.toList());
         NumOfWords = i_Status.getNumOfWords();
         NumOfBlackWords = i_Status.getNumOfBlackWords();
@@ -24,7 +24,7 @@ public class DtoGameDetails implements Dto {
         NumOfBlackCards = i_Status.getNumOfBlackCards();
     }
 
-    public List<Team> getTeams() {
+    public List<DtoTeam> getTeams() {
         return Teams;
     }
 

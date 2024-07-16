@@ -29,6 +29,7 @@ public class LogoutServlet extends HttpServlet {
             manager.removeUser(user);
             result.put(Responses.DELETED, true);
             response.setStatus(HttpServletResponse.SC_OK);
+            SessionUtils.clearSession(request);
         }else{
             result.put(Responses.DELETED, false);
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
