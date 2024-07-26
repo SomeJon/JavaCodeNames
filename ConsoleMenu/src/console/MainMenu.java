@@ -19,6 +19,10 @@ public class MainMenu implements ChoiceNotifier, Serializable{
         return Closing;
     }
 
+    public Menu getCurrentMenu() {
+        return CurrentMenu;
+    }
+
     public MainMenu(String i_MainMenuName)
     {
         final boolean MAIN_MENU = true;
@@ -69,15 +73,15 @@ public class MainMenu implements ChoiceNotifier, Serializable{
                     }
                     else{
                         continueLoop = true;
-                        System.out.println("!!!!Input out of range! range for input: " +
-                                        min + "-" + max + "!!!!!");
-                        System.out.print("Enter your choice: ");
+                        String toPrint = "!!!!Input out of range! range for input: " +
+                                        min + "-" + max + "!!!!!\nEnter your choice: ";
+                        System.out.print(toPrint);
                     }
                 } catch (InputMismatchException i_ExceptionOccurred) {
                     continueLoop = true;
                     scanner.nextLine();
-                    System.out.println("!!!!Incorrect input type! Please enter an int!!!!!");
-                    System.out.print("Enter your choice: ");
+                    String toPrint = "!!!!Incorrect input type! Please enter an int!!!!!\nEnter your choice: ";
+                    System.out.print(toPrint);
                 }
             } while(continueLoop);
 

@@ -33,8 +33,8 @@ public class Engine implements EngineInterface, Serializable {
 
     @Override
     public void loadFiles(Response i_LoadFiles) throws JAXBException, IOException {
-        if(i_LoadFiles instanceof LoadFilesResponse) {
-            LoadFilesResponse response = (LoadFilesResponse) i_LoadFiles;
+        if(i_LoadFiles instanceof LoadInputStreamsResponse) {
+            LoadInputStreamsResponse response = (LoadInputStreamsResponse) i_LoadFiles;
             FileReaderEx02.ReadFiles(response.getXmlInputStream(), response.getTxtInputStream(),
                     response.getTxtFileName(), Data, response.getDtoToLoad());
         }

@@ -1,46 +1,51 @@
 package dto.type.in.response;
 
-import dto.type.out.server.DtoServerInfo;
+import java.io.File;
 
-import java.io.InputStream;
-
-public class LoadFilesResponse implements Response {
-    private InputStream TxtInputStream;
-    private InputStream XmlInputStream;
-    private DtoServerInfo DtoToLoad;
+public class LoadFilesResponse implements Response{
+    private File XmlFile;
+    private String XmlFileName;
+    private File TxtFile;
     private String TxtFileName;
 
-    public LoadFilesResponse(InputStream i_XmlInputStream, InputStream i_TxtInputStream, String i_TxtFileName) {
-        XmlInputStream = i_XmlInputStream;
-        TxtInputStream = i_TxtInputStream;
-        TxtFileName = i_TxtFileName;
-        DtoToLoad = new DtoServerInfo();
+    public LoadFilesResponse() {
+        XmlFile = null;
+        TxtFile = null;
     }
 
-    public String getTxtFileName() {
-        return TxtFileName;
-    }
-
-    public InputStream getTxtInputStream() {
-        return TxtInputStream;
-    }
-
-    public InputStream getXmlInputStream() {
-        return XmlInputStream;
+    public LoadFilesResponse(File i_XmlFile, File i_TxtFile) {
+        XmlFile = i_XmlFile;
+        XmlFileName = i_XmlFile.getName();
+        TxtFile = i_TxtFile;
+        TxtFileName = i_TxtFile.getName();
     }
 
     @Override
     public void loadResponse(Response i_Response) {
-        TxtInputStream = ((LoadFilesResponse)i_Response).TxtInputStream;
-        XmlInputStream = ((LoadFilesResponse)i_Response).XmlInputStream;
+        XmlFile = ((LoadFilesResponse)i_Response).XmlFile;
+        TxtFile = ((LoadFilesResponse)i_Response).TxtFile;
+        XmlFileName = XmlFile.getName();
+        TxtFileName = TxtFile.getName();
     }
 
     @Override
     public boolean receivedResponse() {
-        return XmlInputStream != null && TxtInputStream != null;
+        return XmlFile != null && TxtFile != null;
     }
 
-    public DtoServerInfo getDtoToLoad() {
-        return DtoToLoad;
+    public File getXmlFile() {
+        return XmlFile;
+    }
+
+    public String getXmlFileName() {
+        return XmlFileName;
+    }
+
+    public File getTxtFile() {
+        return TxtFile;
+    }
+
+    public String getTxtFileName() {
+        return TxtFileName;
     }
 }

@@ -8,6 +8,8 @@ import java.util.List;
 public class DtoServerInfo {
     private String ServerName;
     private String DictFileName;
+    private int col;
+    private int row;
     private final List<DtoServerTeam> ServerTeams;
 
     public DtoServerInfo() {
@@ -20,6 +22,22 @@ public class DtoServerInfo {
 
     public void setDictFileName(String i_DictFileName) {
         DictFileName = i_DictFileName;
+    }
+
+    public int getCol() {
+        return col;
+    }
+
+    public void setCol(int i_col) {
+        col = i_col;
+    }
+
+    public int getRow() {
+        return row;
+    }
+
+    public void setRow(int i_row) {
+        row = i_row;
     }
 
     public String getServerName() {

@@ -3,13 +3,17 @@ package console;
 import java.io.Serializable;
 
 public class MenuItem implements Serializable {
-    private final String ItemText;
+    private String ItemText;
     private final Object ItemValue;
     private final ChoiceNotifier Notify;
 
 
     public String getItemText() {
         return ItemText;
+    }
+
+    public void setItemText(String i_ItemText) {
+        ItemText = i_ItemText;
     }
 
     public Object getItemValue() {

@@ -42,6 +42,8 @@ public class FileReaderEx02 {
 
         int columns = gameData.getECNBoard().getECNLayout().getColumns();
         int rows = gameData.getECNBoard().getECNLayout().getRows();
+        O_DtoToFill.setRow(rows);
+        O_DtoToFill.setCol(columns);
         i_DataHolder.loadData(status, columns, rows, wordsSet, wordsSet);
 
     }

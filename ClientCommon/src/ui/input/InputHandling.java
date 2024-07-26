@@ -1,7 +1,15 @@
 package ui.input;
 
 import dto.type.in.response.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
+import java.nio.file.Paths;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -25,21 +33,55 @@ public enum InputHandling {
             }
         }
     },
-    FILE_PATH_TXT{
+    FILE_PATH {
         @Override
         public void getInput(Response o_Response) {
             Scanner scanner = new Scanner(System.in);
 
-            System.out.print("Enter a full txt file path: ");
-            String path = scanner.nextLine();
-            File file = new File(path);
+            System.out.print("Enter a full xml File path: ");
+            String xmlPath = scanner.nextLine();
+            File xmlFile = new File(xmlPath);
 
-            if (!file.isFile()) {
-                errorPrint("A file was not found at the given path!");
-            } else if (!path.endsWith(".txt")) {
-                errorPrint("File path does not lead to a txt file!");
+            if (!xmlFile.isFile()) {
+                errorPrint("A File was not found at the given path!");
+            } else if (!xmlPath.endsWith(".xml")) {
+                errorPrint("File path does not lead to an xml File!");
             } else {
-                o_Response.loadResponse(new LoadFileResponse(file));
+                try {
+                    DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+                    DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+                    Document doc = dBuilder.parse(xmlFile);
+
+                    doc.getDocumentElement().normalize();
+
+                    NodeList nList = doc.getElementsByTagName("ECN-Dictionary-File");
+                    if (nList.getLength() > 0) {
+                        Node nNode = nList.item(0);
+                        if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                            Element element = (Element) nNode;
+                            String dictionaryFile = element.getTextContent();
+                            String txtPath = Paths.get(xmlPath)
+                                    .getParent()
+                                    .resolve(dictionaryFile)
+                                    .toString();
+
+                            File txtFile = new File(txtPath);
+
+                            if (!txtFile.isFile()) {
+                                errorPrint("The Dictionary file was not found!" +
+                                        " Please make sure it's in the same directory as the xml file");
+                            } else if (!txtPath.endsWith(".txt")) {
+                                errorPrint("Dictionary file has to be a txt file!");
+                            } else {
+                                o_Response.loadResponse(new LoadFilesResponse(xmlFile, txtFile));
+                            }
+                        }
+                    } else {
+                        errorPrint("No Dictionary File name was found in the xml.");
+                    }
+                } catch (Exception e) {
+                    errorPrint("An error occurred while trying to read the Dictionary-File from the xml xmlFile!");
+                }
             }
         }
     },

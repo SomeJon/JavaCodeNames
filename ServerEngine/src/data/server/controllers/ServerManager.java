@@ -3,8 +3,9 @@ package data.server.controllers;
 import data.server.data.ServerData;
 import data.server.data.ePermission;
 import data.user.User;
-import dto.type.in.response.LoadFilesResponse;
+import dto.type.in.response.LoadInputStreamsResponse;
 import dto.type.out.server.DtoServerInfo;
+import dto.type.out.server.DtoServerStatus;
 import engine.Engine;
 import engine.data.GameData;
 import exception.server.AdminOn;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.Collectors;
 
 public class ServerManager {
     private final ServerData Data = new ServerData();
@@ -38,7 +40,7 @@ public class ServerManager {
         return Data.getUserManager().removeUser(i_User);
     }
 
-    public void loadSubServerData(LoadFilesResponse i_Response) throws JAXBException, IOException {
+    public void loadSubServerData(LoadInputStreamsResponse i_Response) throws JAXBException, IOException {
         Engine toAdd = new Engine(new GameData());
         toAdd.loadFiles(i_Response);
 
@@ -72,5 +74,13 @@ public class ServerManager {
 
     public int numberOfSubServerState(){
         return subServers.size();
+    }
+
+    public DtoServerStatus getServerStatus(){
+        lock.readLock().lock();
+        DtoServerStatus ret = new DtoServerStatus(subServers.stream().map(SubServer::getStatus).collect(Collectors.toList()));
+        lock.readLock().unlock();
+
+        return ret;
     }
 }

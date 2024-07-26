@@ -5,18 +5,28 @@ import admin.client.action.Action;
 import console.MainMenu;
 import console.Menu;
 import cookiejar.copied.SimpleCookieManager;
+import dto.type.in.response.Response;
 import okhttp3.OkHttpClient;
 import ui.input.InputHandling;
+
+import java.io.File;
 
 public class ClientData {
     private final MainMenu Main;
     public final OkHttpClient HTTP_CLIENT = new OkHttpClient.Builder()
                 .cookieJar(new SimpleCookieManager())
                 .build();
-    public boolean Menu2 = false;
-    public boolean LoggedIn = false;
-    public Action CurrentAction = null;
-    public InputHandling CurrentInput = null;
+    private boolean Menu2 = false;
+    private boolean LoggedIn = false;
+    private Action CurrentAction = null;
+    private InputHandling CurrentInput = null;
+    private Response CurrentResponse = null;
+    private File WaitingTxt = null;
+    private File WaitingXml = null;
+
+    public boolean isMenu2() {
+        return Menu2;
+    }
 
     public ClientData() {
         Main = new MainMenu("Admin Client");
@@ -26,10 +36,64 @@ public class ClientData {
         return Main;
     }
 
+    public boolean isLoggedIn() {
+        return LoggedIn;
+    }
+
+    public Action getCurrentAction() {
+        return CurrentAction;
+    }
+
+    public InputHandling getCurrentInput() {
+        return CurrentInput;
+    }
+
+    public File getWaitingTxt() {
+        return WaitingTxt;
+    }
+
+    public Response getCurrentResponse() {
+        return CurrentResponse;
+    }
+
+    public void setLoggedIn(boolean i_LoggedIn) {
+        LoggedIn = i_LoggedIn;
+    }
+
+    public void setCurrentAction(Action i_CurrentAction) {
+        CurrentAction = i_CurrentAction;
+    }
+
+    public void setCurrentInput(InputHandling i_CurrentInput) {
+        CurrentInput = i_CurrentInput;
+    }
+
+    public void activateCurrentInput(Response i_CurrentResponse) {
+        CurrentResponse = i_CurrentResponse;
+        CurrentInput.getInput(CurrentResponse);
+        CurrentInput = null;
+    }
+
+    public void setCurrentResponse(Response i_CurrentResponse) {
+        CurrentResponse = i_CurrentResponse;
+    }
+
+    public void setWaitingTxt(File i_WaitingTxt) {
+        WaitingTxt = i_WaitingTxt;
+    }
+
+    public File getWaitingXml() {
+        return WaitingXml;
+    }
+
+    public void setWaitingXml(File i_WaitingXml) {
+        WaitingXml = i_WaitingXml;
+    }
+
     public void buildMenu1Or2(boolean i_OpenGame, Client client){
         Menu Load = Main.getStartMenu().createSubMenu("Load Game Files");
-        Load.createMenuOption("Chose an .xml path to a file", InputHandling.FILE_PATH_XML, client);
-        Load.createMenuOption("Chose a .txt path to a file", InputHandling.FILE_PATH_TXT, client);
+        Load.createMenuOption("Chose a file path to a .xml file", InputHandling.FILE_PATH, client);
+        //Load.createMenuOption("Chose a file path to a .txt file", InputHandling.FILE_PATH, client);
         Load.createMenuOption("Upload to server", Action.UPLOAD, client);
         if(i_OpenGame){
             addFirstOptions(client);

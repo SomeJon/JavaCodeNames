@@ -21,7 +21,7 @@ public class ClientData {
     public InputHandling CurrentInput = null;
 
     public ClientData() {
-        Main = new MainMenu("Admin Client");
+        Main = new MainMenu("User Client");
     }
 
     public MainMenu getMain() {

@@ -50,7 +50,7 @@ public class GameStatus implements Serializable {
                     .collect(Collectors.toList());
             throw new TeamNamesNotUnique(teamNames);
         }
-        if(numOfWords < numOfCards){
+        if(numOfWords < numOfCards + numOfBlackCards){
             throw new OutOfBoundLoad("Cards amount", numOfCards, numOfWords, 0);
         }
         if(numOfBlackWords < numOfBlackCards){

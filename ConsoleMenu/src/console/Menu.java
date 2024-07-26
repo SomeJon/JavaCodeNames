@@ -66,20 +66,18 @@ public class Menu implements Serializable {
             int choiceNumbering = START_NUMBER;
             String endingMenuItemPrint = endingMenuItem();
             String dashes = String.join("", Collections.nCopies(i_DashesSize, "-"));
+            StringBuilder menuPrint = new StringBuilder();
 
-            System.out.println(
-                    "**" + MenuName + "**\n"
-                    + dashes);
+            menuPrint.append("\n").append(dashes).append("\n").append("**").append(MenuName).append("**\n").append(dashes).append("\n");
             for (MenuItem item : MenuItems)
             {
-                System.out.println(choiceNumbering +  " -> " + item.getItemText());
+                menuPrint.append(choiceNumbering).append(" -> ").append(item.getItemText()).append("\n");
                 choiceNumbering++;
             }
 
-            System.out.print(
-                    "\n0 -> " + endingMenuItemPrint +
-                        "\n" + dashes +
-                            "\n" + "Enter your choice: ");
+            menuPrint.append("\n0 -> ").append(endingMenuItemPrint).append("\n").append(dashes).append("\n").append("Enter your choice: ");
+
+            System.out.print(menuPrint);
         }
 
         private String endingMenuItem() {
