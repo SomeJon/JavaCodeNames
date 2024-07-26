@@ -40,10 +40,12 @@ public class ServerTeam {
 
         for (int i = 0; i < numGuessers; i++) {
             Role toAdd = new Role(eRoles.Guesser);
+            Guessers.add(toAdd);
         }
 
         for (int i = 0; i < numIdentifiers; i++) {
             Role toAdd = new Role(eRoles.Identifier);
+            Identifiers.add(toAdd);
         }
     }
 
@@ -57,6 +59,14 @@ public class ServerTeam {
 
     public List<Role> getIdentifiers() {
         return Identifiers;
+    }
+
+    public int getCurrentNumGuessers() {
+        return CurrentNumGuessers;
+    }
+
+    public int getCurrentNumIdentifiers() {
+        return CurrentNumIdentifiers;
     }
 
     public void addRole(eRoles i_Role, User i_User) {

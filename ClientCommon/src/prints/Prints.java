@@ -5,7 +5,7 @@ import dto.type.out.server.DtoServerTeam;
 import dto.type.out.server.DtoSubServerStatus;
 
 public class Prints {
-    public static String parseGamesStatus(DtoServerStatus i_Status){
+    public static String parseGamesStatus(DtoServerStatus i_Status, boolean printCurrentPlayers){
         StringBuilder ret = new StringBuilder();
 
         for(DtoSubServerStatus status : i_Status.getSubServerStatus()){
@@ -22,13 +22,33 @@ public class Prints {
                     .append(status.getDictFileName()).append("\nNumber of participating cards: (Normal Cards - ")
                     .append(status.getNumOfCards()).append(") (Black Cards - ")
                     .append(status.getNumOfBlackCards()).append(") (Chosen from - " ).append(status.getNumOfWords())
-                    .append(") Words\nTeams:\n");
-            for (DtoServerTeam team : status.getServerTeams()){
-                ret.append("+++++++++++++++\n").append(tab).append(team.getTeam().getName()).append("\n")
-                        .append(tab).append("Needed points - ").append(team.getTeam().getPointGoal())
-                        .append("\n").append(tab).append("Definers - (")
-                        .append(team.getNumOfDefiners()).append(") Guessers - (")
-                        .append(team.getNumOfGuessers()).append(")\n");
+                    .append(" Words)\nTeams:\n");
+            for (DtoServerTeam team : status.getServerTeams()) {
+                ret.append("+++++++++++++++\n").append(tab)
+                            .append(team.getTeam().getName())
+                            .append("\n").append(tab)
+                            .append("Needed points - ")
+                            .append(team.getTeam().getPointGoal())
+                            .append("\n").append(tab);
+                if (!printCurrentPlayers) {
+                    ret.append("Definers - (")
+                            .append(team.getNumOfDefiners())
+                            .append(")\nGuessers - (")
+                            .append(team.getNumOfGuessers())
+                            .append(")\n");
+                }
+                else{
+                    ret.append("(Connected/Needed)")
+                            .append("\n").append(tab)
+                            .append("Definers - (")
+                            .append(team.getConnectedDefiners()).append("/")
+                            .append(team.getNumOfDefiners()).append(")")
+                            .append("\n").append(tab)
+                            .append("Guessers - (")
+                            .append(team.getConnectedGuessers()).append("/")
+                            .append(team.getNumOfGuessers())
+                            .append(")\n");
+                }
             }
 
         }

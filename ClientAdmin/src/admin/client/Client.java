@@ -137,7 +137,7 @@ public class Client implements ChoiceNotifier {
             if (response.code() == HttpCode.OK) {
                 DtoResponse<DtoServerStatus> dtoResponse =
                         new Gson().fromJson(response.body().charStream(), ResponseType.DTO_RESPONSE_STATUS);
-                String toPrint = parseGamesStatus(dtoResponse.getResult());
+                String toPrint = parseGamesStatus(dtoResponse.getResult(), false);
                 System.out.print(toPrint);
             } else if (response.code() == HttpCode.NOT_FOUND || response.code() == HttpCode.BAD_REQUEST) {
                 DtoResponse<DtoServerStatus> dtoResponse =

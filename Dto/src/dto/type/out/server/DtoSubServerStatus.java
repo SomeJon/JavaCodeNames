@@ -7,7 +7,7 @@ import java.util.List;
 public class DtoSubServerStatus {
     private final String ServerName;
     private final String DictFileName;
-    private final List<DtoServerTeam> ServerTeams;
+    private List<DtoServerTeam> ServerTeams;
     private final Integer NumOfWords;
     private final Integer NumOfBlackWords;
     private final Integer NumOfCards;
@@ -70,5 +70,9 @@ public class DtoSubServerStatus {
 
     public void setActive(boolean i_Active) {
         Active = i_Active;
+    }
+
+    public void setServerTeams(List<DtoServerTeam> i_ServerTeams) {
+        ServerTeams = i_ServerTeams;
     }
 }

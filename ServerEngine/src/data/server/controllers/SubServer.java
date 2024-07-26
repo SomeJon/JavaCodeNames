@@ -28,6 +28,7 @@ public class SubServer {
 
     public DtoSubServerStatus getStatus() {
         Status.setActive(Data.getActive());
+        Status.setServerTeams(Data.getTeams());
         return Status;
     }
 }
