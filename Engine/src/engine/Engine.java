@@ -126,6 +126,7 @@ public class Engine implements EngineInterface, Serializable {
             if (groupTeam != playingTeam) {
                 DtoGuessResult.ENEMY_TEAM_HIT.setGroupTeam(new DtoGroupTeam(groupTeam));
                 if(groupTeam.getCardsFlipped() == groupTeam.getCards()) {
+                    Data.getActiveData().endTeam(groupTeam);
                     returnedValue = new DtoGameEndResult(groupTeam, DtoGuessResult.ENEMY_TEAM_HIT);
                 }
                 else{
@@ -133,6 +134,7 @@ public class Engine implements EngineInterface, Serializable {
                 }
             } else {
                 if (groupTeam.getCardsFlipped() == groupTeam.getCards()) {
+                    Data.getActiveData().endCurrentTeam();
                     returnedValue = new DtoGameEndResult(groupTeam, DtoGuessResult.SUCCESSFUL_GUESS);
                 } else {
                     returnedValue = DtoGuessResult.SUCCESSFUL_GUESS;

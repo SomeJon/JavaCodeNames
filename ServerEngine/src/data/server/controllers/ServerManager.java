@@ -4,8 +4,12 @@ import data.server.data.ServerData;
 import data.server.data.ePermission;
 import data.user.User;
 import dto.type.in.response.LoadInputStreamsResponse;
+import dto.type.out.server.Choice.DtoServerGameChoice;
+import dto.type.out.server.Choice.DtoServerTeamChoice;
+import dto.type.out.server.Choice.DtoSubServerChoice;
 import dto.type.out.server.DtoServerInfo;
 import dto.type.out.server.DtoServerStatus;
+import dto.type.out.server.DtoSubServerStatus;
 import engine.Engine;
 import engine.data.GameData;
 import exception.server.AdminOn;
@@ -18,6 +22,7 @@ import java.util.List;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class ServerManager {
     private final ServerData Data = new ServerData();
@@ -29,22 +34,52 @@ public class ServerManager {
         return hasGame;
     }
 
+    /**
+     * Admin entry method to add an admin user.
+     *
+     * @return User object representing the admin user.
+     * @throws AdminOn if an admin is already present.
+     */
     public User adminEntry() throws AdminOn {
         return Data.getUserManager().addAdmin();
     }
 
+    /**
+     * Check if an admin is already present.
+     *
+     * @return true if an admin is present, false otherwise.
+     */
     public boolean isAdminOn() {
         return Data.getUserManager().isAdminOn();
     }
 
+    /**
+     * User entry method to add a normal user.
+     *
+     * @param i_UserName Name of the user to be added.
+     * @return User object representing the added user.
+     */
     public User userEntry(String i_UserName){
         return Data.getUserManager().addNormalUser(i_UserName);
     }
 
+    /**
+     * Remove a user.
+     *
+     * @param i_User User object representing the user to be removed.
+     * @return true if the user was removed successfully, false otherwise.
+     */
     public boolean removeUser(User i_User){
         return Data.getUserManager().removeUser(i_User);
     }
 
+    /**
+     * Load sub-server data from input streams.
+     *
+     * @param i_Response LoadInputStreamsResponse object containing input streams and server info.
+     * @throws JAXBException if an error occurs during XML processing.
+     * @throws IOException if an I/O error occurs.
+     */
     public void loadSubServerData(LoadInputStreamsResponse i_Response) throws JAXBException, IOException {
         Engine toAdd = new Engine(new GameData());
         toAdd.loadFiles(i_Response);
@@ -68,6 +103,13 @@ public class ServerManager {
         }
     }
 
+    /**
+     * Check if a user has permission to access a specific server.
+     *
+     * @param i_User User object representing the user.
+     * @param i_ServerId ID of the server.
+     * @return true if the user has permission, false otherwise.
+     */
     private boolean checkPermission(User i_User, int i_ServerId) {
         boolean ret;
 
@@ -78,15 +120,58 @@ public class ServerManager {
         return ret;
     }
 
-    public int numberOfSubServerState(){
-        return subServers.size();
+    /**
+     * Get the number of sub-server states.
+     *
+     * @return Number of sub-servers.
+     */
+    public int numberOfSubServerState() {
+        lock.readLock().lock();
+        try {
+            return subServers.size();
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
-    public DtoServerStatus getServerStatus(){
+    /**
+     * Get the status of all servers.
+     *
+     * @return DtoServerStatus object containing the status of all servers.
+     */
+    public DtoServerStatus getServerStatus() {
         lock.readLock().lock();
-        DtoServerStatus ret = new DtoServerStatus(subServers.stream().map(SubServer::getStatus).collect(Collectors.toList()));
-        lock.readLock().unlock();
+        try {
+            List<DtoSubServerStatus> statuses = subServers.stream()
+                .map(SubServer::getStatus)
+                .collect(Collectors.toList());
+            return new DtoServerStatus(statuses);
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
 
-        return ret;
+    /**
+     * Get game choices from all sub-servers.
+     *
+     * @return DtoServerGameChoice object containing game choices from all sub-servers.
+     */
+    public DtoServerGameChoice getServerGameChoices() {
+        lock.readLock().lock();
+        try {
+            List<DtoSubServerChoice> choices = IntStream.range(0, subServers.size())
+                .mapToObj(i -> {
+                    SubServer subServer = subServers.get(i);
+                    List<DtoServerTeamChoice> teamsToAdd = IntStream.range(0, subServer.getServerTeams().size())
+                        .mapToObj(j -> new DtoServerTeamChoice(j + 1, subServer.getServerTeams().get(j)))
+                        .collect(Collectors.toList());
+                    return new DtoSubServerChoice(i + 1, subServer.getServerName(), teamsToAdd);
+                })
+                .collect(Collectors.toList());
+
+            return new DtoServerGameChoice(choices);
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 }

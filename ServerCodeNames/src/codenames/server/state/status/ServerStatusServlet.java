@@ -13,40 +13,54 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @WebServlet(name = "Server Status", urlPatterns = "/state/status")
 public class ServerStatusServlet extends HttpServlet {
+
+    /**
+     * Handles the HTTP GET request to fetch the server status.
+     *
+     * @param request  the HttpServletRequest object
+     * @param response the HttpServletResponse object
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException      if an I/O error occurs
+     */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         ServerManager manager = ServerUtils.getServerManager(getServletContext());
         String requestedState = request.getParameter(AttributeNames.WANTED_STATUS);
-        DtoServerStatus ret = new DtoServerStatus();
+        DtoServerStatus serverStatus = new DtoServerStatus();
         String errorMsg = "";
 
         if (requestedState != null) {
-            ret.setSubServerStatus(manager.getServerStatus().getSubServerStatus());
-            ret.setSubServerStatus(ret.getSubServerStatus().stream()
-                    .filter(T -> {
-                        if (requestedState.equals(AttributeNames.ACTIVE))
-                            return T.isActive();
-                        else if (requestedState.equals(AttributeNames.PENDING))
-                            return !T.isActive();
-                        else return true;
-                    }).collect(Collectors.toList()));
-            if(ret.getSubServerStatus().isEmpty()){
+            List<DtoSubServerStatus> subServerStatuses = manager.getServerStatus().getSubServerStatus();
+            List<DtoSubServerStatus> filteredStatuses = subServerStatuses.stream()
+                .filter(status -> {
+                    switch (requestedState) {
+                        case AttributeNames.ACTIVE:
+                            return status.isActive();
+                        case AttributeNames.PENDING:
+                            return !status.isActive();
+                        default:
+                            return true;
+                    }
+                })
+                .collect(Collectors.toList());
+
+            serverStatus.setSubServerStatus(filteredStatuses);
+
+            if (filteredStatuses.isEmpty()) {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                if(manager.hasGame())
-                    errorMsg = "There are no matching games";
-                else
-                    errorMsg = "There are no loaded games";
-            }else{
+                errorMsg = manager.hasGame() ? "There are no matching games" : "There are no loaded games";
+            } else {
                 response.setStatus(HttpServletResponse.SC_OK);
             }
-        }else {
+        } else {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             errorMsg = "No parameter was loaded";
         }
 
-        ServerUtils.moveObjectIntoResponse(response, new DtoResponse<>(ret, errorMsg));
+        ServerUtils.moveObjectIntoResponse(response, new DtoResponse<>(serverStatus, errorMsg));
     }
 }

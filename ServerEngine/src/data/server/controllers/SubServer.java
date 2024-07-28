@@ -2,10 +2,14 @@ package data.server.controllers;
 
 import data.server.data.SubServerChat;
 import data.server.data.SubServerData;
+import data.server.data.group.ServerTeam;
 import dto.type.out.data.DtoGameDetails;
 import dto.type.out.server.DtoServerInfo;
+import dto.type.out.server.DtoServerTeam;
 import dto.type.out.server.DtoSubServerStatus;
 import engine.EngineInterface;
+
+import java.util.List;
 
 public class SubServer {
     private SubServerData Data;
@@ -32,5 +36,13 @@ public class SubServer {
         Status.setActive(Data.getActive());
         Status.setServerTeams(Data.getTeams());
         return Status;
+    }
+
+    public List<DtoServerTeam> getServerTeams() {
+        return Data.getTeams();
+    }
+
+    public boolean getActiveState(){
+        return Data.getActive();
     }
 }
