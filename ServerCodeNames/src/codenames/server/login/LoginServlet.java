@@ -20,7 +20,7 @@ import java.util.Map;
 
 @WebServlet(name="Login", urlPatterns = "/login")
 public class LoginServlet extends HttpServlet {
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         User user = SessionUtils.getUser(request);
         Map<String, Boolean> result = new HashMap<>();

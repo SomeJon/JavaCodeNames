@@ -1,9 +1,10 @@
 package user.client.data;
 
+import console.ChoiceNotifier;
 import console.Menu;
 import dto.type.in.response.Response;
 import ui.input.InputHandling;
-import user.client.Client;
+import user.client.Client2;
 
 import console.MainMenu;
 import cookiejar.copied.SimpleCookieManager;
@@ -28,14 +29,20 @@ public class ClientData {
         return Main;
     }
 
-    public void buildMenu1(Client i_Client){
+    public void buildMenu1(ChoiceNotifier i_Client){
         Main.getStartMenu().createMenuOption("Login", InputHandling.GET_NAME, i_Client);
     }
 
-    public void buildMenu2(Client i_Client){
+    public void buildMenu2(ChoiceNotifier i_Client){
         Main.getStartMenu().getMenuItems().remove(0);
         Main.getStartMenu().createMenuOption("Show all games details", Action.SHOW_GAMES, i_Client);
         Menu SubMenu1 = Main.getStartMenu().createSubMenu("Join Game");
         SubMenu1.createMenuOption("Choose a game", InputHandling.GET_GAME_ID, i_Client);
+    }
+
+    public void activateCurrentInput(Response i_CurrentResponse) {
+        CurrentResponse = i_CurrentResponse;
+        CurrentInput.getInput(CurrentResponse);
+        CurrentInput = null;
     }
 }

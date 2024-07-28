@@ -1,10 +1,10 @@
 package user.client;
 
-import com.sun.javafx.fxml.builder.URLBuilder;
 import console.ChoiceNotifier;
 import console.MenuItem;
 import constant.attribute.AttributeNames;
 import dto.type.in.response.StringResponse;
+import request.CNRequest;
 import ui.input.InputHandling;
 import user.client.action.Action;
 import user.client.data.LinkConst;
@@ -20,15 +20,16 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.util.Map;
 
-public class Client implements ChoiceNotifier {
+import static ui.input.InputHandling.errorPrint;
+
+public class Client2 implements ChoiceNotifier {
     private final ClientData Data;
 
-    public Client(ClientData Data) {
+    public Client2(ClientData Data) {
         this.Data = Data;
     }
 
-    private void login() throws IOException {
-        Data.CurrentInput.getInput(Data.CurrentResponse);
+    private void login(){
         String url = HttpUrl.parse(ClientConst.SERVER_CONTEXT +
                         LinkConst.LOGIN).newBuilder().addQueryParameter(AttributeNames.USERNAME,
                 ((StringResponse)Data.CurrentResponse).getStr()).build().toString();
@@ -38,19 +39,20 @@ public class Client implements ChoiceNotifier {
                 .build();
         Call call = Data.HTTP_CLIENT.newCall(request);
 
-        try {
-            Response response = call.execute();
-
-            DtoResponse<Map<String, Boolean>> dtoResponse =
-                    new Gson().fromJson(response.body().charStream(), ResponseType.STRING_BOOLEAN);
+        try(Response response = call.execute()){
             if (response.code() == HttpCode.CREATED) {
                 Data.LoggedIn = true;
                 System.out.println("--Logged in as " + ((StringResponse) Data.CurrentResponse).getStr() + "--\n");
+                Data.buildMenu2(this);
             } else if (response.code() == HttpCode.CONFLICT || response.code() == HttpCode.BAD_REQUEST) {
+                DtoResponse<Map<String, Boolean>> dtoResponse =
+                    new Gson().fromJson(response.body().charStream(), ResponseType.STRING_BOOLEAN);
                 System.out.println("--" + dtoResponse.getErrorMessage() + "--\n");
-            } else System.out.println("An unexpected error occurred");
+            } else errorPrint("An unexpected server error occurred");
         } catch (ConnectException e) {
-            System.out.println("Server could not be found");
+            errorPrint("Server could not be found");
+        } catch (IOException e) {
+            errorPrint("Unexpected IOException occurred");
         }
         finally {
             Data.CurrentInput = null;
@@ -90,6 +92,32 @@ public class Client implements ChoiceNotifier {
     public void Notify(Object sender) {
         Data.CurrentAction = getCurrentAction(sender);
         Data.CurrentInput = getInputHandling(sender);
+
+        if(Data.CurrentAction != null){
+            switch (Data.CurrentAction) {
+                case SHOW_GAMES:
+                    CNRequest.printStats(ClientConst.SERVER_CONTEXT + LinkConst.GET_STATUSES,
+                        AttributeNames.ALL, Data.HTTP_CLIENT, true);
+                    break;
+                case WATCH_GAMES:
+                    //todo
+            }
+            Data.CurrentAction = null;
+        }
+
+        if(Data.CurrentInput != null){
+            dto.type.in.response.Response resp = null;
+            switch (Data.CurrentInput) {
+                case GET_NAME:
+                    resp = new StringResponse();
+                    Data.activateCurrentInput(resp);
+                    login();
+                    break;
+                case GET_GAME_ID:
+                    //todo
+            }
+            Data.CurrentInput = null;
+        }
     }
 
     private Action getCurrentAction(Object sender) {

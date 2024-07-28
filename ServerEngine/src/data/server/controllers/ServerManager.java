@@ -23,6 +23,11 @@ public class ServerManager {
     private final ServerData Data = new ServerData();
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
     private final List<SubServer> subServers = new ArrayList<>();
+    private boolean hasGame = false;
+
+    public boolean hasGame() {
+        return hasGame;
+    }
 
     public User adminEntry() throws AdminOn {
         return Data.getUserManager().addAdmin();
@@ -52,6 +57,7 @@ public class ServerManager {
             if (checkName) {
                 SubServer newSubServer = new SubServer(toAdd, subServers.size() + 1, dtoServerInfo);
                 subServers.add(newSubServer);
+                hasGame = true;
             }
             else{
                 throw new NameTaken(dtoServerInfo.getServerName());

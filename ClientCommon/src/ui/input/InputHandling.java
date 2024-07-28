@@ -174,7 +174,7 @@ public enum InputHandling {
 
     private final static int EndGuessId = 0;
     public abstract void getInput(Response o_Response);
-    private static void errorPrint(String errorMessage){
+    public static void errorPrint(String errorMessage){
         String toPrint = "\n!!!An error occurred!!!\n" + errorMessage + "\n!!!!!!\n";
         System.out.println(toPrint);
     }

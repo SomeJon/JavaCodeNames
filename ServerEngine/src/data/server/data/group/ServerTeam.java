@@ -19,6 +19,7 @@ public class ServerTeam {
     private final List<Role> Identifiers;
     private int CurrentNumGuessers;
     private int CurrentNumIdentifiers;
+    private boolean TeamReady = false;
     private final ReadWriteLock Lock = new ReentrantReadWriteLock();
 
 
@@ -61,6 +62,10 @@ public class ServerTeam {
         return Identifiers;
     }
 
+    public boolean isTeamReady() {
+        return TeamReady;
+    }
+
     public int getCurrentNumGuessers() {
         return CurrentNumGuessers;
     }
@@ -91,6 +96,8 @@ public class ServerTeam {
             else{
                 throw new NoSpot();
             }
+
+            TeamReady = CurrentNumGuessers == Guessers.size() && CurrentNumIdentifiers == Identifiers.size();
         }
         finally{
             Lock.writeLock().unlock();

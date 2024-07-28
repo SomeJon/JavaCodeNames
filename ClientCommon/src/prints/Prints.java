@@ -33,7 +33,7 @@ public class Prints {
                 if (!printCurrentPlayers) {
                     ret.append("Definers - (")
                             .append(team.getNumOfDefiners())
-                            .append(")\nGuessers - (")
+                            .append(") Guessers - (")
                             .append(team.getNumOfGuessers())
                             .append(")\n");
                 }

@@ -35,7 +35,10 @@ public class ServerStatusServlet extends HttpServlet {
                     }).collect(Collectors.toList()));
             if(ret.getSubServerStatus().isEmpty()){
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                errorMsg = "There are no matching games";
+                if(manager.hasGame())
+                    errorMsg = "There are no matching games";
+                else
+                    errorMsg = "There are no loaded games";
             }else{
                 response.setStatus(HttpServletResponse.SC_OK);
             }

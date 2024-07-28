@@ -13,18 +13,17 @@ import constant.client.HttpCode;
 import constant.client.ResponseType;
 import constant.response.Responses;
 import dto.type.in.response.IntResponse;
-import dto.type.in.response.LoadFileResponse;
 import dto.type.in.response.LoadFilesResponse;
 import dto.type.out.server.DtoResponse;
-import dto.type.out.server.DtoServerStatus;
 import okhttp3.*;
+import request.CNRequest;
 import ui.input.InputHandling;
 
 import java.io.IOException;
 import java.net.ConnectException;
 import java.util.Map;
 
-import static prints.Prints.parseGamesStatus;
+import static ui.input.InputHandling.errorPrint;
 
 
 public class Client implements ChoiceNotifier {
@@ -42,13 +41,15 @@ public class Client implements ChoiceNotifier {
         Call call = Data.HTTP_CLIENT.newCall(request);
 
         try(Response response = call.execute()) {
-            DtoResponse<Map<String, Boolean>> dtoResponse =
-                    new Gson().fromJson(response.body().charStream(), ResponseType.STRING_BOOLEAN);
             if (response.code() == HttpCode.CREATED) {
+                DtoResponse<Map<String, Boolean>> dtoResponse =
+                    new Gson().fromJson(response.body().charStream(), ResponseType.STRING_BOOLEAN);
                 Data.setLoggedIn(true);
                 System.out.println("--Logged in as an admin--\n");
                 Data.buildMenu1Or2(!dtoResponse.getResult().get(Responses.NO_SUB_SERVERS), this);
             } else if (response.code() == HttpCode.CONFLICT) {
+                DtoResponse<Map<String, Boolean>> dtoResponse =
+                    new Gson().fromJson(response.body().charStream(), ResponseType.STRING_BOOLEAN);
                 errorPrint("--" + dtoResponse.getErrorMessage() + "--\n");
             } else errorPrint("An unexpected error occurred");
         } catch (ConnectException e) {
@@ -91,6 +92,19 @@ public class Client implements ChoiceNotifier {
         Data.setCurrentInput(getInputHandling(sender));
         //Data.getMain().pauseRunning();
 
+        if(Data.getCurrentAction() != null) {
+            switch (Data.getCurrentAction()) {
+                case UPLOAD:
+                    Data.setCurrentAction(null);
+                    upload();
+                    break;
+                case SHOW_GAMES:
+                    Data.setCurrentAction(null);
+                    showGames();
+                    break;
+            }
+        }
+
         if(Data.getCurrentInput() != null) {
             dto.type.in.response.Response resp = null;
             switch (Data.getCurrentInput()) {
@@ -106,48 +120,12 @@ public class Client implements ChoiceNotifier {
                     break;
             }
         }
-
-        if(Data.getCurrentAction() != null) {
-            switch (Data.getCurrentAction()) {
-                case UPLOAD:
-                    Data.setCurrentAction(null);
-                    upload();
-                    break;
-                case SHOW_GAMES:
-                    Data.setCurrentAction(null);
-                    showGames();
-                    break;
-            }
-        }
     }
 
     private void showGames(){
-        String url = HttpUrl
-                .parse(ClientConst.SERVER_CONTEXT + LinkConst.GET_STATUSES)
-                .newBuilder().addQueryParameter(AttributeNames.WANTED_STATUS, AttributeNames.ALL)
-                .build().toString();
-
-        Request request = new Request.Builder()
-                .url(url)
-                .get()
-                .build();
-
-        Call call = Data.HTTP_CLIENT.newCall(request);
-        try(Response response = call.execute()){
-            if (response.code() == HttpCode.OK) {
-                DtoResponse<DtoServerStatus> dtoResponse =
-                        new Gson().fromJson(response.body().charStream(), ResponseType.DTO_RESPONSE_STATUS);
-                String toPrint = parseGamesStatus(dtoResponse.getResult(), false);
-                System.out.print(toPrint);
-            } else if (response.code() == HttpCode.NOT_FOUND || response.code() == HttpCode.BAD_REQUEST) {
-                DtoResponse<DtoServerStatus> dtoResponse =
-                        new Gson().fromJson(response.body().charStream(), ResponseType.DTO_RESPONSE_STATUS);
-                errorPrint(dtoResponse.getErrorMessage());
-            } else
-                errorPrint("An unexpected error occurred");
-        } catch (IOException e) {
-            System.out.println("Upload failed: " + e.getMessage());
-        }
+        CNRequest.printStats(
+                ClientConst.SERVER_CONTEXT + LinkConst.GET_STATUSES,
+                        AttributeNames.ALL, Data.HTTP_CLIENT, false);
     }
 
     private void loadFiles(){
@@ -251,10 +229,5 @@ public class Client implements ChoiceNotifier {
         Data.getMain().play();
 
         return Data.getMain().isClosing();
-    }
-
-    private static void errorPrint(String errorMessage){
-        String toPrint = "\n!!!An error occurred!!!\n" + errorMessage + "\n!!!!!!\n";
-        System.out.println(toPrint);
     }
 }

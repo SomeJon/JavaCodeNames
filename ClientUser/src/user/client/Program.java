@@ -6,7 +6,7 @@ import java.io.IOException;
 
 public class Program {
     public static void main(String[] args) throws IOException {
-        Client client = new Client(new ClientData());
+        Client2 client = new Client2(new ClientData());
 
         client.RunClient();
     }
