@@ -1,5 +1,6 @@
 package data.server.controllers;
 
+import data.server.data.SubServerChat;
 import data.server.data.SubServerData;
 import dto.type.out.data.DtoGameDetails;
 import dto.type.out.server.DtoServerInfo;
@@ -9,6 +10,7 @@ import engine.EngineInterface;
 public class SubServer {
     private SubServerData Data;
     private final DtoSubServerStatus Status;
+    private final SubServerChat Chat = new SubServerChat();
 
     public SubServer(EngineInterface engine, int id, DtoServerInfo dtoServerInfo) {
         Data = new SubServerData(engine, id, dtoServerInfo);

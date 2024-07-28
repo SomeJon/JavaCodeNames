@@ -3,12 +3,16 @@ package data.user;
 
 import data.server.data.ePermission;
 import data.server.data.group.ServerTeam;
+import message.UserMessage.eRole;
 
 public class User {
     private final String Name;
     private int GameId;
     private final ePermission PermissionLevel;
     private ServerTeam ConnectedTeam;
+    private eRole Role;
+    private int ChatUpdate = 0;
+    private int TurnUpdate = 0;
 
     public User(String i_Name, ePermission i_PermissionLevel) {
         Name = i_Name;
@@ -43,5 +47,29 @@ public class User {
 
     public ePermission getPermissionLevel() {
         return PermissionLevel;
+    }
+
+    public int getChatUpdate() {
+        return ChatUpdate;
+    }
+
+    public void updateChat(int i_ChatUpdate) {
+        ChatUpdate += i_ChatUpdate;
+    }
+
+    public int getTurnUpdate() {
+        return TurnUpdate;
+    }
+
+    public void setTurnUpdate(int i_TurnUpdate) {
+        TurnUpdate = i_TurnUpdate;
+    }
+
+    public eRole getRole() {
+        return Role;
+    }
+
+    public void setRole(eRole i_Role) {
+        Role = i_Role;
     }
 }

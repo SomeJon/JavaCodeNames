@@ -42,5 +42,7 @@
       </library>
     </orderEntry>
     <orderEntry type="module" module-name="Consts" />
+    <orderEntry type="module" module-name="ChatData" />
+    <orderEntry type="module" module-name="GsonCodeNamesAdapter" />
   </component>
 </module>

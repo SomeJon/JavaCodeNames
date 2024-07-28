@@ -10,5 +10,6 @@
     <orderEntry type="module" module-name="Engine" />
     <orderEntry type="module" module-name="Dto" />
     <orderEntry type="module" module-name="CodeNamesExceptions" />
+    <orderEntry type="module" module-name="ChatData" />
   </component>
 </module>

@@ -12,6 +12,8 @@
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/jetbrains/annotations/24.0.0/annotations-24.0.0.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/../../../../Program Files/Java/addon/okio-2.8.0.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/../../../../Program Files/Java/addon/okhttp-4.9.1.jar" path-in-jar="/" />
+      <element id="module-output" name="ChatData" />
+      <element id="module-output" name="GsonCodeNamesAdapter" />
     </root>
   </artifact>
 </component>
