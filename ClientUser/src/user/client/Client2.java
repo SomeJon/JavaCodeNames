@@ -113,6 +113,9 @@ public class Client2 implements ChoiceNotifier {
                 case SHOW_PENDING_GAMES:
                     showPendingGames();
                     break;
+                case CLEAN_CHOICE:
+                    Data.buildMenu20(this);
+                    break;
             }
             Data.CurrentAction = null;
         }
@@ -132,7 +135,7 @@ public class Client2 implements ChoiceNotifier {
                     getTeamId();
                     break;
                 case GET_ROLE:
-                    //todo
+                    getRole();
                     break;
             }
             Data.CurrentInput = null;

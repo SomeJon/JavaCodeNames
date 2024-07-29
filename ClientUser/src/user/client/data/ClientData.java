@@ -44,12 +44,10 @@ public class ClientData {
         Main.getStartMenu().createMenuOption("Show all games details", Action.SHOW_GAMES, i_Client);
         NotifyList notifiers = new NotifyList();
         notifiers.addNotifyBefore(i_Client, Action.SHOW_PENDING_GAMES);
+        notifiers.addNotifyBefore(i_Client, Action.CLEAN_CHOICE);
         Menu subMenu1 = Main.getStartMenu().createSubMenuWithActions("Join Game", notifiers);
         subMenu1.createMenuOption("Refresh games info", Action.REFRESH, i_Client);
         subMenu1.createMenuOption("Enter game id", InputHandling.GET_GAME_ID, i_Client);
-        subMenu1.createMenuOption("Enter team id", InputHandling.GET_TEAM_ID, i_Client);
-        subMenu1.createMenuOption("Chose a role", InputHandling.GET_ROLE, i_Client);
-        subMenu1.createMenuOption("Enter game", Action.ENTER_GAME, i_Client);
     }
 
     public void buildMenu20(ChoiceNotifier i_Client){

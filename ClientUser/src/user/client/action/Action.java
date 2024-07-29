@@ -4,5 +4,6 @@ public enum Action {
     SHOW_GAMES,
     SHOW_PENDING_GAMES,
     ENTER_GAME,
-    REFRESH
+    REFRESH,
+    CLEAN_CHOICE
 }
