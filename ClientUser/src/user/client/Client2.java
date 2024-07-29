@@ -108,7 +108,7 @@ public class Client2 implements ChoiceNotifier {
                     CNRequest.printStats(ClientConst.SERVER_CONTEXT + LinkConst.GET_STATUSES,
                         AttributeNames.ALL, Data.HTTP_CLIENT, true);
                     break;
-                case REFRESH:
+                case REFRESH: //todo: (Low priority) make it so you can refresh + keep choices that fits
                     Data.buildMenu20(this);
                 case SHOW_PENDING_GAMES:
                     showPendingGames();
