@@ -28,7 +28,7 @@ public class SubServerData {
         Engine = engine;
         Teams = new ArrayList<ServerTeam>();
         List<DtoServerTeam> teams = dtoServerInfo.getServerTeams();
-        Turn = new AtomicInteger();
+        Turn = new AtomicInteger(0);
         Active = false;
 
         for (DtoServerTeam team : teams) {

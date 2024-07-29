@@ -1,8 +1,10 @@
-package dto.type.in.response;
+package dto.type.in.response.load;
+
+import dto.type.in.response.Response;
 
 import java.io.File;
 
-public class LoadXmlResponse implements Response{
+public class LoadXmlResponse implements Response {
     private File InputXmlFile;
 
     public LoadXmlResponse() {

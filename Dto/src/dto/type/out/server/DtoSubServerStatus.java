@@ -4,7 +4,7 @@ import dto.type.out.data.DtoGameDetails;
 
 import java.util.List;
 
-public class DtoSubServerStatus {
+public class DtoSubServerStatus implements HasActive{
     private final String ServerName;
     private final String DictFileName;
     private List<DtoServerTeam> ServerTeams;

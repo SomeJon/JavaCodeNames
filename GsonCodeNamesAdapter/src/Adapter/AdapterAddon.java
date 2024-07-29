@@ -1,4 +1,5 @@
-import Adapter.MessageTypeAdapter;
+package Adapter;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import message.Message;

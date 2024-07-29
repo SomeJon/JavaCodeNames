@@ -61,6 +61,17 @@ public class Menu implements Serializable {
             return addedSubMenu;
         }
 
+        public Menu createSubMenuWithActions(String i_SubMenuName, NotifyList i_Notifiers) {
+            final boolean SUB_MENU = false;
+
+            Menu addedSubMenu = new Menu(i_SubMenuName, SUB_MENU, this, MenuChange);
+
+            i_Notifiers.addNotifyBefore(MenuChange, addedSubMenu);
+            createMenuOption(i_SubMenuName, addedSubMenu, i_Notifiers);
+
+            return addedSubMenu;
+        }
+
         public void printMenu (Integer i_DashesSize) {
             final int START_NUMBER = 1;
             int choiceNumbering = START_NUMBER;

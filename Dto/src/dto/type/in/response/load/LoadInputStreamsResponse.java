@@ -1,5 +1,6 @@
-package dto.type.in.response;
+package dto.type.in.response.load;
 
+import dto.type.in.response.Response;
 import dto.type.out.server.DtoServerInfo;
 
 import java.io.InputStream;

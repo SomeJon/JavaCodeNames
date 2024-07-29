@@ -1,8 +1,8 @@
 package ui.view;
 
-import dto.type.in.response.GuesserResponse;
-import dto.type.in.response.IdentificationResponse;
-import dto.type.in.response.LoadXmlResponse;
+import dto.type.in.response.ingame.GuesserResponse;
+import dto.type.in.response.ingame.IdentificationResponse;
+import dto.type.in.response.load.LoadXmlResponse;
 import dto.type.in.response.Response;
 import ui.save.FileLocationResponse;
 

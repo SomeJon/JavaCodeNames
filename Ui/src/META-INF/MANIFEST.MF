@@ -1,4 +1,0 @@
-Manifest-Version: 1.0
-AdapterAddon-Class: ui.program.client.client.Program
-Class-Path: Engine.jar
-

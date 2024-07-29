@@ -8,7 +8,10 @@ public class AttributeNames {
     public static final String XML_FILE = "xmlFile";
     public static final String TXT_File = "txtFile";
     public static final String WANTED_STATUS = "status";
+    public static final String WANTED_GAME = "game";
+    public static final String WANTED_TEAM = "team";
     public static final String ACTIVE = "active";
     public static final String PENDING = "pending";
     public static final String ALL = "all";
+
 }

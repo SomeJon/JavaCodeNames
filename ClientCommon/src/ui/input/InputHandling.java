@@ -1,6 +1,12 @@
 package ui.input;
 
 import dto.type.in.response.*;
+import dto.type.in.response.common.IntResponse;
+import dto.type.in.response.common.StringResponse;
+import dto.type.in.response.ingame.GuesserResponse;
+import dto.type.in.response.ingame.IdentificationResponse;
+import dto.type.in.response.load.LoadFileResponse;
+import dto.type.in.response.load.LoadFilesResponse;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -105,7 +111,7 @@ public enum InputHandling {
                 } catch (InputMismatchException e) {
                     continueLoop = true;
                     scanner.nextLine();
-                    errorPrint("Non Number entered! please try again");
+                    errorPrint("Non Number entered! Please try again");
                 }
             } while (continueLoop);
 
@@ -128,7 +134,7 @@ public enum InputHandling {
                 } catch (InputMismatchException e) {
                     continueLoop = true;
                     scanner.nextLine();
-                    errorPrint("None Number entered! please try again");
+                    errorPrint("None Number entered! Please try again");
                 }
             } while (continueLoop);
 
@@ -144,14 +150,66 @@ public enum InputHandling {
             int Int = 0;
 
             do {
-                System.out.print("Please chose a game by entering its id: "); //todo handle errors
+                System.out.print("Please chose a game id: ");
                 try {
                     Int = scanner.nextInt();
                     continueLoop = false;
                 } catch (InputMismatchException e) {
                     continueLoop = true;
                     scanner.nextLine();
-                    errorPrint("None Number entered! please try again");
+                    errorPrint("None Number entered! Please try again");
+                }
+            } while (continueLoop);
+
+            System.out.println();
+            o_Response.loadResponse(new IntResponse(Int));
+        }
+    },
+    GET_TEAM_ID{
+        @Override
+        public void getInput(Response o_Response) {
+            Scanner scanner = new Scanner(System.in);
+            boolean continueLoop;
+            int Int = 0;
+
+            do {
+                System.out.print("Please chose a team id: ");
+                try {
+                    Int = scanner.nextInt();
+                    continueLoop = false;
+                } catch (InputMismatchException e) {
+                    continueLoop = true;
+                    scanner.nextLine();
+                    errorPrint("None Number entered! Please try again");
+                }
+            } while (continueLoop);
+
+            System.out.println();
+            o_Response.loadResponse(new IntResponse(Int));
+        }
+    },
+    GET_ROLE{
+        @Override
+        public void getInput(Response o_Response) {
+            Scanner scanner = new Scanner(System.in);
+            boolean continueLoop;
+            int Int = 0;
+
+            do {
+                System.out.print("Please enter role id (0:Definer) (1:Guesser)"); //todo handle errors
+                try {
+                    Int = scanner.nextInt();
+                    if(Int == 0 || Int == 1) {
+                        continueLoop = false;
+                    }
+                    else {
+                        continueLoop = true;
+                        errorPrint("Please only enter 0 or 1! Please try again");
+                    }
+                } catch (InputMismatchException e) {
+                    continueLoop = true;
+                    scanner.nextLine();
+                    errorPrint("None Number entered! Please try again");
                 }
             } while (continueLoop);
 
@@ -176,6 +234,6 @@ public enum InputHandling {
     public abstract void getInput(Response o_Response);
     public static void errorPrint(String errorMessage){
         String toPrint = "\n!!!An error occurred!!!\n" + errorMessage + "\n!!!!!!\n";
-        System.out.println(toPrint);
+        System.out.print(toPrint);
     }
 }

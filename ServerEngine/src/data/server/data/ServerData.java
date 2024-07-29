@@ -5,11 +5,16 @@ import data.user.UserManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class ServerData {
     private Boolean AdminOn = false;
     private int NumberOfConnectedUsers = 0;
     private final UserManager UserManager = new UserManager();
+    private AtomicInteger UpdateCount = new AtomicInteger(0);
+    private ReadWriteLock UpdateLock = new ReentrantReadWriteLock();
 
 
     public Boolean getAdminOn() {
@@ -30,5 +35,27 @@ public class ServerData {
 
     public data.user.UserManager getUserManager() {
         return UserManager;
+    }
+
+    public int getUpdateCount() {
+        int ret;
+
+        UpdateLock.readLock().lock();
+        try{
+            ret = UpdateCount.get();
+        } finally {
+            UpdateLock.readLock().unlock();
+        }
+
+        return ret;
+    }
+
+    public void updateCount() {
+        UpdateLock.writeLock().lock();
+        try{
+            UpdateCount.incrementAndGet();
+        } finally {
+            UpdateLock.writeLock().unlock();
+        }
     }
 }

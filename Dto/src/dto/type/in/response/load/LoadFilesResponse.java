@@ -1,8 +1,10 @@
-package dto.type.in.response;
+package dto.type.in.response.load;
+
+import dto.type.in.response.Response;
 
 import java.io.File;
 
-public class LoadFilesResponse implements Response{
+public class LoadFilesResponse implements Response {
     private File XmlFile;
     private String XmlFileName;
     private File TxtFile;

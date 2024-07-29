@@ -1,6 +1,8 @@
-package dto.type.in.response;
+package dto.type.in.response.ingame;
 
-public class GuesserResponse implements Response{
+import dto.type.in.response.Response;
+
+public class GuesserResponse implements Response {
     private Integer CardId;
 
     public Integer getCardId() {

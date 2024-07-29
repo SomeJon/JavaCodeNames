@@ -5,6 +5,8 @@ import data.server.data.ePermission;
 import data.server.data.group.ServerTeam;
 import message.UserMessage.eRole;
 
+
+
 public class User {
     private final String Name;
     private int GameId;
@@ -13,6 +15,8 @@ public class User {
     private eRole Role;
     private int ChatUpdate = 0;
     private int TurnUpdate = 0;
+    private int ServerUpdate = 0;
+
 
     public User(String i_Name, ePermission i_PermissionLevel) {
         Name = i_Name;
@@ -61,8 +65,16 @@ public class User {
         return TurnUpdate;
     }
 
-    public void setTurnUpdate(int i_TurnUpdate) {
-        TurnUpdate = i_TurnUpdate;
+    public void updateTurn(int i_TurnUpdate) {
+        TurnUpdate += i_TurnUpdate;
+    }
+
+    public int getServerUpdate() {
+        return ServerUpdate;
+    }
+
+    public void updateServer(int i_ServerUpdate) {
+        ServerUpdate += i_ServerUpdate;
     }
 
     public eRole getRole() {

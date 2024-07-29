@@ -33,7 +33,7 @@ public class UserManager {
                 Users.add(user);
             }
             else{
-                throw new NameTaken(i_Username.toUpperCase());
+                throw new NameTaken(i_Username);
             }
         }
         finally {

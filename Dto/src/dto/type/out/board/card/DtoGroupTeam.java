@@ -1,8 +1,6 @@
 package dto.type.out.board.card;
 
 import dto.type.out.data.DtoTeam;
-import engine.board.card.GroupCard;
-import engine.board.card.GroupNeutral;
 import engine.board.card.GroupTeam;
 
 public class DtoGroupTeam extends DtoGroupCard{

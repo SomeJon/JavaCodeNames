@@ -7,7 +7,7 @@ import constant.attribute.AttributeNames;
 import constant.response.Responses;
 import data.server.controllers.ServerManager;
 import data.user.User;
-import dto.type.in.response.LoadInputStreamsResponse;
+import dto.type.in.response.load.LoadInputStreamsResponse;
 import dto.type.out.server.DtoResponse;
 import exception.CodeNameException;
 import exception.loadxml.OutOfBoundLoad;

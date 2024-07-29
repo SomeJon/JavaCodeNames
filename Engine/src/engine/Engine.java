@@ -2,6 +2,10 @@ package engine;
 
 import dto.Dto;
 import dto.type.in.response.*;
+import dto.type.in.response.ingame.GuesserResponse;
+import dto.type.in.response.ingame.IdentificationResponse;
+import dto.type.in.response.load.LoadInputStreamsResponse;
+import dto.type.in.response.load.LoadXmlResponse;
 import dto.type.out.board.DtoBoard;
 import dto.type.out.board.card.DtoGroupTeam;
 import dto.type.out.data.*;

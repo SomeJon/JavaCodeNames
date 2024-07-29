@@ -1,6 +1,8 @@
-package dto.type.in.response;
+package dto.type.in.response.ingame;
 
-public class IdentificationResponse implements Response{
+import dto.type.in.response.Response;
+
+public class IdentificationResponse implements Response {
     private String Identification;
     private int Related;
 

@@ -5,8 +5,8 @@ import dto.type.out.board.card.DtoGroupTeam;
 import dto.type.out.data.DtoActiveGameStatus;
 import engine.board.card.Card;
 import engine.data.Identification;
-import dto.type.in.response.GuesserResponse;
-import dto.type.in.response.IdentificationResponse;
+import dto.type.in.response.ingame.GuesserResponse;
+import dto.type.in.response.ingame.IdentificationResponse;
 import dto.type.in.response.Response;
 
 import javax.xml.bind.JAXBException;

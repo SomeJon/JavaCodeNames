@@ -1,4 +1,6 @@
-package dto.type.in.response;
+package dto.type.in.response.common;
+
+import dto.type.in.response.Response;
 
 public class IntResponse implements Response {
     private Integer Int;

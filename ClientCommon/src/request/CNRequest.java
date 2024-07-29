@@ -4,27 +4,33 @@ import com.google.gson.Gson;
 import constant.attribute.AttributeNames;
 import constant.client.HttpCode;
 import constant.client.ResponseType;
+import dto.type.out.server.Choice.DtoServerGameChoice;
 import dto.type.out.server.DtoResponse;
 import dto.type.out.server.DtoServerStatus;
 import okhttp3.*;
 
 import java.io.IOException;
 
+import static prints.Prints.parseGamesChoice;
 import static prints.Prints.parseGamesStatus;
 import static ui.input.InputHandling.errorPrint;
 
 public class CNRequest {
-    public static void printStats(String i_Url, String i_GetTypes,
-                                  OkHttpClient i_Client, boolean printCurrentPlayers){
+    public static Request getRequestStats(String i_Url, String i_GetTypes) {
         String url = HttpUrl
                 .parse(i_Url)
                 .newBuilder().addQueryParameter(AttributeNames.WANTED_STATUS, i_GetTypes)
                 .build().toString();
 
-        Request request = new Request.Builder()
+        return new Request.Builder()
                 .url(url)
                 .get()
                 .build();
+    }
+
+    public static void printStats(String i_Url, String i_GetTypes,
+                                  OkHttpClient i_Client, boolean printCurrentPlayers){
+        Request request = getRequestStats(i_Url, i_GetTypes);
 
         Call call = i_Client.newCall(request);
 
@@ -33,7 +39,7 @@ public class CNRequest {
                 DtoResponse<DtoServerStatus> dtoResponse =
                         new Gson().fromJson(response.body().charStream(), ResponseType.DTO_RESPONSE_STATUS);
                 String toPrint = parseGamesStatus(dtoResponse.getResult(), printCurrentPlayers);
-                System.out.println(toPrint);
+                System.out.print(toPrint);
             } else if (response.code() == HttpCode.NOT_FOUND || response.code() == HttpCode.BAD_REQUEST) {
                 DtoResponse<DtoServerStatus> dtoResponse =
                         new Gson().fromJson(response.body().charStream(), ResponseType.DTO_RESPONSE_STATUS);
@@ -41,7 +47,7 @@ public class CNRequest {
             } else
                 errorPrint("An unexpected error occurred");
         } catch (IOException e) {
-            errorPrint("Upload failed: " + e.getMessage());
+            errorPrint("IOException occurred: " + e.getMessage());
         }
     }
 }

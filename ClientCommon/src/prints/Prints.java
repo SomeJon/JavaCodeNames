@@ -1,17 +1,20 @@
 package prints;
 
+import dto.type.out.server.Choice.DtoServerGameChoice;
+import dto.type.out.server.Choice.DtoServerTeamChoice;
+import dto.type.out.server.Choice.DtoSubServerChoice;
 import dto.type.out.server.DtoServerStatus;
 import dto.type.out.server.DtoServerTeam;
 import dto.type.out.server.DtoSubServerStatus;
 
 public class Prints {
-    public static String parseGamesStatus(DtoServerStatus i_Status, boolean printCurrentPlayers){
+    public static String parseGamesStatus(DtoServerStatus i_Status, boolean i_PrintCurrentPlayers){
         StringBuilder ret = new StringBuilder();
 
-        for(DtoSubServerStatus status : i_Status.getSubServerStatus()){
+        for(DtoSubServerStatus status : i_Status.getSubServerStatus()) {
             String state;
             String tab = "    ";
-            if(status.isActive())
+            if (status.isActive())
                 state = "Active";
             else
                 state = "Pending";
@@ -21,23 +24,21 @@ public class Prints {
                     .append(status.getCols()).append(")\nName of dictionary file: ")
                     .append(status.getDictFileName()).append("\nNumber of participating cards: (Normal Cards - ")
                     .append(status.getNumOfCards()).append(") (Black Cards - ")
-                    .append(status.getNumOfBlackCards()).append(") (Chosen from - " ).append(status.getNumOfWords())
+                    .append(status.getNumOfBlackCards()).append(") (Chosen from - ").append(status.getNumOfWords())
                     .append(" Words)\nTeams:\n");
             for (DtoServerTeam team : status.getServerTeams()) {
                 ret.append("+++++++++++++++\n").append(tab)
-                            .append(team.getTeam().getName())
-                            .append("\n").append(tab)
-                            .append("Needed points - ")
-                            .append(team.getTeam().getPointGoal())
-                            .append("\n").append(tab);
-                if (!printCurrentPlayers) {
+                        .append("Team Name: ").append(team.getTeam().getName())
+                        .append("\n").append(tab)
+                        .append("Needed points - ").append(team.getTeam().getPointGoal())
+                        .append("\n").append(tab);
+                if (!i_PrintCurrentPlayers) {
                     ret.append("Definers - (")
                             .append(team.getNumOfDefiners())
                             .append(") Guessers - (")
                             .append(team.getNumOfGuessers())
                             .append(")\n");
-                }
-                else{
+                } else {
                     ret.append("(Connected/Needed)")
                             .append("\n").append(tab)
                             .append("Definers - (")
@@ -50,7 +51,41 @@ public class Prints {
                             .append(")\n");
                 }
             }
+        }
+        ret.append("------------------------\n");
 
+        return ret.toString();
+    }
+
+    public static String parseGamesChoice(DtoServerGameChoice i_Choice){
+        StringBuilder ret = new StringBuilder();
+
+        for(DtoSubServerChoice choice : i_Choice.getSubServerChoices()){
+            String tab = "    ";
+            ret.append("------------------------\n")
+                    .append("Game Id: ").append(choice.getId())
+                    .append("\nGame Name: ").append(choice.getGameName())
+                    .append("\nTeams:\n");
+            for (DtoServerTeamChoice team : choice.getTeamChoices()) {
+                ret.append("+++++++++++++++\n").append(tab)
+                        .append("Team Id: ").append(team.getTeamId())
+                        .append("\n").append(tab)
+                        .append("Team Name: ").append(team.getTeamInfo().getTeam().getName())
+                        .append("\n").append(tab)
+                        .append("Needed points - ")
+                        .append(team.getTeamInfo().getTeam().getPointGoal())
+                        .append("\n").append(tab)
+                        .append("(Connected/Needed)")
+                        .append("\n").append(tab)
+                        .append("Definers - (")
+                        .append(team.getTeamInfo().getConnectedDefiners()).append("/")
+                        .append(team.getTeamInfo().getNumOfDefiners()).append(")")
+                        .append("\n").append(tab)
+                        .append("Guessers - (")
+                        .append(team.getTeamInfo().getConnectedGuessers()).append("/")
+                        .append(team.getTeamInfo().getNumOfGuessers())
+                        .append(")\n");
+            }
         }
         ret.append("------------------------\n");
 

@@ -1,8 +1,10 @@
-package dto.type.in.response;
+package dto.type.in.response.load;
+
+import dto.type.in.response.Response;
 
 import java.io.File;
 
-public class LoadFileResponse implements Response{
+public class LoadFileResponse implements Response {
     private File InputFile;
     private String FileName;
 
@@ -17,7 +19,7 @@ public class LoadFileResponse implements Response{
 
     @Override
     public void loadResponse(Response i_Response) {
-        InputFile = ((dto.type.in.response.LoadFileResponse)i_Response).InputFile;
+        InputFile = ((LoadFileResponse)i_Response).InputFile;
         FileName = InputFile.getName();
     }
 

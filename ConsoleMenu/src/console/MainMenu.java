@@ -9,7 +9,11 @@ public class MainMenu implements ChoiceNotifier, Serializable{
     private Menu CurrentMenu;
     private boolean Running = false;
     private boolean Closing = false;
+    private boolean CancelMenuChange;
 
+    public void cancelMenuChange() {
+        CancelMenuChange = true;
+    }
 
     public Menu getStartMenu() {
         return StartMenu;
@@ -89,6 +93,11 @@ public class MainMenu implements ChoiceNotifier, Serializable{
     }
 
     public void Notify(Object sender) {
-        CurrentMenu = (Menu)((MenuItem)sender).getItemValue();
+        if(!CancelMenuChange){
+            CurrentMenu = (Menu)((MenuItem)sender).getItemValue();
+        }
+        else{
+            CancelMenuChange = false;
+        }
     }
 }

@@ -1,6 +1,7 @@
 package codenames.server.state.status;
 
 import codenames.ServerUtils;
+import codenames.Utils;
 import constant.attribute.AttributeNames;
 import data.server.controllers.ServerManager;
 import dto.type.out.server.DtoResponse;
@@ -35,18 +36,9 @@ public class ServerStatusServlet extends HttpServlet {
 
         if (requestedState != null) {
             List<DtoSubServerStatus> subServerStatuses = manager.getServerStatus().getSubServerStatus();
-            List<DtoSubServerStatus> filteredStatuses = subServerStatuses.stream()
-                .filter(status -> {
-                    switch (requestedState) {
-                        case AttributeNames.ACTIVE:
-                            return status.isActive();
-                        case AttributeNames.PENDING:
-                            return !status.isActive();
-                        default:
-                            return true;
-                    }
-                })
-                .collect(Collectors.toList());
+            List<DtoSubServerStatus> filteredStatuses = Utils
+                    .filterByState(subServerStatuses.stream(), requestedState)
+                    .collect(Collectors.toList());
 
             serverStatus.setSubServerStatus(filteredStatuses);
 

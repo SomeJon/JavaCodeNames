@@ -3,7 +3,7 @@ package data.server.controllers;
 import data.server.data.ServerData;
 import data.server.data.ePermission;
 import data.user.User;
-import dto.type.in.response.LoadInputStreamsResponse;
+import dto.type.in.response.load.LoadInputStreamsResponse;
 import dto.type.out.server.Choice.DtoServerGameChoice;
 import dto.type.out.server.Choice.DtoServerTeamChoice;
 import dto.type.out.server.Choice.DtoSubServerChoice;
@@ -26,9 +26,10 @@ import java.util.stream.IntStream;
 
 public class ServerManager {
     private final ServerData Data = new ServerData();
-    private final ReadWriteLock lock = new ReentrantReadWriteLock();
+    private final ReadWriteLock SubServersLock = new ReentrantReadWriteLock();
     private final List<SubServer> subServers = new ArrayList<>();
     private boolean hasGame = false;
+    private ReadWriteLock UpdateLock = new ReentrantReadWriteLock();
 
     public boolean hasGame() {
         return hasGame;
@@ -84,22 +85,29 @@ public class ServerManager {
         Engine toAdd = new Engine(new GameData());
         toAdd.loadFiles(i_Response);
 
-        lock.writeLock().lock();
+        SubServersLock.writeLock().lock();
         try {
             DtoServerInfo dtoServerInfo = i_Response.getDtoToLoad();
             boolean checkName = subServers.stream().noneMatch(T -> T.getServerName()
                     .equalsIgnoreCase(dtoServerInfo.getServerName()));
             if (checkName) {
                 SubServer newSubServer = new SubServer(toAdd, subServers.size() + 1, dtoServerInfo);
-                subServers.add(newSubServer);
-                hasGame = true;
+                UpdateLock.writeLock().lock();
+                try {
+                    subServers.add(newSubServer);
+                    hasGame = true;
+                    Data.updateCount();
+                }
+                finally {
+                    UpdateLock.writeLock().unlock();
+                }
             }
             else{
                 throw new NameTaken(dtoServerInfo.getServerName());
             }
         }
         finally {
-            lock.writeLock().unlock();
+            SubServersLock.writeLock().unlock();
         }
     }
 
@@ -126,11 +134,11 @@ public class ServerManager {
      * @return Number of sub-servers.
      */
     public int numberOfSubServerState() {
-        lock.readLock().lock();
+        SubServersLock.readLock().lock();
         try {
             return subServers.size();
         } finally {
-            lock.readLock().unlock();
+            SubServersLock.readLock().unlock();
         }
     }
 
@@ -140,14 +148,14 @@ public class ServerManager {
      * @return DtoServerStatus object containing the status of all servers.
      */
     public DtoServerStatus getServerStatus() {
-        lock.readLock().lock();
+        SubServersLock.readLock().lock();
         try {
             List<DtoSubServerStatus> statuses = subServers.stream()
                 .map(SubServer::getStatus)
                 .collect(Collectors.toList());
             return new DtoServerStatus(statuses);
         } finally {
-            lock.readLock().unlock();
+            SubServersLock.readLock().unlock();
         }
     }
 
@@ -157,7 +165,7 @@ public class ServerManager {
      * @return DtoServerGameChoice object containing game choices from all sub-servers.
      */
     public DtoServerGameChoice getServerGameChoices() {
-        lock.readLock().lock();
+        SubServersLock.readLock().lock();
         try {
             List<DtoSubServerChoice> choices = IntStream.range(0, subServers.size())
                 .mapToObj(i -> {
@@ -165,13 +173,25 @@ public class ServerManager {
                     List<DtoServerTeamChoice> teamsToAdd = IntStream.range(0, subServer.getServerTeams().size())
                         .mapToObj(j -> new DtoServerTeamChoice(j + 1, subServer.getServerTeams().get(j)))
                         .collect(Collectors.toList());
-                    return new DtoSubServerChoice(i + 1, subServer.getServerName(), teamsToAdd);
+                    return new DtoSubServerChoice(i + 1, subServer.getActiveState(), subServer.getServerName(), teamsToAdd);
                 })
                 .collect(Collectors.toList());
 
             return new DtoServerGameChoice(choices);
         } finally {
-            lock.readLock().unlock();
+            SubServersLock.readLock().unlock();
         }
+    }
+
+    public int getUpdateCount(){
+        int ret;
+        UpdateLock.readLock().lock();
+        try{
+            ret = Data.getUpdateCount();
+        } finally {
+            UpdateLock.readLock().unlock();
+        }
+
+        return ret;
     }
 }

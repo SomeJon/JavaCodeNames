@@ -1,16 +1,20 @@
 package dto.type.out.server.Choice;
 
+import dto.type.out.server.HasActive;
+
 import java.util.List;
 
-public class DtoSubServerChoice {
+public class DtoSubServerChoice implements HasActive {
     private final int Id;
+    private final boolean Active;
     private final String GameName;
     private final List<DtoServerTeamChoice> TeamChoices;
 
-    public DtoSubServerChoice(int id, String gameName, List<DtoServerTeamChoice> teamChoices) {
+    public DtoSubServerChoice(int id, boolean active, String gameName, List<DtoServerTeamChoice> teamChoices) {
         Id = id;
         GameName = gameName;
         TeamChoices = teamChoices;
+        Active = active;
     }
 
     public int getId() {
@@ -23,5 +27,9 @@ public class DtoSubServerChoice {
 
     public List<DtoServerTeamChoice> getTeamChoices() {
         return TeamChoices;
+    }
+
+    public boolean isActive() {
+        return Active;
     }
 }
