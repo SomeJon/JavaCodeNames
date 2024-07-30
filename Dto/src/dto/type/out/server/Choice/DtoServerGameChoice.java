@@ -1,8 +1,10 @@
 package dto.type.out.server.Choice;
 
+import dto.Dto;
+
 import java.util.List;
 
-public class DtoServerGameChoice {
+public class DtoServerGameChoice implements Dto {
     private List<DtoSubServerChoice> SubServerChoices;
 
     public DtoServerGameChoice(List<DtoSubServerChoice> subServerChoices) {

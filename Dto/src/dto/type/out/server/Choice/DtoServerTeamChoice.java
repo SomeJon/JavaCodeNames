@@ -1,8 +1,9 @@
 package dto.type.out.server.Choice;
 
+import dto.Dto;
 import dto.type.out.server.DtoServerTeam;
 
-public class DtoServerTeamChoice {
+public class DtoServerTeamChoice implements Dto {
     private final int TeamId;
     private final DtoServerTeam TeamInfo;
 

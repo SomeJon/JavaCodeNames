@@ -3,6 +3,7 @@ package data.server.controllers;
 import data.server.data.ServerData;
 import data.server.data.ePermission;
 import data.user.User;
+import dto.Dto;
 import dto.type.in.response.load.LoadInputStreamsResponse;
 import dto.type.out.server.Choice.DtoServerGameChoice;
 import dto.type.out.server.Choice.DtoServerTeamChoice;
@@ -10,15 +11,18 @@ import dto.type.out.server.Choice.DtoSubServerChoice;
 import dto.type.out.server.DtoServerInfo;
 import dto.type.out.server.DtoServerStatus;
 import dto.type.out.server.DtoSubServerStatus;
+import dto.type.out.server.game.DtoBoardUpdate;
+import dto.type.out.server.game.DtoGameUpdate;
+import dto.type.out.server.game.DtoTurnsUpdate;
 import engine.Engine;
 import engine.data.GameData;
 import exception.server.AdminOn;
 import exception.server.NameTaken;
+import exception.server.Unauthorized;
 
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -42,6 +46,7 @@ public class ServerManager {
             subServers.get(GameId - 1).getData().joinTeam(i_User, TeamId, RoleChoice);
             Data.updateCount();
             i_User.setGameId(GameId);
+            i_User.setTeamId(TeamId);
         } finally {
             UpdateLock.writeLock().unlock();
         }
@@ -230,6 +235,26 @@ public class ServerManager {
     }
 
     public int getGameUpdate(int GameId){
-        return subServers.get(GameId - 1).getData().getUpdate();
+        return subServers.get(GameId - 1).getData().getBoardUpdate();
+    }
+
+    public Dto getUpdates(User i_User){
+        int gameId = i_User.getGameId();
+        if(gameId == 0)
+            throw new Unauthorized();
+
+        DtoBoardUpdate dtoBoard = subServers.get(gameId - 1).getData().getBoardUpdates(i_User);
+        DtoTurnsUpdate dtoTurns = subServers.get(gameId - 1).getData().getTurnUpdates(i_User);
+        Dto ret = null;
+
+        if(dtoBoard != null && dtoTurns != null){
+            ret = new DtoGameUpdate(dtoBoard, dtoTurns);
+        } else if(dtoTurns != null){
+            ret = dtoTurns;
+        } else if(dtoBoard != null){
+            ret = dtoBoard;
+        }
+
+        return ret;
     }
 }

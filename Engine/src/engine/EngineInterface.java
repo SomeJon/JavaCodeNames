@@ -23,4 +23,5 @@ public interface EngineInterface{
         public Dto checkCardReturnContinue(Card i_GuessedCard);
         public DtoGroupTeam nextTeam();
         public DtoActiveGameStatus getActiveGameStatus();
+        public boolean didGameEng();
 }

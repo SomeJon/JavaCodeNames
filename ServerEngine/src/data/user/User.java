@@ -9,21 +9,31 @@ import message.UserMessage.eRole;
 
 public class User {
     private final String Name;
-    private int GameId;
+    private int GameId; //0 = not in a game
+    private int TeamId; //0 = not in a team
     private final ePermission PermissionLevel;
     private ServerTeam ConnectedTeam;
     private eRole Role;
     private int ChatUpdate = 0;
     private int TurnUpdate = 0;
+    private int NextTurnId = 0;
     private int ServerUpdate = 0;
-    private int GameUpdate = 0;
-
+    private int BoardUpdate = 0;
 
     public User(String i_Name, ePermission i_PermissionLevel) {
         Name = i_Name;
         PermissionLevel = i_PermissionLevel;
         ConnectedTeam = null;
         GameId = 0;
+        TeamId = 0;
+    }
+
+    public int getTeamId() {
+        return TeamId;
+    }
+
+    public void setTeamId(int i_TeamId) {
+        TeamId = i_TeamId;
     }
 
     public ServerTeam getConnectedTeam() {
@@ -86,16 +96,16 @@ public class User {
         Role = i_Role;
     }
 
-    public int getGameUpdate() {
-        return GameUpdate;
+    public int getBoardUpdate() {
+        return BoardUpdate;
     }
 
-    public void setGameUpdate(int i_GameUpdate) {
-        GameUpdate = i_GameUpdate;
+    public void setBoardUpdate(int i_GameUpdate) {
+        BoardUpdate = i_GameUpdate;
     }
 
-    public boolean checkGameUpdate(int i_GameUpdate) {
-        return GameUpdate == i_GameUpdate;
+    public boolean checkBoardUpdate(int i_GameUpdate) {
+        return BoardUpdate == i_GameUpdate;
     }
 
     public boolean checkTurnUpdate(int i_TurnUpdate) {
@@ -108,5 +118,13 @@ public class User {
 
     public boolean checkServerUpdate(int i_ServerUpdate) {
         return ServerUpdate == i_ServerUpdate;
+    }
+
+    public int getNextTurnId() {
+        return NextTurnId;
+    }
+
+    public void setNextTurnId(int i_NextTurnId) {
+        NextTurnId = i_NextTurnId;
     }
 }

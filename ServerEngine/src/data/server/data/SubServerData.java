@@ -1,29 +1,39 @@
 package data.server.data;
 
+import data.server.data.game.Turn;
 import data.server.data.group.ServerTeam;
 import data.server.data.group.eRoles;
 import data.user.User;
+import dto.type.out.board.DtoBoard;
+import dto.type.out.board.card.DtoGroupTeam;
 import dto.type.out.server.DtoServerInfo;
 import dto.type.out.server.DtoServerTeam;
+import dto.type.out.server.game.DtoBoardUpdate;
+import dto.type.out.server.game.DtoTurnsUpdate;
 import engine.EngineInterface;
 import exception.server.NoSpot;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.OptionalInt;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class SubServerData {
     private final String name;
     private final int Id;
     private Boolean Active;
-    private AtomicInteger Turn;
-    private int Update = 0;
+    private int TurnUpdate = 0;
+    private int BoardUpdate = 0;
     private EngineInterface Engine = null;
     private final List<ServerTeam> Teams;
-    private final ReadWriteLock TeamsLock = new ReentrantReadWriteLock();
+    private final List<data.server.data.game.Turn> Turns = new ArrayList<>();
+    private final ReadWriteLock TeamsLock = new ReentrantReadWriteLock(); //locks the team for reading and writing into them
+    private final ReadWriteLock TurnLock = new ReentrantReadWriteLock(); //locks Turn from changing while updating or reading
+    private final ReadWriteLock BoardLock = new ReentrantReadWriteLock(); //locks board from changing while board read
+
 
     public SubServerData(EngineInterface engine, int id, DtoServerInfo dtoServerInfo) {
         name = dtoServerInfo.getServerName();
@@ -31,7 +41,6 @@ public class SubServerData {
         Engine = engine;
         Teams = new ArrayList<ServerTeam>();
         List<DtoServerTeam> teams = dtoServerInfo.getServerTeams();
-        Turn = new AtomicInteger(0);
         Active = false;
 
         for (DtoServerTeam team : teams) {
@@ -52,16 +61,12 @@ public class SubServerData {
         return Active;
     }
 
-    public AtomicInteger getTurn() {
-        return Turn;
+    public int getTurnUpdate() {
+        return TurnUpdate;
     }
 
     public EngineInterface getEngine() {
         return Engine;
-    }
-
-    public void turnUp(){
-        Turn.incrementAndGet();
     }
 
     public List<DtoServerTeam> getTeams() {
@@ -94,7 +99,7 @@ public class SubServerData {
         TeamsLock.writeLock().lock();
         try {
             Teams.get(TeamId - 1).addRole(toAdd, i_User);
-            Update++;
+            BoardUpdate++;
             StartTry();
         }
         catch(NoSpot error){
@@ -112,13 +117,82 @@ public class SubServerData {
     private void StartTry(){
         boolean check = Teams.stream().allMatch(ServerTeam::isTeamReady);
         if (check) {
-            Turn.incrementAndGet();
             Active = true;
-            Engine.startGame();
+            BoardLock.writeLock().lock();
+            TurnLock.writeLock().lock();
+            TurnUpdate++;
+            BoardUpdate++;
+            try {
+                Engine.startGame();
+                Turns.add(buildTurn());
+            }finally {
+                TurnLock.writeLock().unlock();
+                BoardLock.writeLock().unlock();
+            }
         }
     }
 
-    public int getUpdate() {
-        return Update;
+    public int getBoardUpdate() {
+        return BoardUpdate;
+    }
+
+    private Turn buildTurn(){
+        DtoGroupTeam team = (DtoGroupTeam)Engine.getActiveTeam();
+        String targetName = team.getName();
+        int teamId = -1;
+        OptionalInt indexOpt = IntStream.range(0, Teams.size())
+                .filter(i -> Teams.get(i).getTeam().getName().equals(targetName))
+                .findFirst();
+
+        TurnUpdate++;
+        if (indexOpt.isPresent()) {
+            teamId = indexOpt.getAsInt();
+        }
+
+        return new Turn(teamId + 1, team);
+    }
+
+    public DtoTurnsUpdate getTurnUpdates(User i_User){
+        DtoTurnsUpdate delta = null;
+        TurnLock.readLock();
+        try{
+            if(!i_User.checkTurnUpdate(TurnUpdate)) {
+                boolean semi = false;
+                int userUpdate = i_User.getNextTurnId();
+
+                if (userUpdate == Turns.size()) {
+                    userUpdate--;
+                    semi = true;
+                }
+
+                delta = new DtoTurnsUpdate(Turns.subList(userUpdate, Turns.size())
+                        .stream()
+                        .map(Turn::getDto)
+                        .collect(Collectors.toList()), semi);
+                i_User.setNextTurnId(Turns.size());
+
+
+                i_User.setTurnUpdate(TurnUpdate);
+            }
+        } finally {
+            TurnLock.readLock().unlock();
+        }
+
+        return delta;
+    }
+
+    public DtoBoardUpdate getBoardUpdates(User i_User){
+        DtoBoardUpdate ret = null;
+        BoardLock.readLock().lock();
+        try{
+            if(!i_User.checkBoardUpdate(BoardUpdate)) {
+                ret = new DtoBoardUpdate((DtoBoard)Engine.getActiveBoard(), Engine.didGameEng());
+                i_User.setBoardUpdate(BoardUpdate);
+            }
+        } finally {
+            BoardLock.readLock().unlock();
+        }
+
+        return ret;
     }
 }

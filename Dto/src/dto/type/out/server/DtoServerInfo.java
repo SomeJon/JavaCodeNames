@@ -1,11 +1,12 @@
 package dto.type.out.server;
 
+import dto.Dto;
 import engine.data.Team;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class DtoServerInfo {
+public class DtoServerInfo implements Dto {
     private String ServerName;
     private String DictFileName;
     private int col;

@@ -1,8 +1,10 @@
 package dto.type.out.server;
 
+import dto.Dto;
+
 import java.util.List;
 
-public class DtoServerStatus {
+public class DtoServerStatus implements Dto {
     private List<DtoSubServerStatus> subServerStatus;
 
     public DtoServerStatus() {

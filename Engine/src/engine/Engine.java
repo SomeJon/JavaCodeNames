@@ -160,4 +160,9 @@ public class Engine implements EngineInterface, Serializable {
         return new DtoActiveGameStatus(Data.getActiveData().getPlayingBoard(),
                 Data.getActiveData().getPlayingTeamGroup());
     }
+
+    @Override
+    public boolean didGameEng() {
+        return Data.getActiveData().getPlayingTeams().size() == 1;
+    }
 }

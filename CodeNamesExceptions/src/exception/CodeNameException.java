@@ -9,7 +9,8 @@ public abstract class CodeNameException extends RuntimeException {
         SERVER_NAME_TAKEN,
         SERVER_GAME_LOGIC,
         SERVER_ADMIN_ON,
-        SERVER_NO_SPOT
+        SERVER_NO_SPOT,
+        UNAUTHORIZED,
     }
 
     private ExceptionType Type;

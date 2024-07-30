@@ -2,7 +2,6 @@ package codenames.server.connect.check.update;
 
 import codenames.ServerUtils;
 import codenames.SessionUtils;
-import codenames.Utils;
 import codenames.server.health.HealthServlet;
 import constant.attribute.AttributeNames;
 import data.server.controllers.ServerManager;
@@ -33,9 +32,9 @@ public class CheckUpdateServlet extends HealthServlet {
             if (!user.checkGameUpdate(manager.getGameUpdate(GameId))) {
                 Integer update = 0;
                 ret = manager.getGameChoice(GameId, update);
-                user.setGameUpdate(update);
+                user.setBoardUpdate(update);
                 ServerUtils.moveObjectIntoResponse(response, ret);
-                user.setGameUpdate(manager.getGameUpdate(GameId));
+                user.setBoardUpdate(manager.getGameUpdate(GameId));
                 response.setStatus(HttpServletResponse.SC_OK);
             } else{
                 response.setStatus(HttpServletResponse.SC_NO_CONTENT);

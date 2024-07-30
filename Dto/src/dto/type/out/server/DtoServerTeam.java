@@ -1,9 +1,10 @@
 package dto.type.out.server;
 
+import dto.Dto;
 import dto.type.out.data.DtoTeam;
 import engine.data.Team;
 
-public class DtoServerTeam {
+public class DtoServerTeam implements Dto {
     private final DtoTeam Team;
     private final int NumOfGuessers;
     private final int NumOfDefiners;

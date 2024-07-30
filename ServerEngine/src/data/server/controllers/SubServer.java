@@ -2,8 +2,6 @@ package data.server.controllers;
 
 import data.server.data.SubServerChat;
 import data.server.data.SubServerData;
-import data.server.data.group.ServerTeam;
-import data.user.User;
 import dto.type.out.data.DtoGameDetails;
 import dto.type.out.server.DtoServerInfo;
 import dto.type.out.server.DtoServerTeam;
@@ -46,6 +44,6 @@ public class SubServer {
     }
 
     public int getUpdate(){
-        return Data.getUpdate();
+        return Data.getBoardUpdate();
     }
 }
