@@ -16,6 +16,7 @@ public class User {
     private int ChatUpdate = 0;
     private int TurnUpdate = 0;
     private int ServerUpdate = 0;
+    private int GameUpdate = 0;
 
 
     public User(String i_Name, ePermission i_PermissionLevel) {
@@ -57,24 +58,24 @@ public class User {
         return ChatUpdate;
     }
 
-    public void updateChat(int i_ChatUpdate) {
-        ChatUpdate += i_ChatUpdate;
+    public void setChatUpdate(int i_ChatUpdate) {
+        ChatUpdate = i_ChatUpdate;
+    }
+
+    public void setTurnUpdate(int i_TurnUpdate) {
+        TurnUpdate = i_TurnUpdate;
+    }
+
+    public void setServerUpdate(int i_ServerUpdate) {
+        ServerUpdate = i_ServerUpdate;
     }
 
     public int getTurnUpdate() {
         return TurnUpdate;
     }
 
-    public void updateTurn(int i_TurnUpdate) {
-        TurnUpdate += i_TurnUpdate;
-    }
-
     public int getServerUpdate() {
         return ServerUpdate;
-    }
-
-    public void updateServer(int i_ServerUpdate) {
-        ServerUpdate += i_ServerUpdate;
     }
 
     public eRole getRole() {
@@ -83,5 +84,29 @@ public class User {
 
     public void setRole(eRole i_Role) {
         Role = i_Role;
+    }
+
+    public int getGameUpdate() {
+        return GameUpdate;
+    }
+
+    public void setGameUpdate(int i_GameUpdate) {
+        GameUpdate = i_GameUpdate;
+    }
+
+    public boolean checkGameUpdate(int i_GameUpdate) {
+        return GameUpdate == i_GameUpdate;
+    }
+
+    public boolean checkTurnUpdate(int i_TurnUpdate) {
+        return TurnUpdate == i_TurnUpdate;
+    }
+
+    public boolean checkChatUpdate(int i_ChatUpdate) {
+        return ChatUpdate == i_ChatUpdate;
+    }
+
+    public boolean checkServerUpdate(int i_ServerUpdate) {
+        return ServerUpdate == i_ServerUpdate;
     }
 }

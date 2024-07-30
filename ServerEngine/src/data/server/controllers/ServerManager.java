@@ -18,6 +18,7 @@ import exception.server.NameTaken;
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -175,7 +176,7 @@ public class ServerManager {
      *
      * @return DtoServerGameChoice object containing game choices from all sub-servers.
      */
-    public DtoServerGameChoice getServerGameChoices() {
+    public DtoServerGameChoice getServerGameChoices(Integer o_Update) {
         SubServersLock.readLock().lock();
         try {
             List<DtoSubServerChoice> choices = IntStream.range(0, subServers.size())
@@ -190,6 +191,7 @@ public class ServerManager {
 
             return new DtoServerGameChoice(choices);
         } finally {
+            o_Update = Data.getUpdateCount();
             SubServersLock.readLock().unlock();
         }
     }
@@ -208,5 +210,26 @@ public class ServerManager {
 
     public boolean didGameStart(int GameId){
         return subServers.get(GameId - 1).getData().getActive();
+    }
+
+    public DtoSubServerChoice getGameChoice(int GameId, Integer o_Update) {
+        SubServersLock.readLock().lock();
+        try {
+            SubServer subServer = subServers.get(GameId - 1);
+            List<DtoServerTeamChoice> teamsToAdd = IntStream.range(0, subServer.getServerTeams().size())
+                        .mapToObj(j -> new DtoServerTeamChoice(j + 1, subServer.getServerTeams().get(j)))
+                        .collect(Collectors.toList());
+            DtoSubServerChoice choice = new DtoSubServerChoice(GameId, subServer.getActiveState(),
+                    subServer.getServerName(), teamsToAdd);
+
+            return choice;
+        } finally {
+            o_Update = subServers.get(GameId - 1).getUpdate();
+            SubServersLock.readLock().unlock();
+        }
+    }
+
+    public int getGameUpdate(int GameId){
+        return subServers.get(GameId - 1).getData().getUpdate();
     }
 }

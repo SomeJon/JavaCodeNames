@@ -23,10 +23,12 @@ public class SubServerChat {
         DtoServerChat ret = null;
 
         if(newMessages != null){
-            i_User.updateChat(newMessages.size());
+            i_User.setChatUpdate(chatData.getCurrentUpdate());
             ret = new DtoServerChat(i_User.getChatUpdate(), newMessages);
         }
 
         return ret;
     }
+
+
 }

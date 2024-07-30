@@ -34,9 +34,10 @@ public class Utils {
                     }
                 });
     }
-
-    public static List<DtoSubServerChoice> getFilteredChoices(ServerManager manager, String requestedState) {
-        List<DtoSubServerChoice> subServerChoices = manager.getServerGameChoices().getSubServerChoices();
+    
+    public static List<DtoSubServerChoice> getFilteredChoices(ServerManager manager, String requestedState,
+                                                              Integer o_Update) {
+        List<DtoSubServerChoice> subServerChoices = manager.getServerGameChoices(o_Update).getSubServerChoices();
         return Utils
                     .filterByState(subServerChoices.stream(), requestedState)
                     .collect(Collectors.toList());

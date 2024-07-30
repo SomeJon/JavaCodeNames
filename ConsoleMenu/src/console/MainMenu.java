@@ -27,6 +27,10 @@ public class MainMenu implements ChoiceNotifier, Serializable{
         return CurrentMenu;
     }
 
+    public void setCurrentMenu(Menu i_CurrentMenu) {
+        CurrentMenu = i_CurrentMenu;
+    }
+
     public MainMenu(String i_MainMenuName)
     {
         final boolean MAIN_MENU = true;

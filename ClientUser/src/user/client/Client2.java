@@ -51,7 +51,9 @@ public class Client2 implements ChoiceNotifier {
         try(Response response = call.execute()){
             if (response.code() == HttpCode.CREATED) {
                 Data.LoggedIn = true;
-                System.out.println("--Logged in as " + ((StringResponse) Data.CurrentResponse).getStr() + "--\n");
+                String str = ((StringResponse) Data.CurrentResponse).getStr();
+                System.out.println("--Logged in as " + str + "--\n");
+                Data.getMain().getStartMenu().setMenuName("User Client - " + str);
                 Data.buildMenu2(this);
             } else if (response.code() == HttpCode.CONFLICT || response.code() == HttpCode.BAD_REQUEST) {
                 DtoResponse<Map<String, Boolean>> dtoResponse =
@@ -114,7 +116,8 @@ public class Client2 implements ChoiceNotifier {
                     showPendingGames();
                     break;
                 case CLEAN_CHOICE:
-                    Data.buildMenu20(this);
+                    if(Data.getMain().getCurrentMenu().getMenuName().equalsIgnoreCase("Join Game"))
+                        Data.buildMenu20(this);
                     break;
                 case ENTER_GAME:
                     joinGame();
@@ -145,6 +148,76 @@ public class Client2 implements ChoiceNotifier {
         }
     }
 
+    private void waitForGame(){
+        boolean check = didGameStart();
+
+        while(!check){
+            updateData();
+            check = Data.CurrentSubChoice.isActive();
+            sleepForSomeTime(1000);
+        }
+
+        Data.buildMenu3(this);
+        //todo: start game update thread with some infos
+        //todo: start chat update thread
+    }
+
+    private boolean didGameStart(){
+        boolean ret = false;
+
+        if(Data.NewUpdate) {
+            Request request = getRequestCheckGame(ClientConst.SERVER_CONTEXT + LinkConst.CHECK_GAME,
+                    Data.GameData.getGameId());
+
+            Call call = Data.HTTP_CLIENT.newCall(request);
+
+            try (Response response = call.execute()) {
+                if (response.code() == HttpCode.CREATED) {
+                    ret = true;
+                } else
+                    errorPrint("Unexpected server update error occurred!");
+            } catch (IOException e) {
+                errorPrint("IOException occurred: " + e.getMessage());
+            }
+        }
+
+        return ret;
+    }
+
+    private void updateData(){
+        Request request = getRequestCheckGame(ClientConst.SERVER_CONTEXT + LinkConst.UPDATE_GAME_STATUS,
+                Data.GameData.getGameId());
+
+        Call call = Data.HTTP_CLIENT.newCall(request);
+
+        try(Response response = call.execute()) {
+            if (response.code() == HttpCode.OK) {
+                Data.CurrentSubChoice = new Gson().fromJson(response.body().charStream(),
+                        DtoSubServerChoice.class);
+                printUpdate();
+                Data.NewUpdate = true;
+            } else if (response.code() == HttpCode.NO_CONTENT) {
+                Data.NewUpdate = false;
+            } else
+                errorPrint("Unexpected server update error occurred!");
+        } catch (IOException e){
+            errorPrint("IOException occurred: " + e.getMessage());
+        }
+    }
+
+    private void printUpdate(){
+        StringBuilder toPrint = new StringBuilder();
+
+        for(DtoServerTeamChoice teamChoice : Data.CurrentSubChoice.getTeamChoices()){
+            DtoServerTeam team = teamChoice.getTeamInfo();
+            toPrint.append(team.getTeam().getName())
+                    .append(" - Roles state(Connected/Needed): ")
+                    .append(parseRolesShort(team)).append("\n");
+        }
+
+        System.out.println(toPrint);
+    }
+
     private void joinGame(){
         Request request = putRequestJoin(ClientConst.SERVER_CONTEXT + LinkConst.JOIN_GAME,
                 Data.GameData.getGameId(), Data.GameData.getTeamId(), Data.GameData.getRole().GetChoice());
@@ -156,15 +229,15 @@ public class Client2 implements ChoiceNotifier {
             if(response.code() == HttpCode.OK) {
                 str = "Joined game " + Data.GameData.getGameName() +
                         "!\nPlease wait for other users to join...";
-                //todo: create a thread that waits for game to be active and create a menu when it is
+                System.out.println(str);
+                waitForGame();
             }
             else if (response.code() == HttpCode.GONE || response.code() == HttpCode.BAD_REQUEST
                     || response.code() == HttpCode.UNAUTHORIZED) {
                 assert response.body() != null;
                 str = response.body().string();
-            }
-            if(str != null)
                 System.out.println(str);
+            }
         } catch (IOException e) {
             errorPrint("IOException occurred: " + e.getMessage());
         }
@@ -337,42 +410,55 @@ public class Client2 implements ChoiceNotifier {
         StringBuilder toPrint = new StringBuilder();
 
         toPrint.append("Available teams: ");
-        for(DtoServerTeamChoice team : info.getTeamChoices()){
-            toPrint.append("(")
-                    .append(team.getTeamId())
-                    .append(": ")
-                    .append(team.getTeamInfo().getTeam().getName())
-                    .append(")");
+        for(DtoServerTeamChoice team : info.getTeamChoices()) {
+            if (team.getTeamInfo().getConnectedGuessers() != team.getTeamInfo().getNumOfGuessers() ||
+                    team.getTeamInfo().getConnectedDefiners() != team.getTeamInfo().getNumOfDefiners()) {
+                toPrint.append("(")
+                        .append(team.getTeamId())
+                        .append(": ")
+                        .append(team.getTeamInfo().getTeam().getName())
+                        .append(")");
+            }
         }
 
         System.out.println(toPrint);
     }
 
-    private void printRoleShortInfo(){
+    private void printRoleShortInfo() {
         DtoServerTeam info = Data.CurrentTeamChoice.getTeamInfo();
         StringBuilder toPrint = new StringBuilder();
 
-        toPrint.append("Available roles(Connected/Needed): ");
-        if(info.getNumOfDefiners() != info.getConnectedDefiners()){
-            toPrint.append("(0:Definers: (")
-                    .append(info.getConnectedDefiners())
-                    .append("/")
-                    .append(info.getNumOfDefiners())
-                    .append(")) ");
-        }
-        if(info.getNumOfGuessers() != info.getConnectedGuessers()){
-            toPrint.append("(1:Guessers: (")
-                    .append(info.getConnectedGuessers())
-                    .append("/")
-                    .append(info.getNumOfGuessers())
-                    .append(")");
-        }
+        toPrint.append("Roles state(Connected/Needed): ")
+                .append(parseRolesShort(info));
+
 
         System.out.println(toPrint);
+    }
+
+    private StringBuilder parseRolesShort(DtoServerTeam info){
+        StringBuilder ret = new StringBuilder();
+        return ret.append("(0:Definers: (")
+                .append(info.getConnectedDefiners())
+                .append("/")
+                .append(info.getNumOfDefiners())
+                .append(")) ")
+                .append("(1:Guessers: (")
+                .append(info.getConnectedGuessers())
+                .append("/")
+                .append(info.getNumOfGuessers())
+                .append(")");
     }
 
     private boolean checkTeamFull(DtoServerTeam i_ToCheck){
         return i_ToCheck.getNumOfDefiners() == i_ToCheck.getConnectedDefiners() &&
                 i_ToCheck.getNumOfGuessers() == i_ToCheck.getConnectedGuessers();
+    }
+
+    private static void sleepForSomeTime(long time) {
+        try {
+            Thread.sleep(time);
+        } catch (InterruptedException ignored) {
+
+        }
     }
 }

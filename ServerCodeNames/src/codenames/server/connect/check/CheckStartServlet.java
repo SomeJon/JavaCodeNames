@@ -3,6 +3,7 @@ package codenames.server.connect.check;
 import codenames.ServerUtils;
 import constant.attribute.AttributeNames;
 import data.server.controllers.ServerManager;
+import dto.type.out.server.Choice.DtoServerGameChoice;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -28,6 +29,7 @@ public class CheckStartServlet extends HttpServlet {
                 boolean check = manager.didGameStart(GameId);
                 if (check) {
                     response.setStatus(HttpServletResponse.SC_CREATED);
+
                 } else {
                     response.setStatus(HttpServletResponse.SC_CONFLICT);
                 }

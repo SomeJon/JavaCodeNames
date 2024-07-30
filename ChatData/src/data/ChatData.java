@@ -31,4 +31,8 @@ public class ChatData {
 
         return ret;
     }
+
+    public int getCurrentUpdate() {
+        return CurrentUpdate;
+    }
 }

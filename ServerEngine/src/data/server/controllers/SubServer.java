@@ -44,4 +44,8 @@ public class SubServer {
     public boolean getActiveState(){
         return Data.getActive();
     }
+
+    public int getUpdate(){
+        return Data.getUpdate();
+    }
 }

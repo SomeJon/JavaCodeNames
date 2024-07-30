@@ -39,9 +39,11 @@ public class GamesInfoServlet extends HttpServlet {
 
         if (user != null) {
             if (requestedState != null) {
-                if (user.getServerUpdate() < manager.getUpdateCount()) {
-                    List<DtoSubServerChoice> filteredChoices = Utils.getFilteredChoices(manager, requestedState);
-
+                int updateNum = manager.getUpdateCount();
+                if (!user.checkServerUpdate(updateNum)) {
+                    Integer update = 0;
+                    List<DtoSubServerChoice> filteredChoices = Utils.getFilteredChoices(manager, requestedState, update);
+                    user.setServerUpdate(update);
                     gameChoices.setSubServerChoices(filteredChoices);
 
                     if (filteredChoices.isEmpty()) {
@@ -51,7 +53,13 @@ public class GamesInfoServlet extends HttpServlet {
                         response.setStatus(HttpServletResponse.SC_OK);
                     }
                 } else{
-                    response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+                    if(updateNum > 0) {
+                        response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+                    }
+                    else{
+                        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                        errorMsg = manager.hasGame() ? "There are no matching games" : "There are no loaded games";
+                    }
                 }
             } else {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

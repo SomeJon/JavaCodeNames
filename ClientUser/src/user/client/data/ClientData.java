@@ -10,6 +10,7 @@ import ui.input.InputHandling;
 import cookiejar.copied.SimpleCookieManager;
 import okhttp3.OkHttpClient;
 import user.client.action.Action;
+import user.client.action.ChatSetting;
 
 import java.util.List;
 
@@ -26,6 +27,7 @@ public class ClientData {
     public DtoServerGameChoice CurrentChoices = null;
     public DtoSubServerChoice CurrentSubChoice = null;
     public DtoServerTeamChoice CurrentTeamChoice = null;
+    public boolean NewUpdate = false;
 
     public ClientData() {
         Main = new MainMenu("User Client");
@@ -43,8 +45,8 @@ public class ClientData {
         Main.getStartMenu().getMenuItems().remove(0);
         Main.getStartMenu().createMenuOption("Show all games details", Action.SHOW_GAMES, i_Client);
         NotifyList notifiers = new NotifyList();
-        notifiers.addNotifyBefore(i_Client, Action.SHOW_PENDING_GAMES);
         notifiers.addNotifyBefore(i_Client, Action.CLEAN_CHOICE);
+        notifiers.addNotifyBefore(i_Client, Action.SHOW_PENDING_GAMES);
         Menu subMenu1 = Main.getStartMenu().createSubMenuWithActions("Join Game", notifiers);
         subMenu1.createMenuOption("Refresh games info", Action.REFRESH, i_Client);
         subMenu1.createMenuOption("Enter game id", InputHandling.GET_GAME_ID, i_Client);
@@ -127,5 +129,37 @@ public class ClientData {
         CurrentResponse = i_CurrentResponse;
         CurrentInput.getInput(CurrentResponse);
         CurrentInput = null;
+    }
+
+    public void buildMenu3(ChoiceNotifier i_Client){
+        Menu main = Main.getStartMenu();
+
+        main.getMenuItems().remove(1);
+
+        Menu newGameMenu = main.createSubMenu("Joined Game Menu - " + GameData.getGameName());
+        Main.setCurrentMenu(newGameMenu);
+        newGameMenu.createMenuOption("Retrieve Game Status", Action.GAME_SHOW, i_Client);
+        newGameMenu.createMenuOption("Play turn - {current playing team}", Action.PLAY_TURN, i_Client);
+
+        Menu chatMenu = newGameMenu.createSubMenu("Chat");
+        chatMenu.createMenuOption("Enter Chat", Action.CHAT_OPEN, i_Client); //todo: might change it to a chat object
+        Menu chatSettings = chatMenu.createSubMenu("Settings");
+        chatSettings.createMenuOption("Show game messages - ON" +
+                "\n-Show messages created by the server to log actions",
+                ChatSetting.CHAT_SERVER, i_Client); //todo:same
+        Menu entrySetting = chatSettings.createSubMenu("Mode setting - Current: {All/Partly:10/None}" +
+                "\n-All: Shows all chat messages on each entry into the chat" +
+                "\n-Partly: Shows only the top 10 messages" +
+                "\n-None: Does not show any previous messages, only new ones");
+        if(GameData.getRole() == user.client.data.GameData.roleChoice.IDENTIFIER){
+            chatSettings.createMenuOption("Show Identifiers Messages - On",
+                    ChatSetting.CHAT_IDENTIFIER, i_Client); //todo: same
+            chatSettings.createMenuOption("Show Guessers Messages - On",
+                    ChatSetting.CHAT_GUESSER, i_Client); //todo: same
+        }
+
+        entrySetting.createMenuOption("All - ON", ChatSetting.CHAT_ALL, i_Client);
+        entrySetting.createMenuOption("Partly - OFF", ChatSetting.CHAT_PARTLY, i_Client);
+        entrySetting.createMenuOption("None - OFF", ChatSetting.CHAT_NONE, i_Client);
     }
 }

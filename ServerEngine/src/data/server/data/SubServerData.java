@@ -20,6 +20,7 @@ public class SubServerData {
     private final int Id;
     private Boolean Active;
     private AtomicInteger Turn;
+    private int Update = 0;
     private EngineInterface Engine = null;
     private final List<ServerTeam> Teams;
     private final ReadWriteLock TeamsLock = new ReentrantReadWriteLock();
@@ -93,6 +94,7 @@ public class SubServerData {
         TeamsLock.writeLock().lock();
         try {
             Teams.get(TeamId - 1).addRole(toAdd, i_User);
+            Update++;
             StartTry();
         }
         catch(NoSpot error){
@@ -114,5 +116,9 @@ public class SubServerData {
             Active = true;
             Engine.startGame();
         }
+    }
+
+    public int getUpdate() {
+        return Update;
     }
 }

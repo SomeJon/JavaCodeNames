@@ -40,6 +40,19 @@ public class CNRequest {
                 .build();
     }
 
+    public static Request getRequestCheckGame(String i_Url, Integer GameId) {
+        String url = HttpUrl
+                .parse(i_Url)
+                .newBuilder()
+                .addQueryParameter(AttributeNames.WANTED_GAME, GameId.toString())
+                .build().toString();
+
+        return new Request.Builder()
+                .url(url)
+                .get()
+                .build();
+    }
+
     public static void printStats(String i_Url, String i_GetTypes,
                                   OkHttpClient i_Client, boolean printCurrentPlayers){
         Request request = getRequestStats(i_Url, i_GetTypes);
