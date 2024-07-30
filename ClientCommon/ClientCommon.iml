@@ -36,5 +36,14 @@
       </library>
     </orderEntry>
     <orderEntry type="module" module-name="Consts" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://C:/Program Files/Java/addon/okio-2.8.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>

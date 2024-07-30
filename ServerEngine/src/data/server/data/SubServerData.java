@@ -1,9 +1,12 @@
 package data.server.data;
 
 import data.server.data.group.ServerTeam;
+import data.server.data.group.eRoles;
+import data.user.User;
 import dto.type.out.server.DtoServerInfo;
 import dto.type.out.server.DtoServerTeam;
 import engine.EngineInterface;
+import exception.server.NoSpot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +25,6 @@ public class SubServerData {
     private final ReadWriteLock TeamsLock = new ReentrantReadWriteLock();
 
     public SubServerData(EngineInterface engine, int id, DtoServerInfo dtoServerInfo) {
-        //todo check if we need to check the file name or whatever
         name = dtoServerInfo.getServerName();
         Id = id;
         Engine = engine;
@@ -65,15 +67,52 @@ public class SubServerData {
         List<DtoServerTeam> teams = new ArrayList<>();
 
         TeamsLock.readLock().lock();
-        teams = Teams.stream()
-                .map(T ->
-                        new DtoServerTeam(
-                                T.getTeam(), T.getGuessers().size(),
-                                T.getIdentifiers().size(), T.getCurrentNumGuessers(),
-                                T.getCurrentNumIdentifiers()))
-                .collect(Collectors.toList());
-        TeamsLock.readLock().unlock();
+        try {
+            teams = Teams.stream()
+                    .map(T ->
+                            new DtoServerTeam(
+                                    T.getTeam(), T.getGuessers().size(),
+                                    T.getIdentifiers().size(), T.getCurrentNumGuessers(),
+                                    T.getCurrentNumIdentifiers()))
+                    .collect(Collectors.toList());
+        } finally {
+            TeamsLock.readLock().unlock();
+        }
 
         return teams;
+    }
+
+    public void joinTeam(User i_User, int TeamId, int RoleChoice) {
+        eRoles toAdd;
+        if (RoleChoice == 0) {
+            toAdd = eRoles.Identifier;
+        } else {
+            toAdd = eRoles.Guesser;
+        }
+
+        TeamsLock.writeLock().lock();
+        try {
+            Teams.get(TeamId - 1).addRole(toAdd, i_User);
+            StartTry();
+        }
+        catch(NoSpot error){
+            if(Teams.stream().allMatch(ServerTeam::isTeamReady)){
+                throw new NoSpot(NoSpot.eNoSpot.Game);
+            }
+            else{
+                throw error;
+            }
+        } finally {
+            TeamsLock.writeLock().unlock();
+        }
+    }
+
+    private void StartTry(){
+        boolean check = Teams.stream().allMatch(ServerTeam::isTeamReady);
+        if (check) {
+            Turn.incrementAndGet();
+            Active = true;
+            Engine.startGame();
+        }
     }
 }

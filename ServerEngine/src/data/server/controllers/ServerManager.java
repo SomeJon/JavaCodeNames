@@ -35,6 +35,17 @@ public class ServerManager {
         return hasGame;
     }
 
+    public void joinGame(User i_User, int GameId, int TeamId, int RoleChoice){
+        UpdateLock.writeLock().lock();
+        try {
+            subServers.get(GameId - 1).getData().joinTeam(i_User, TeamId, RoleChoice);
+            Data.updateCount();
+            i_User.setGameId(GameId);
+        } finally {
+            UpdateLock.writeLock().unlock();
+        }
+    }
+
     /**
      * Admin entry method to add an admin user.
      *
@@ -193,5 +204,9 @@ public class ServerManager {
         }
 
         return ret;
+    }
+
+    public boolean didGameStart(int GameId){
+        return subServers.get(GameId - 1).getData().getActive();
     }
 }

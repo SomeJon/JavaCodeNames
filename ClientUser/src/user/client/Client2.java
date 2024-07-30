@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static prints.Prints.parseGamesChoice;
-import static request.CNRequest.getRequestStats;
+import static request.CNRequest.*;
 import static ui.input.InputHandling.errorPrint;
 
 public class Client2 implements ChoiceNotifier {
@@ -116,6 +116,9 @@ public class Client2 implements ChoiceNotifier {
                 case CLEAN_CHOICE:
                     Data.buildMenu20(this);
                     break;
+                case ENTER_GAME:
+                    joinGame();
+                    break;
             }
             Data.CurrentAction = null;
         }
@@ -142,9 +145,34 @@ public class Client2 implements ChoiceNotifier {
         }
     }
 
+    private void joinGame(){
+        Request request = putRequestJoin(ClientConst.SERVER_CONTEXT + LinkConst.JOIN_GAME,
+                Data.GameData.getGameId(), Data.GameData.getTeamId(), Data.GameData.getRole().GetChoice());
+
+        Call call = Data.HTTP_CLIENT.newCall(request);
+
+        try(Response response = call.execute()){
+            String str = null;
+            if(response.code() == HttpCode.OK) {
+                str = "Joined game " + Data.GameData.getGameName() +
+                        "!\nPlease wait for other users to join...";
+                //todo: create a thread that waits for game to be active and create a menu when it is
+            }
+            else if (response.code() == HttpCode.GONE || response.code() == HttpCode.BAD_REQUEST
+                    || response.code() == HttpCode.UNAUTHORIZED) {
+                assert response.body() != null;
+                str = response.body().string();
+            }
+            if(str != null)
+                System.out.println(str);
+        } catch (IOException e) {
+            errorPrint("IOException occurred: " + e.getMessage());
+        }
+    }
+
     private void getRole(){
         IntResponse resp = new IntResponse();
-        printTeamShortInfo();
+        printRoleShortInfo();
         Data.activateCurrentInput(resp);
 
         int roleChoice = ((IntResponse) Data.CurrentResponse).getInt();
@@ -294,9 +322,9 @@ public class Client2 implements ChoiceNotifier {
 
         toPrint.append("Available games: ");
         for(DtoSubServerChoice subServerChoice : info.getSubServerChoices()){
-            toPrint.append("(Id: ")
+            toPrint.append("(")
                     .append(subServerChoice.getId())
-                    .append(" Name: ")
+                    .append(": ")
                     .append(subServerChoice.getGameName())
                     .append(")");
         }
@@ -310,9 +338,9 @@ public class Client2 implements ChoiceNotifier {
 
         toPrint.append("Available teams: ");
         for(DtoServerTeamChoice team : info.getTeamChoices()){
-            toPrint.append("(Id: ")
+            toPrint.append("(")
                     .append(team.getTeamId())
-                    .append(" Name: ")
+                    .append(": ")
                     .append(team.getTeamInfo().getTeam().getName())
                     .append(")");
         }
@@ -326,14 +354,14 @@ public class Client2 implements ChoiceNotifier {
 
         toPrint.append("Available roles(Connected/Needed): ");
         if(info.getNumOfDefiners() != info.getConnectedDefiners()){
-            toPrint.append("(Definers: (")
+            toPrint.append("(0:Definers: (")
                     .append(info.getConnectedDefiners())
                     .append("/")
                     .append(info.getNumOfDefiners())
-                    .append("))");
+                    .append(")) ");
         }
         if(info.getNumOfGuessers() != info.getConnectedGuessers()){
-            toPrint.append("(Guessers: (")
+            toPrint.append("(1:Guessers: (")
                     .append(info.getConnectedGuessers())
                     .append("/")
                     .append(info.getNumOfGuessers())

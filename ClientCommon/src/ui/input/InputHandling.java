@@ -196,7 +196,7 @@ public enum InputHandling {
             int Int = 0;
 
             do {
-                System.out.print("Please enter role id (0:Definer) (1:Guesser)"); //todo handle errors
+                System.out.print("Please enter role id: "); //todo handle errors
                 try {
                     Int = scanner.nextInt();
                     if(Int == 0 || Int == 1) {

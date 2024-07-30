@@ -3,6 +3,7 @@ package data.server.controllers;
 import data.server.data.SubServerChat;
 import data.server.data.SubServerData;
 import data.server.data.group.ServerTeam;
+import data.user.User;
 import dto.type.out.data.DtoGameDetails;
 import dto.type.out.server.DtoServerInfo;
 import dto.type.out.server.DtoServerTeam;
@@ -12,7 +13,7 @@ import engine.EngineInterface;
 import java.util.List;
 
 public class SubServer {
-    private SubServerData Data;
+    private final SubServerData Data;
     private final DtoSubServerStatus Status;
     private final SubServerChat Chat = new SubServerChat();
 
@@ -21,8 +22,6 @@ public class SubServer {
         DtoGameDetails details = (DtoGameDetails) engine.getStatus();
         Status = new DtoSubServerStatus(dtoServerInfo, details);
     }
-
-    //todo: add user verification
 
     public SubServerData getData() {
         return Data;

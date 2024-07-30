@@ -7,15 +7,26 @@ public class GameData {
             public String toString() {
                 return "Identifier";
             }
+
+            @Override
+            public int GetChoice() {
+                return 0;
+            }
         },
         GUESSER{
             @Override
             public String toString() {
                 return "Guesser";
             }
+
+            @Override
+            public int GetChoice() {
+                return 1;
+            }
         };
 
         public abstract String toString();
+        public abstract int GetChoice();
     }
 
     private String GameName = null;

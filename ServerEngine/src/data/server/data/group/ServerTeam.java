@@ -5,8 +5,10 @@ import dto.type.out.server.DtoServerTeam;
 import engine.data.Team;
 import exception.server.NoSpot;
 import exception.server.NotEnoughRole;
+import message.UserMessage;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -50,16 +52,33 @@ public class ServerTeam {
         }
     }
 
+
     public engine.data.Team getTeam() {
         return Team;
     }
 
     public List<Role> getGuessers() {
-        return Guessers;
+        List<Role> ret;
+        Lock.readLock().lock();
+        try{
+            ret = new ArrayList<>(Guessers);
+        } finally {
+            Lock.readLock().unlock();
+        }
+
+        return ret;
     }
 
     public List<Role> getIdentifiers() {
-        return Identifiers;
+        List<Role> ret;
+        Lock.readLock().lock();
+        try{
+            ret = new ArrayList<>(Identifiers);
+        } finally {
+            Lock.readLock().unlock();
+        }
+
+        return ret;
     }
 
     public boolean isTeamReady() {
@@ -80,26 +99,33 @@ public class ServerTeam {
         try {
             boolean available = isRoleAvailable(i_Role);
             if (available) {
+                UserMessage.eRole toUpdate = null;
                 switch (i_Role) {
                     case Guesser:
                         openRole = Guessers.stream().filter(T -> T.getUser() == null).findFirst();
                         CurrentNumGuessers++;
+                        toUpdate = UserMessage.eRole.Guesser;
                         break;
                     case Identifier:
                         openRole = Identifiers.stream().filter(T -> T.getUser() == null).findFirst();
                         CurrentNumIdentifiers++;
+                        toUpdate = UserMessage.eRole.Definer;
                         break;
                 }
                 openRole.ifPresent(role -> role.setUser(i_User));
                 i_User.setConnectedTeam(this);
+                i_User.setRole(toUpdate);
             }
-            else{
-                throw new NoSpot();
+            else {
+                if (TeamReady) {
+                    throw new NoSpot(NoSpot.eNoSpot.Team);
+                } else {
+                    throw new NoSpot(NoSpot.eNoSpot.Role);
+                }
             }
 
             TeamReady = CurrentNumGuessers == Guessers.size() && CurrentNumIdentifiers == Identifiers.size();
-        }
-        finally{
+        } finally{
             Lock.writeLock().unlock();
         }
     }

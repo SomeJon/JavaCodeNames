@@ -5,7 +5,10 @@ import constant.attribute.AttributeNames;
 import data.server.controllers.ServerManager;
 import dto.type.out.server.Choice.DtoSubServerChoice;
 import dto.type.out.server.HasActive;
+import jakarta.servlet.http.HttpServletRequest;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -37,5 +40,15 @@ public class Utils {
         return Utils
                     .filterByState(subServerChoices.stream(), requestedState)
                     .collect(Collectors.toList());
+    }
+
+    public static <T> T fromJsonRequest(HttpServletRequest request, Class<T> i_Class) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        BufferedReader reader = request.getReader();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            sb.append(line);
+        }
+        return gson.fromJson(sb.toString(), i_Class);
     }
 }
