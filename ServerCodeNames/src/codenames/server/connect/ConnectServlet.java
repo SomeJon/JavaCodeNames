@@ -41,6 +41,13 @@ public class ConnectServlet extends HttpServlet {
                         errorMessage = "Game is already full!";
                         break;
                 }
+            } catch(IndexOutOfBoundsException e){
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                errorMessage = "Bad info received! please recheck entered info!";
+            } catch (Exception e){
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                errorMessage = "Unknown error received!";
+                e.printStackTrace();
             }
         } else{
             if (!received.receivedResponse()) {

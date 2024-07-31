@@ -1,14 +1,20 @@
 package user.client;
 
+import Adapter.AdapterAddon;
 import console.ChoiceNotifier;
 import console.MenuItem;
 import constant.attribute.AttributeNames;
+import dto.Dto;
 import dto.type.in.response.common.IntResponse;
 import dto.type.in.response.common.StringResponse;
-import dto.type.out.server.Choice.DtoServerGameChoice;
-import dto.type.out.server.Choice.DtoServerTeamChoice;
-import dto.type.out.server.Choice.DtoSubServerChoice;
+import dto.type.out.server.choice.DtoServerGameChoice;
+import dto.type.out.server.choice.DtoServerTeamChoice;
+import dto.type.out.server.choice.DtoSubServerChoice;
 import dto.type.out.server.DtoServerTeam;
+import dto.type.out.server.game.DtoBoardUpdate;
+import dto.type.out.server.game.DtoEndResult;
+import dto.type.out.server.game.DtoGameUpdate;
+import dto.type.out.server.game.DtoSingleTurnUpdate;
 import request.CNRequest;
 import ui.input.InputHandling;
 import user.client.action.Action;
@@ -33,7 +39,7 @@ import static ui.input.InputHandling.errorPrint;
 
 public class Client2 implements ChoiceNotifier {
     private final ClientData Data;
-
+    private final static Gson gson = AdapterAddon.getGson();
     public Client2(ClientData Data) {
         this.Data = Data;
     }
@@ -57,7 +63,7 @@ public class Client2 implements ChoiceNotifier {
                 Data.buildMenu2(this);
             } else if (response.code() == HttpCode.CONFLICT || response.code() == HttpCode.BAD_REQUEST) {
                 DtoResponse<Map<String, Boolean>> dtoResponse =
-                    new Gson().fromJson(response.body().charStream(), ResponseType.STRING_BOOLEAN);
+                    gson.fromJson(response.body().charStream(), ResponseType.STRING_BOOLEAN);
                 errorPrint(dtoResponse.getErrorMessage());
             } else errorPrint("An unexpected server error occurred");
         } catch (ConnectException e) {
@@ -122,6 +128,7 @@ public class Client2 implements ChoiceNotifier {
                 case ENTER_GAME:
                     joinGame();
                     break;
+                case GAME_SHOW:
             }
             Data.CurrentAction = null;
         }
@@ -148,16 +155,51 @@ public class Client2 implements ChoiceNotifier {
         }
     }
 
-    private void waitForGame(){
-        boolean check = didGameStart();
-
-        while(!check){
-            updateData();
-            check = Data.CurrentSubChoice.isActive();
-            sleepForSomeTime(1000);
+    private void showGame(){
+        if(!Data.GameStarted){
+            updateData(true);
+            if(!Data.GameStarted){
+                printStatusPending();
+            }
+        }else{
+            getGameUpdate();
         }
+    }
 
+    private void getGameUpdate(){
+        Request request = getRequestUpdateGameData
+                (ClientConst.SERVER_CONTEXT + ClientConst.GET_UPDATED_GAME_DATA);
+
+        Call call = Data.HTTP_CLIENT.newCall(request);
+
+        try (Response response = call.execute()){
+            if (response.code() == HttpCode.OK) {
+                Dto ret = gson.fromJson(response.body().charStream(), Dto.class);
+
+                if(ret instanceof DtoGameUpdate){
+                    Data.GameData.loadGame((DtoGameUpdate) ret);
+                } else if(ret instanceof DtoBoardUpdate){
+                    Data.GameData.loadBoard((DtoBoardUpdate) ret);
+                } else if(ret instanceof DtoSingleTurnUpdate){
+                    Data.GameData.loadTurn((DtoSingleTurnUpdate) ret);
+                } else if(ret instanceof DtoEndResult){
+                    printGameEnd((DtoEndResult) ret);
+                    Data.rebuildMenu2(this);
+                } else{
+                    errorPrint("Unexpected server update error occurred");
+                }
+            } else if(response.code() == HttpCode.UNAUTHORIZED) {
+                errorPrint("Unauthorized for updates!");
+            }
+        } catch (IOException e){
+            errorPrint("An IOException error occurred");
+        }
+    }
+
+    private void waitForGame(){
         Data.buildMenu3(this);
+        updateData(true);
+
         //todo: start game update thread with some infos
         //todo: start chat update thread
     }
@@ -184,7 +226,7 @@ public class Client2 implements ChoiceNotifier {
         return ret;
     }
 
-    private void updateData(){
+    private void updateData(boolean i_PrintData){
         Request request = getRequestCheckGame(ClientConst.SERVER_CONTEXT + LinkConst.UPDATE_GAME_STATUS,
                 Data.GameData.getGameId());
 
@@ -192,9 +234,12 @@ public class Client2 implements ChoiceNotifier {
 
         try(Response response = call.execute()) {
             if (response.code() == HttpCode.OK) {
-                Data.CurrentSubChoice = new Gson().fromJson(response.body().charStream(),
+                Data.CurrentSubChoice = gson.fromJson(response.body().charStream(),
                         DtoSubServerChoice.class);
-                printUpdate();
+                if(i_PrintData)
+                    printUpdate();
+
+                Data.GameStarted = Data.CurrentSubChoice.isActive();
                 Data.NewUpdate = true;
             } else if (response.code() == HttpCode.NO_CONTENT) {
                 Data.NewUpdate = false;
@@ -367,7 +412,7 @@ public class Client2 implements ChoiceNotifier {
         try(Response response = call.execute()){
             if (response.code() == HttpCode.OK) {
                 DtoResponse<DtoServerGameChoice> dtoResponse =
-                        new Gson().fromJson(response.body().charStream(), ResponseType.DTO_RESPONSE_CHOICE);
+                        gson.fromJson(response.body().charStream(), ResponseType.DTO_RESPONSE_CHOICE);
                 Data.CurrentChoices = dtoResponse.getResult();
                 String toPrint = parseGamesChoice(Data.CurrentChoices);
                 System.out.print(toPrint);
@@ -376,7 +421,7 @@ public class Client2 implements ChoiceNotifier {
                 System.out.print(toPrint);
             } else if (response.code() == HttpCode.NOT_FOUND || response.code() == HttpCode.BAD_REQUEST) {
                 DtoResponse<DtoServerGameChoice> dtoResponse =
-                        new Gson().fromJson(response.body().charStream(), ResponseType.DTO_RESPONSE_STATUS);
+                        gson.fromJson(response.body().charStream(), ResponseType.DTO_RESPONSE_STATUS);
                 errorPrint(dtoResponse.getErrorMessage());
                 Data.getMain().cancelMenuChange();
             } else {
@@ -459,6 +504,38 @@ public class Client2 implements ChoiceNotifier {
             Thread.sleep(time);
         } catch (InterruptedException ignored) {
 
+        }
+    }
+
+    private void printStatusPending(){
+        String toPrint;
+        Data.updateTurnChoice("Waiting for game to start");
+        toPrint = "Status: Pending\nWaiting for game to start";
+
+        System.out.print(toPrint);
+    }
+
+    private void printStatusActive(){
+
+    }
+
+    private void printGameEnd(DtoEndResult i_Result){
+        StringBuilder toPrint = new StringBuilder();
+        if(!i_Result.isEnd()){
+            toPrint.append("Your user is not connected to the game!");
+        } else{
+            if(i_Result.isGameEnd()){
+                toPrint.append("The game has ended!");
+            } else{
+                toPrint.append("Your team has finished playing in the game!");
+            }
+            toPrint.append("\nStats:\n  -Placement: ");
+            if(i_Result.getPlacement() == 0){
+                toPrint.append("Lost!");
+            }
+            else{
+                toPrint.append(i_Result.getResult());
+            }
         }
     }
 }

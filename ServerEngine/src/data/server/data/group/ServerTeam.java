@@ -21,6 +21,7 @@ public class ServerTeam {
     private final List<Role> Identifiers;
     private int CurrentNumGuessers;
     private int CurrentNumIdentifiers;
+    private int CurrentTurnNum = 0;
     private boolean TeamReady = false;
     private final ReadWriteLock Lock = new ReentrantReadWriteLock();
 
@@ -55,6 +56,25 @@ public class ServerTeam {
 
     public engine.data.Team getTeam() {
         return Team;
+    }
+
+    public int getCurrentTurnNum() {
+        Lock.readLock().lock();
+        try{
+            return CurrentTurnNum;
+        } finally {
+            Lock.readLock().unlock();
+        }
+    }
+
+    public int upTurn() {
+        Lock.writeLock().lock();
+        try{
+            CurrentTurnNum++;
+            return CurrentTurnNum;
+        } finally {
+            Lock.writeLock().unlock();
+        }
     }
 
     public List<Role> getGuessers() {

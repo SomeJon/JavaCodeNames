@@ -17,5 +17,6 @@
       </library>
     </orderEntry>
     <orderEntry type="module" module-name="ChatData" />
+    <orderEntry type="module" module-name="Dto" />
   </component>
 </module>

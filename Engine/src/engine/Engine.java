@@ -156,6 +156,12 @@ public class Engine implements EngineInterface, Serializable {
     }
 
     @Override
+    public Dto getNextTeam() {
+        GroupTeam nextTeam = Data.getActiveData().getNextTeam();
+        return new DtoGroupTeam(nextTeam);
+    }
+
+    @Override
     public DtoActiveGameStatus getActiveGameStatus() {
         return new DtoActiveGameStatus(Data.getActiveData().getPlayingBoard(),
                 Data.getActiveData().getPlayingTeamGroup());
@@ -165,4 +171,6 @@ public class Engine implements EngineInterface, Serializable {
     public boolean didGameEng() {
         return Data.getActiveData().getPlayingTeams().size() == 1;
     }
+
+
 }

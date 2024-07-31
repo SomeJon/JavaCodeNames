@@ -22,6 +22,7 @@ public interface EngineInterface{
         public Dto playTurnGuessers(Identification i_CurrentIdentification, GuesserResponse i_Response);
         public Dto checkCardReturnContinue(Card i_GuessedCard);
         public DtoGroupTeam nextTeam();
+        public Dto getNextTeam();
         public DtoActiveGameStatus getActiveGameStatus();
         public boolean didGameEng();
 }

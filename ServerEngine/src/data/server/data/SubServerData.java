@@ -3,19 +3,18 @@ package data.server.data;
 import data.server.data.game.Turn;
 import data.server.data.group.ServerTeam;
 import data.server.data.group.eRoles;
+import data.user.UpdateContainer;
 import data.user.User;
 import dto.type.out.board.DtoBoard;
 import dto.type.out.board.card.DtoGroupTeam;
 import dto.type.out.server.DtoServerInfo;
 import dto.type.out.server.DtoServerTeam;
 import dto.type.out.server.game.DtoBoardUpdate;
-import dto.type.out.server.game.DtoTurnsUpdate;
+import dto.type.out.server.game.DtoSingleTurnUpdate;
 import engine.EngineInterface;
 import exception.server.NoSpot;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.OptionalInt;
+import java.util.*;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
@@ -29,7 +28,8 @@ public class SubServerData {
     private int BoardUpdate = 0;
     private EngineInterface Engine = null;
     private final List<ServerTeam> Teams;
-    private final List<data.server.data.game.Turn> Turns = new ArrayList<>();
+    private final Map<ServerTeam, Integer> Result = new HashMap<>();
+    private final List<data.server.data.game.Turn> Turns = new ArrayList<>(); //todo: remove final enable to delete for restart
     private final ReadWriteLock TeamsLock = new ReentrantReadWriteLock(); //locks the team for reading and writing into them
     private final ReadWriteLock TurnLock = new ReentrantReadWriteLock(); //locks Turn from changing while updating or reading
     private final ReadWriteLock BoardLock = new ReentrantReadWriteLock(); //locks board from changing while board read
@@ -138,6 +138,7 @@ public class SubServerData {
 
     private Turn buildTurn(){
         DtoGroupTeam team = (DtoGroupTeam)Engine.getActiveTeam();
+        DtoGroupTeam nextTeam = (DtoGroupTeam)Engine.getNextTeam();
         String targetName = team.getName();
         int teamId = -1;
         OptionalInt indexOpt = IntStream.range(0, Teams.size())
@@ -149,30 +150,16 @@ public class SubServerData {
             teamId = indexOpt.getAsInt();
         }
 
-        return new Turn(teamId + 1, team);
+        return new Turn(teamId + 1, Teams.get(teamId).upTurn(), team, nextTeam);
     }
 
-    public DtoTurnsUpdate getTurnUpdates(User i_User){
-        DtoTurnsUpdate delta = null;
+    public DtoSingleTurnUpdate getTurnUpdates(UpdateContainer io_Container){
+        DtoSingleTurnUpdate delta = null;
         TurnLock.readLock();
         try{
-            if(!i_User.checkTurnUpdate(TurnUpdate)) {
-                boolean semi = false;
-                int userUpdate = i_User.getNextTurnId();
-
-                if (userUpdate == Turns.size()) {
-                    userUpdate--;
-                    semi = true;
-                }
-
-                delta = new DtoTurnsUpdate(Turns.subList(userUpdate, Turns.size())
-                        .stream()
-                        .map(Turn::getDto)
-                        .collect(Collectors.toList()), semi);
-                i_User.setNextTurnId(Turns.size());
-
-
-                i_User.setTurnUpdate(TurnUpdate);
+            if(io_Container.checkTurnUpdate(TurnUpdate)) {
+                delta = Turns.get(Turns.size() - 1).getDto();
+                io_Container.setTurnUpdate(TurnUpdate);
             }
         } finally {
             TurnLock.readLock().unlock();
@@ -181,13 +168,13 @@ public class SubServerData {
         return delta;
     }
 
-    public DtoBoardUpdate getBoardUpdates(User i_User){
+    public DtoBoardUpdate getBoardUpdates(UpdateContainer io_Container){
         DtoBoardUpdate ret = null;
         BoardLock.readLock().lock();
         try{
-            if(!i_User.checkBoardUpdate(BoardUpdate)) {
+            if(io_Container.checkBoardUpdate(BoardUpdate)) {
                 ret = new DtoBoardUpdate((DtoBoard)Engine.getActiveBoard(), Engine.didGameEng());
-                i_User.setBoardUpdate(BoardUpdate);
+                io_Container.setBoardUpdate(BoardUpdate);
             }
         } finally {
             BoardLock.readLock().unlock();

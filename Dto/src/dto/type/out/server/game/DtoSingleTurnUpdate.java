@@ -12,16 +12,21 @@ public class DtoSingleTurnUpdate implements Dto {
     }
     private final eDtoState TurnRole;
     private final int PlayingTeamId;
+    private final int TurnNum;
     private final DtoGroupTeam PlayingTeam;
+    private final DtoGroupTeam NextPlayingTeam;
     private final DtoIdentification TurnIdentification;
     private final List<DtoGuess> Guesses;
     private final int GuessesLeft;
 
-    public DtoSingleTurnUpdate(eDtoState turnRole, int playingTeamId, DtoGroupTeam playingTeam,
-                               DtoIdentification turnIdentification, List<DtoGuess> guesses, int guessesLeft) {
+    public DtoSingleTurnUpdate(eDtoState turnRole, int playingTeamId, int turnNum, DtoGroupTeam playingTeam,
+                               DtoGroupTeam nextPlayingTeam, DtoIdentification turnIdentification,
+                               List<DtoGuess> guesses, int guessesLeft) {
         TurnRole = turnRole;
         PlayingTeamId = playingTeamId;
+        TurnNum = turnNum;
         PlayingTeam = playingTeam;
+        NextPlayingTeam = nextPlayingTeam;
         TurnIdentification = turnIdentification;
         Guesses = guesses;
         GuessesLeft = guessesLeft;

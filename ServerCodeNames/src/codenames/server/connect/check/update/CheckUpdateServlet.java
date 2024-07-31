@@ -6,7 +6,7 @@ import codenames.server.health.HealthServlet;
 import constant.attribute.AttributeNames;
 import data.server.controllers.ServerManager;
 import data.user.User;
-import dto.type.out.server.Choice.DtoSubServerChoice;
+import dto.type.out.server.choice.DtoSubServerChoice;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,12 +29,12 @@ public class CheckUpdateServlet extends HealthServlet {
 
         if(GameId != null && user != null) {
             ServerManager manager = ServerUtils.getServerManager(request.getSession().getServletContext());
-            if (!user.checkGameUpdate(manager.getGameUpdate(GameId))) {
+            if (user.getUpdates().checkBoardUpdate(manager.getGameUpdate(GameId))) {
                 Integer update = 0;
                 ret = manager.getGameChoice(GameId, update);
-                user.setBoardUpdate(update);
+                user.getUpdates().setBoardUpdate(update);
                 ServerUtils.moveObjectIntoResponse(response, ret);
-                user.setBoardUpdate(manager.getGameUpdate(GameId));
+                user.getUpdates().setBoardUpdate(manager.getGameUpdate(GameId));
                 response.setStatus(HttpServletResponse.SC_OK);
             } else{
                 response.setStatus(HttpServletResponse.SC_NO_CONTENT);

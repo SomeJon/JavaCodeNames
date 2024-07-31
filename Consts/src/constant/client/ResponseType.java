@@ -1,7 +1,7 @@
 package constant.client;
 
 import com.google.gson.reflect.TypeToken;
-import dto.type.out.server.Choice.DtoServerGameChoice;
+import dto.type.out.server.choice.DtoServerGameChoice;
 import dto.type.out.server.DtoResponse;
 import dto.type.out.server.DtoServerStatus;
 

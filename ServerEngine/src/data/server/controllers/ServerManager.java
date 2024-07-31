@@ -5,14 +5,15 @@ import data.server.data.ePermission;
 import data.user.User;
 import dto.Dto;
 import dto.type.in.response.load.LoadInputStreamsResponse;
-import dto.type.out.server.Choice.DtoServerGameChoice;
-import dto.type.out.server.Choice.DtoServerTeamChoice;
-import dto.type.out.server.Choice.DtoSubServerChoice;
+import dto.type.out.server.choice.DtoServerGameChoice;
+import dto.type.out.server.choice.DtoServerTeamChoice;
+import dto.type.out.server.choice.DtoSubServerChoice;
 import dto.type.out.server.DtoServerInfo;
 import dto.type.out.server.DtoServerStatus;
 import dto.type.out.server.DtoSubServerStatus;
 import dto.type.out.server.game.DtoBoardUpdate;
 import dto.type.out.server.game.DtoGameUpdate;
+import dto.type.out.server.game.DtoSingleTurnUpdate;
 import dto.type.out.server.game.DtoTurnsUpdate;
 import engine.Engine;
 import engine.data.GameData;
@@ -238,13 +239,13 @@ public class ServerManager {
         return subServers.get(GameId - 1).getData().getBoardUpdate();
     }
 
-    public Dto getUpdates(User i_User){
+    public Dto getUpdates(User i_User) throws Unauthorized{
         int gameId = i_User.getGameId();
         if(gameId == 0)
             throw new Unauthorized();
 
-        DtoBoardUpdate dtoBoard = subServers.get(gameId - 1).getData().getBoardUpdates(i_User);
-        DtoTurnsUpdate dtoTurns = subServers.get(gameId - 1).getData().getTurnUpdates(i_User);
+        DtoBoardUpdate dtoBoard = subServers.get(gameId - 1).getData().getBoardUpdates(i_User.getUpdates());
+        DtoSingleTurnUpdate dtoTurns = subServers.get(gameId - 1).getData().getTurnUpdates(i_User.getUpdates());
         Dto ret = null;
 
         if(dtoBoard != null && dtoTurns != null){

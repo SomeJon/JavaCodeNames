@@ -7,8 +7,11 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
+import static Adapter.AdapterAddon.getGson;
+
 
 public class ServerUtils {
+	private final static Gson gson = getGson();
     private static final String SERVER_MANAGER_ATTRIBUTE_NAME = "ServerManager";
     private static final Object ServerManagerLock = new Object();
     public static ServerManager getServerManager(ServletContext servletContext) {
@@ -22,7 +25,7 @@ public class ServerUtils {
 	}
 
 	public static void moveObjectIntoResponse(HttpServletResponse response, Object toWrite) throws IOException {
-		String json = new Gson().toJson(toWrite);
+		String json = gson.toJson(toWrite);
 
 		response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");

@@ -2,9 +2,9 @@ package user.client.data;
 
 import console.*;
 import dto.type.in.response.Response;
-import dto.type.out.server.Choice.DtoServerGameChoice;
-import dto.type.out.server.Choice.DtoServerTeamChoice;
-import dto.type.out.server.Choice.DtoSubServerChoice;
+import dto.type.out.server.choice.DtoServerGameChoice;
+import dto.type.out.server.choice.DtoServerTeamChoice;
+import dto.type.out.server.choice.DtoSubServerChoice;
 import ui.input.InputHandling;
 
 import cookiejar.copied.SimpleCookieManager;
@@ -16,6 +16,7 @@ import java.util.List;
 
 public class ClientData {
     private final MainMenu Main;
+    private MenuItem PlayTurn;
     public final OkHttpClient HTTP_CLIENT = new OkHttpClient.Builder()
                 .cookieJar(new SimpleCookieManager())
                 .build();
@@ -28,6 +29,7 @@ public class ClientData {
     public DtoSubServerChoice CurrentSubChoice = null;
     public DtoServerTeamChoice CurrentTeamChoice = null;
     public boolean NewUpdate = false;
+    public boolean GameStarted = false;
 
     public ClientData() {
         Main = new MainMenu("User Client");
@@ -138,8 +140,9 @@ public class ClientData {
 
         Menu newGameMenu = main.createSubMenu("Joined Game Menu - " + GameData.getGameName());
         Main.setCurrentMenu(newGameMenu);
-        newGameMenu.createMenuOption("Retrieve Game Status", Action.GAME_SHOW, i_Client);
-        newGameMenu.createMenuOption("Play turn - {current playing team}", Action.PLAY_TURN, i_Client);
+        newGameMenu.createMenuOption("Fetch Game Status", Action.GAME_SHOW, i_Client);
+        newGameMenu.createMenuOption("Play turn {Waiting for game to start}", Action.PLAY_TURN, i_Client);
+        PlayTurn = newGameMenu.getMenuItems().get(1);
 
         Menu chatMenu = newGameMenu.createSubMenu("Chat");
         chatMenu.createMenuOption("Enter Chat", Action.CHAT_OPEN, i_Client); //todo: might change it to a chat object
@@ -161,5 +164,20 @@ public class ClientData {
         entrySetting.createMenuOption("All - ON", ChatSetting.CHAT_ALL, i_Client);
         entrySetting.createMenuOption("Partly - OFF", ChatSetting.CHAT_PARTLY, i_Client);
         entrySetting.createMenuOption("None - OFF", ChatSetting.CHAT_NONE, i_Client);
+    }
+
+    public void updateTurnChoice(String i_PlayingTeam){
+        PlayTurn.setItemText("Play turn {" + i_PlayingTeam + "}");
+    }
+
+    public void rebuildMenu2(ChoiceNotifier i_Client){
+        Main.getStartMenu().getMenuItems().remove(1);
+        NotifyList notifiers = new NotifyList();
+        notifiers.addNotifyBefore(i_Client, Action.CLEAN_CHOICE);
+        notifiers.addNotifyBefore(i_Client, Action.SHOW_PENDING_GAMES);
+        Menu subMenu1 = Main.getStartMenu().createSubMenuWithActions("Join Game", notifiers);
+        subMenu1.createMenuOption("Refresh games info", Action.REFRESH, i_Client);
+        subMenu1.createMenuOption("Enter game id", InputHandling.GET_GAME_ID, i_Client);
+        Main.previousMenu();
     }
 }

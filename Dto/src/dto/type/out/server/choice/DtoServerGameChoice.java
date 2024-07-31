@@ -1,4 +1,4 @@
-package dto.type.out.server.Choice;
+package dto.type.out.server.choice;
 
 import dto.Dto;
 

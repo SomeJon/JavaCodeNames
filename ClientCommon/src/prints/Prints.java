@@ -1,8 +1,8 @@
 package prints;
 
-import dto.type.out.server.Choice.DtoServerGameChoice;
-import dto.type.out.server.Choice.DtoServerTeamChoice;
-import dto.type.out.server.Choice.DtoSubServerChoice;
+import dto.type.out.server.choice.DtoServerGameChoice;
+import dto.type.out.server.choice.DtoServerTeamChoice;
+import dto.type.out.server.choice.DtoSubServerChoice;
 import dto.type.out.server.DtoServerStatus;
 import dto.type.out.server.DtoServerTeam;
 import dto.type.out.server.DtoSubServerStatus;

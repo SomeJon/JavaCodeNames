@@ -6,8 +6,8 @@ import codenames.Utils;
 import constant.attribute.AttributeNames;
 import data.server.controllers.ServerManager;
 import data.user.User;
-import dto.type.out.server.Choice.DtoServerGameChoice;
-import dto.type.out.server.Choice.DtoSubServerChoice;
+import dto.type.out.server.choice.DtoServerGameChoice;
+import dto.type.out.server.choice.DtoSubServerChoice;
 import dto.type.out.server.DtoResponse;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -17,7 +17,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @WebServlet(name="Games Info Servlet", urlPatterns = "/state/game")
 public class GamesInfoServlet extends HttpServlet {
@@ -40,10 +39,10 @@ public class GamesInfoServlet extends HttpServlet {
         if (user != null) {
             if (requestedState != null) {
                 int updateNum = manager.getUpdateCount();
-                if (!user.checkServerUpdate(updateNum)) {
+                if (user.getUpdates().checkServerUpdate(updateNum)) {
                     Integer update = 0;
                     List<DtoSubServerChoice> filteredChoices = Utils.getFilteredChoices(manager, requestedState, update);
-                    user.setServerUpdate(update);
+                    user.getUpdates().setServerUpdate(update);
                     gameChoices.setSubServerChoices(filteredChoices);
 
                     if (filteredChoices.isEmpty()) {

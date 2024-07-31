@@ -27,24 +27,37 @@ public class Turn {
     }
 
     private final int TeamId;
+    private final int TurnNum;
     private final DtoGroupTeam PlayingTeam;
+    private final DtoGroupTeam NextPlayingTeam;
     private eState State;
     private Identification TurnIdentification = null;
     private final List<Guess> Guesses = new ArrayList<Guess>();
     private int GuessesLeft;
 
-    public Turn(int teamId, DtoGroupTeam playingTeam) {
+
+    public Turn(int teamId, int turnNum, DtoGroupTeam playingTeam, DtoGroupTeam nextPlayingTeam) {
         TeamId = teamId;
+        TurnNum = turnNum;
         PlayingTeam = playingTeam;
         State = eState.IDENTIFICATION;
+        NextPlayingTeam = nextPlayingTeam;
     }
 
     public int getTeamId() {
         return TeamId;
     }
 
+    public int getTurnNum() {
+        return TurnNum;
+    }
+
     public DtoGroupTeam getPlayingTeam() {
         return PlayingTeam;
+    }
+
+    public DtoGroupTeam getNextPlayingTeam() {
+        return NextPlayingTeam;
     }
 
     public eState getState() {
@@ -85,7 +98,7 @@ public class Turn {
                 .map(Guess::getDto)
                 .collect(Collectors.toList());
 
-        return new DtoSingleTurnUpdate(State.getDto(), TeamId, PlayingTeam,
+        return new DtoSingleTurnUpdate(State.getDto(), TeamId, TurnNum, PlayingTeam, NextPlayingTeam,
                 TurnIdentification.getDto(), guesses, GuessesLeft);
     }
 }

@@ -1,6 +1,7 @@
 package data.server.data;
 
 import data.ChatData;
+import data.user.UpdateContainer;
 import data.user.User;
 import dto.type.out.server.chat.DtoServerChat;
 import message.Message;
@@ -18,13 +19,13 @@ public class SubServerChat {
         chatData.AddMessage(newMessage);
     }
 
-    public DtoServerChat getNewMessages(User i_User) {
-        List<Message> newMessages = chatData.getMessages(i_User.getChatUpdate());
+    public DtoServerChat getNewMessages(UpdateContainer io_Container) {
+        List<Message> newMessages = chatData.getMessages(io_Container.getChatUpdate());
         DtoServerChat ret = null;
 
         if(newMessages != null){
-            i_User.setChatUpdate(chatData.getCurrentUpdate());
-            ret = new DtoServerChat(i_User.getChatUpdate(), newMessages);
+            io_Container.setChatUpdate(chatData.getCurrentUpdate());
+            ret = new DtoServerChat(io_Container.getChatUpdate(), newMessages);
         }
 
         return ret;

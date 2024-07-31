@@ -3,7 +3,6 @@ package codenames.server.connect.check;
 import codenames.ServerUtils;
 import constant.attribute.AttributeNames;
 import data.server.controllers.ServerManager;
-import dto.type.out.server.Choice.DtoServerGameChoice;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;

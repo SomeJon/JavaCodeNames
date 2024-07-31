@@ -53,6 +53,13 @@ public class CNRequest {
                 .build();
     }
 
+    public static Request getRequestUpdateGameData(String i_Url) {
+        return new Request.Builder()
+                .url(i_Url)
+                .get()
+                .build();
+    }
+
     public static void printStats(String i_Url, String i_GetTypes,
                                   OkHttpClient i_Client, boolean printCurrentPlayers){
         Request request = getRequestStats(i_Url, i_GetTypes);
