@@ -4,9 +4,24 @@ import dto.Dto;
 
 public class DtoGuess implements Dto {
     public enum eDtoResult{
-        HIT,
-        MISS,
-        BLACK_HIT
+        HIT{
+            @Override
+            public String toString() {
+                return "Hit!";
+            }
+        },
+        MISS{
+            @Override
+            public String toString() {
+                return "Miss!";
+            }
+        },
+        BLACK_HIT{
+            @Override
+            public String toString() {
+                return "Hit a black card!";
+            }
+        };
     }
     private final String guess;
     private final eDtoResult result;

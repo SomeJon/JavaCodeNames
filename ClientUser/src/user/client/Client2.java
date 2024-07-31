@@ -7,14 +7,12 @@ import constant.attribute.AttributeNames;
 import dto.Dto;
 import dto.type.in.response.common.IntResponse;
 import dto.type.in.response.common.StringResponse;
+import dto.type.out.board.card.DtoGroupTeam;
 import dto.type.out.server.choice.DtoServerGameChoice;
 import dto.type.out.server.choice.DtoServerTeamChoice;
 import dto.type.out.server.choice.DtoSubServerChoice;
 import dto.type.out.server.DtoServerTeam;
-import dto.type.out.server.game.DtoBoardUpdate;
-import dto.type.out.server.game.DtoEndResult;
-import dto.type.out.server.game.DtoGameUpdate;
-import dto.type.out.server.game.DtoSingleTurnUpdate;
+import dto.type.out.server.game.*;
 import request.CNRequest;
 import ui.input.InputHandling;
 import user.client.action.Action;
@@ -178,10 +176,13 @@ public class Client2 implements ChoiceNotifier {
 
                 if(ret instanceof DtoGameUpdate){
                     Data.GameData.loadGame((DtoGameUpdate) ret);
+                    Data.updateTurnChoice();
                 } else if(ret instanceof DtoBoardUpdate){
                     Data.GameData.loadBoard((DtoBoardUpdate) ret);
+                    Data.updateTurnChoice();
                 } else if(ret instanceof DtoSingleTurnUpdate){
                     Data.GameData.loadTurn((DtoSingleTurnUpdate) ret);
+                    Data.updateTurnChoice();
                 } else if(ret instanceof DtoEndResult){
                     printGameEnd((DtoEndResult) ret);
                     Data.rebuildMenu2(this);
@@ -510,13 +511,46 @@ public class Client2 implements ChoiceNotifier {
     private void printStatusPending(){
         String toPrint;
         Data.updateTurnChoice("Waiting for game to start");
-        toPrint = "Status: Pending\nWaiting for game to start";
+        toPrint = "Status: Pending\n--Waiting for game to start--";
 
         System.out.print(toPrint);
     }
 
     private void printStatusActive(){
+        StringBuilder toPrint = new StringBuilder();
+        DtoSingleTurnUpdate turn = Data.GameData.getCurrentTurn();
+        DtoGroupTeam playingTeam = turn.getPlayingTeam();
+        toPrint.append("Status: Active\nCurrent Playing Team: ")
+                .append(playingTeam.getName())
+                .append(" - Turn: ")
+                .append(turn.getTurnNum())
+                .append(" - Score(Flipped/Left): (")
+                .append(playingTeam.getCardsFlipped()).append("/").append(playingTeam.getCards())
+                .append(")\n");
 
+        if(turn.getTurnIdentification().isSet()){
+            toPrint.append("Current identification Word: ")
+                    .append(turn.getTurnIdentification().getIdentification())
+                    .append(" - Related Words: ")
+                    .append(turn.getTurnIdentification().getRelatedWords())
+                    .append("\n");
+
+            if(!turn.getGuesses().isEmpty()) {
+                toPrint.append("Guesses done during turn:\n");
+
+                for (DtoGuess guess : turn.getGuesses()) {
+                    toPrint.append("   -Guess: ")
+                            .append(guess.getGuess())
+                            .append(" - Guess result: ")
+                            .append(guess.getResult().toString())
+                            .append("\n");
+                }
+            }
+        }
+
+        toPrint.append(Data.GameData.getParsedBoard());
+
+        System.out.print(toPrint);
     }
 
     private void printGameEnd(DtoEndResult i_Result){

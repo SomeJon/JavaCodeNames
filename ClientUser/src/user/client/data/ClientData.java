@@ -170,6 +170,11 @@ public class ClientData {
         PlayTurn.setItemText("Play turn {" + i_PlayingTeam + "}");
     }
 
+    public void updateTurnChoice(){
+        PlayTurn.setItemText("Play turn {" + GameData.getCurrentTurn().getPlayingTeam().getName() +
+                ":" + GameData.getCurrentTurn().getTurnRole().toString() + "}");
+    }
+
     public void rebuildMenu2(ChoiceNotifier i_Client){
         Main.getStartMenu().getMenuItems().remove(1);
         NotifyList notifiers = new NotifyList();

@@ -14,7 +14,7 @@ public class User {
     private final ePermission PermissionLevel;
     private ServerTeam ConnectedTeam;
     private eRole Role;
-    private UpdateContainer Updates;
+    private final UpdateContainer Updates = new UpdateContainer();
     private DtoEndResult EndResult = new DtoEndResult();
 
     public User(String i_Name, ePermission i_PermissionLevel) {
@@ -71,10 +71,6 @@ public class User {
 
     public UpdateContainer getUpdates() {
         return Updates;
-    }
-
-    public void setUpdates(UpdateContainer i_Updates) {
-        Updates = i_Updates;
     }
 
     public DtoEndResult getEndResult() {

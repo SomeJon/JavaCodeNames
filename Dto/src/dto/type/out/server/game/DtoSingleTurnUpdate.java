@@ -7,8 +7,20 @@ import java.util.List;
 
 public class DtoSingleTurnUpdate implements Dto {
     public enum eDtoState {
-        IDENTIFICATION,
-        GUESSING
+        IDENTIFICATION{
+            @Override
+            public String toString() {
+                return "Identification";
+            }
+        },
+        GUESSING{
+            @Override
+            public String toString() {
+                return "Guessing";
+            }
+        };
+
+        public abstract String toString();
     }
     private final eDtoState TurnRole;
     private final int PlayingTeamId;
@@ -54,5 +66,13 @@ public class DtoSingleTurnUpdate implements Dto {
 
     public int getGuessesLeft() {
         return GuessesLeft;
+    }
+
+    public int getTurnNum() {
+        return TurnNum;
+    }
+
+    public DtoGroupTeam getNextPlayingTeam() {
+        return NextPlayingTeam;
     }
 }

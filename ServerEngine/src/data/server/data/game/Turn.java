@@ -31,7 +31,7 @@ public class Turn {
     private final DtoGroupTeam PlayingTeam;
     private final DtoGroupTeam NextPlayingTeam;
     private eState State;
-    private Identification TurnIdentification = null;
+    private Identification TurnIdentification = new Identification();
     private final List<Guess> Guesses = new ArrayList<Guess>();
     private int GuessesLeft;
 

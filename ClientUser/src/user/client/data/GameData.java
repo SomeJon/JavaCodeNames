@@ -168,11 +168,11 @@ public class GameData {
         return ret;
     }
 
-    public void printBoard(){
+    public String getParsedBoard(){
         boolean visible = Role.GetChoice() == 0;
         GameLock.readLock().lock();
         try{
-            Printing.parse(CurrentBoard.getBoard(), visible);
+            return Printing.parse(CurrentBoard.getBoard(), visible);
         } finally {
             GameLock.readLock().unlock();
         }

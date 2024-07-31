@@ -5,10 +5,12 @@ import dto.Dto;
 public class DtoIdentification implements Dto {
     private final String Identification;
     private final int RelatedWords;
+    private final boolean Set;
 
-    public DtoIdentification(String identification, int relatedWords) {
+    public DtoIdentification(String identification, int relatedWords, boolean set) {
         Identification = identification;
         RelatedWords = relatedWords;
+        Set = set;
     }
 
     public int getRelatedWords() {
@@ -17,5 +19,9 @@ public class DtoIdentification implements Dto {
 
     public String getIdentification() {
         return Identification;
+    }
+
+    public boolean isSet() {
+        return Set;
     }
 }
