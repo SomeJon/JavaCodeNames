@@ -1,6 +1,6 @@
 package data.server.data.game;
 
-import dto.type.out.server.game.DtoIdentification;
+import dto.type.out.server.game.DtoServerIdentification;
 
 public class Identification {
     private final String Identification;
@@ -31,7 +31,7 @@ public class Identification {
         return Set;
     }
 
-    public DtoIdentification getDto(){
-        return new DtoIdentification(Identification, RelatedWords, Set);
+    public DtoServerIdentification getDto(){
+        return new DtoServerIdentification(Identification, RelatedWords, Set);
     }
 }

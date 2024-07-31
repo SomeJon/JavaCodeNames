@@ -21,8 +21,11 @@ public class ConnectServlet extends HttpServlet {
         ServerManager manager = ServerUtils.getServerManager(request.getServletContext());
         User user = SessionUtils.getUser(request);
         String errorMessage = "";
+        ResponseJoin received = null;
 
-        ResponseJoin received = Utils.fromJsonRequest(request, ResponseJoin.class);
+        try {
+            received = Utils.fromJsonRequest(request, ResponseJoin.class);
+        } catch(IOException ignore){}
 
         if (received.receivedResponse() && user != null) {
             try {

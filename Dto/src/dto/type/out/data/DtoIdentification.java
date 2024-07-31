@@ -1,8 +1,10 @@
-package engine.data;
+package dto.type.out.data;
+
+import dto.Dto;
 
 import java.io.Serializable;
 
-public class Identification implements Serializable{
+public class DtoIdentification implements Serializable, Dto {
     private final String Identification;
     private final int Related;
 
@@ -14,7 +16,7 @@ public class Identification implements Serializable{
         return Related;
     }
 
-    public Identification(String guess, int related) {
+    public DtoIdentification(String guess, int related) {
         Identification = guess;
         Related = related;
     }

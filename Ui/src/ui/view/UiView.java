@@ -9,7 +9,7 @@ import dto.type.out.data.DtoActiveGameStatus;
 import dto.type.out.data.DtoGameDetails;
 import dto.type.out.data.DtoGuessResult;
 import dto.type.out.data.DtoTeam;
-import engine.data.Identification;
+import dto.type.out.data.DtoIdentification;
 import exception.CodeNameException;
 import exception.OutOfBoundException;
 import exception.loadxml.OutOfBoundLoad;
@@ -206,11 +206,11 @@ public class UiView implements UiViewInterface, ChoiceNotifier, UiActionConst , 
     }
 
     @Override
-    public void showIdentification(Identification i_CurrentIdentification, int i_GuessesLeft) {
+    public void showIdentification(DtoIdentification i_CurrentIdentification, int i_GuessesLeft) {
         if(Data.getNextInput() != InputHandling.GUESSER)
             Data.setNextInput(InputHandling.GUESSER);
 
-        System.out.println("Identification: " + i_CurrentIdentification.getIdentification() +
+        System.out.println("DtoServerIdentification: " + i_CurrentIdentification.getIdentification() +
                 "\nNumber of related words: " + i_CurrentIdentification.getRelated() +
                 "\nNumber of guesses left: " + i_GuessesLeft);
     }

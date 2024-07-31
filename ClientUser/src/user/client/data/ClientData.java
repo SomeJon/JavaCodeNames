@@ -47,7 +47,7 @@ public class ClientData {
         Main.getStartMenu().getMenuItems().remove(0);
         Main.getStartMenu().createMenuOption("Show all games details", Action.SHOW_GAMES, i_Client);
         NotifyList notifiers = new NotifyList();
-        notifiers.addNotifyBefore(i_Client, Action.CLEAN_CHOICE);
+        notifiers.addNotifyAfter(i_Client, Action.CLEAN_CHOICE);
         notifiers.addNotifyBefore(i_Client, Action.SHOW_PENDING_GAMES);
         Menu subMenu1 = Main.getStartMenu().createSubMenuWithActions("Join Game", notifiers);
         subMenu1.createMenuOption("Refresh games info", Action.REFRESH, i_Client);
@@ -178,7 +178,7 @@ public class ClientData {
     public void rebuildMenu2(ChoiceNotifier i_Client){
         Main.getStartMenu().getMenuItems().remove(1);
         NotifyList notifiers = new NotifyList();
-        notifiers.addNotifyBefore(i_Client, Action.CLEAN_CHOICE);
+        notifiers.addNotifyAfter(i_Client, Action.CLEAN_CHOICE);
         notifiers.addNotifyBefore(i_Client, Action.SHOW_PENDING_GAMES);
         Menu subMenu1 = Main.getStartMenu().createSubMenuWithActions("Join Game", notifiers);
         subMenu1.createMenuOption("Refresh games info", Action.REFRESH, i_Client);

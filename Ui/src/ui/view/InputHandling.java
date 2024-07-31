@@ -48,7 +48,7 @@ public enum InputHandling {
             boolean continueLoop;
 
             System.out.println("Please enter an identification word and number of related words after");
-            System.out.print("Identification word: ");
+            System.out.print("DtoServerIdentification word: ");
             String identificationWord = scanner.nextLine();
             int numberOfRelatedWords = 0;
 

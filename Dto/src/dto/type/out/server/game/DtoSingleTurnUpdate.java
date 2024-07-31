@@ -10,7 +10,7 @@ public class DtoSingleTurnUpdate implements Dto {
         IDENTIFICATION{
             @Override
             public String toString() {
-                return "Identification";
+                return "DtoServerIdentification";
             }
         },
         GUESSING{
@@ -27,13 +27,13 @@ public class DtoSingleTurnUpdate implements Dto {
     private final int TurnNum;
     private final DtoGroupTeam PlayingTeam;
     private final DtoGroupTeam NextPlayingTeam;
-    private final DtoIdentification TurnIdentification;
-    private final List<DtoGuess> Guesses;
+    private final DtoServerIdentification TurnIdentification;
+    private final List<DtoServerGuess> Guesses;
     private final int GuessesLeft;
 
     public DtoSingleTurnUpdate(eDtoState turnRole, int playingTeamId, int turnNum, DtoGroupTeam playingTeam,
-                               DtoGroupTeam nextPlayingTeam, DtoIdentification turnIdentification,
-                               List<DtoGuess> guesses, int guessesLeft) {
+                               DtoGroupTeam nextPlayingTeam, DtoServerIdentification turnIdentification,
+                               List<DtoServerGuess> guesses, int guessesLeft) {
         TurnRole = turnRole;
         PlayingTeamId = playingTeamId;
         TurnNum = turnNum;
@@ -56,11 +56,11 @@ public class DtoSingleTurnUpdate implements Dto {
         return PlayingTeam;
     }
 
-    public DtoIdentification getTurnIdentification() {
+    public DtoServerIdentification getTurnIdentification() {
         return TurnIdentification;
     }
 
-    public List<DtoGuess> getGuesses() {
+    public List<DtoServerGuess> getGuesses() {
         return Guesses;
     }
 

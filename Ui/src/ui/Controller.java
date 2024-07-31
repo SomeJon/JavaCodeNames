@@ -7,7 +7,7 @@ import dto.type.out.data.DtoGameDetails;
 import dto.type.out.data.DtoGameEndResult;
 import dto.type.out.data.DtoGuessResult;
 import engine.EngineInterface;
-import engine.data.Identification;
+import dto.type.out.data.DtoIdentification;
 import exception.CodeNameException;
 import dto.type.in.response.ingame.GuesserResponse;
 import dto.type.in.response.ingame.IdentificationResponse;
@@ -105,7 +105,7 @@ public class Controller{
     private void playTurn(){
         IdentificationResponse response;
         boolean loopContinue;
-        Identification currentIdentification = null;
+        DtoIdentification currentIdentification = null;
         DtoGroupTeam playingTeam = (DtoGroupTeam)Engine.getActiveTeam();
         DtoBoard playingBoard = (DtoBoard)Engine.getActiveBoard();
 
@@ -128,7 +128,7 @@ public class Controller{
         playGuesserTurn(currentIdentification);
     }
 
-    private void playGuesserTurn(Identification i_Identification){
+    private void playGuesserTurn(DtoIdentification i_Identification){
         boolean loopContinue = false;
         GuesserResponse response;
         DtoGroupTeam playingTeam = ((DtoGroupTeam)Engine.getActiveTeam());

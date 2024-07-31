@@ -2,12 +2,12 @@ package dto.type.out.server.game;
 
 import dto.Dto;
 
-public class DtoIdentification implements Dto {
+public class DtoServerIdentification implements Dto {
     private final String Identification;
     private final int RelatedWords;
     private final boolean Set;
 
-    public DtoIdentification(String identification, int relatedWords, boolean set) {
+    public DtoServerIdentification(String identification, int relatedWords, boolean set) {
         Identification = identification;
         RelatedWords = relatedWords;
         Set = set;

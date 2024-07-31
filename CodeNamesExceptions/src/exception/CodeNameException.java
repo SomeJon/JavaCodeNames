@@ -11,6 +11,9 @@ public abstract class CodeNameException extends RuntimeException {
         SERVER_ADMIN_ON,
         SERVER_NO_SPOT,
         UNAUTHORIZED,
+        MISMATCH_UPDATE,
+        MISMATCH_ROLE,
+        MISMATCH_TURN_STAGE,
     }
 
     private ExceptionType Type;

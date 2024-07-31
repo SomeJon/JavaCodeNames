@@ -1,7 +1,7 @@
 package data.server.data.game;
 
 import dto.type.out.board.card.DtoGroupTeam;
-import dto.type.out.server.game.DtoGuess;
+import dto.type.out.server.game.DtoServerGuess;
 import dto.type.out.server.game.DtoSingleTurnUpdate;
 
 import java.util.ArrayList;
@@ -94,7 +94,7 @@ public class Turn {
     }
 
     public DtoSingleTurnUpdate getDto() {
-        List<DtoGuess> guesses = Guesses.stream()
+        List<DtoServerGuess> guesses = Guesses.stream()
                 .map(Guess::getDto)
                 .collect(Collectors.toList());
 

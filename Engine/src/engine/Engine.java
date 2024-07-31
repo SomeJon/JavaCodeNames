@@ -15,7 +15,7 @@ import engine.board.card.GroupCard;
 import engine.board.card.GroupNeutral;
 import engine.board.card.GroupTeam;
 import engine.data.GameData;
-import engine.data.Identification;
+import dto.type.out.data.DtoIdentification;
 import exception.turn.CardFlippedException;
 import exception.turn.GuessOutOfRangeException;
 import exception.turn.IdentificationException;
@@ -70,7 +70,7 @@ public class Engine implements EngineInterface, Serializable {
     }
 
     @Override
-    public Identification playTurnIdentification(IdentificationResponse i_Response) {
+    public DtoIdentification playTurnIdentification(IdentificationResponse i_Response) {
         GroupTeam playingTeam = Data.getActiveData().getPlayingTeamGroup();
 
         if (i_Response.getRelated() >
@@ -79,11 +79,11 @@ public class Engine implements EngineInterface, Serializable {
                     playingTeam.getCards() - playingTeam.getCardsFlipped(), 1);
         }
 
-        return new Identification(i_Response.getIdentification(), i_Response.getRelated());
+        return new DtoIdentification(i_Response.getIdentification(), i_Response.getRelated());
     }
 
     @Override
-    public Dto playTurnGuessers(Identification i_CurrentIdentification, GuesserResponse i_Response){
+    public Dto playTurnGuessers(DtoIdentification i_CurrentIdentification, GuesserResponse i_Response){
         GroupTeam playingTeam = Data.getActiveData().getPlayingTeamGroup();
         Board playingBoard = Data.getActiveData().getPlayingBoard();
         int maxId = Data.getStatus().getNumOfCards() + Data.getStatus().getNumOfBlackCards();

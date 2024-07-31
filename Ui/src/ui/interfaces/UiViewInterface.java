@@ -5,8 +5,7 @@ import dto.type.out.board.card.DtoGroupTeam;
 import dto.type.out.data.DtoActiveGameStatus;
 import dto.type.out.data.DtoGameDetails;
 import dto.type.out.data.DtoGuessResult;
-import engine.board.card.GroupTeam;
-import engine.data.Identification;
+import dto.type.out.data.DtoIdentification;
 import exception.CodeNameException;
 import dto.type.in.response.Response;
 import ui.MenuAction;
@@ -23,7 +22,7 @@ public interface UiViewInterface {
     public void exceptionHandler(CodeNameException i_ReceivedError, boolean i_TryAgain);
     public void showGameDetails(DtoGameDetails i_ReceivedGameStatus);
     public void showTeam(DtoGroupTeam i_PlayingTeam);
-    public void showIdentification(Identification i_CurrentIdentification, int i_GuessesLeft);
+    public void showIdentification(DtoIdentification i_CurrentIdentification, int i_GuessesLeft);
     public void guessResult(DtoGuessResult i_ReceivedGuessResult, int i_GuessLeft, DtoGroupTeam i_PlayingTeam);
     public void victoryHandler(DtoGroupTeam i_WinnerTeam);
     public void showActiveGameStatus(DtoActiveGameStatus i_Data);

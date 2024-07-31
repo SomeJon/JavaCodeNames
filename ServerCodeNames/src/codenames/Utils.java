@@ -50,6 +50,7 @@ public class Utils {
         while ((line = reader.readLine()) != null) {
             sb.append(line);
         }
+
         return gson.fromJson(sb.toString(), i_Class);
     }
 }

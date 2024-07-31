@@ -1,10 +1,12 @@
 package data.server.data;
 
+import data.server.data.game.Identification;
 import data.server.data.game.Turn;
 import data.server.data.group.ServerTeam;
 import data.server.data.group.eRoles;
 import data.user.UpdateContainer;
 import data.user.User;
+import dto.type.in.response.ingame.IdentificationResponse;
 import dto.type.out.board.DtoBoard;
 import dto.type.out.board.card.DtoGroupTeam;
 import dto.type.out.server.DtoServerInfo;
@@ -13,6 +15,11 @@ import dto.type.out.server.game.DtoBoardUpdate;
 import dto.type.out.server.game.DtoSingleTurnUpdate;
 import engine.EngineInterface;
 import exception.server.NoSpot;
+import exception.server.mismatch.MismatchRole;
+import exception.server.mismatch.MismatchStage;
+import exception.server.mismatch.MismatchUpdate;
+import exception.turn.IdentificationException;
+import message.UserMessage;
 
 import java.util.*;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -198,5 +205,37 @@ public class SubServerData {
             dataLock.readLock().unlock();
         }
         return ret;
+    }
+
+    public void playIdentification(User i_User, IdentificationResponse i_Identification)
+            throws MismatchUpdate, MismatchRole, MismatchStage,
+            IndexOutOfBoundsException , IdentificationException {
+        dataLock.writeLock().lock();
+        try{
+            Turn currentTurn = Turns.get(Turns.size() - 1);
+            if(currentTurn.getState() == Turn.eState.IDENTIFICATION) {
+                if (i_User.getUpdates().checkTurnUpdate(TurnUpdate)) {
+                    if (i_User.getRole() == UserMessage.eRole.Definer) {
+                        dto.type.out.data.DtoIdentification ServerSide =
+                                Engine.playTurnIdentification(i_Identification);
+                        Identification toAdd = new Identification(
+                                ServerSide.getIdentification(), ServerSide.getRelated());
+                        currentTurn.setTurnIdentification(toAdd);
+                        GameUpdate++;
+                        TurnUpdate++;
+                        BoardUpdate++;
+                    } else {
+                        throw new MismatchRole();
+                    }
+                } else {
+                    throw new MismatchUpdate();
+                }
+            }
+            else {
+                throw new MismatchStage();
+            }
+        } finally {
+            dataLock.writeLock().unlock();
+        }
     }
 }

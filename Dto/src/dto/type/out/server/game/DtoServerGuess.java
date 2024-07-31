@@ -2,7 +2,7 @@ package dto.type.out.server.game;
 
 import dto.Dto;
 
-public class DtoGuess implements Dto {
+public class DtoServerGuess implements Dto {
     public enum eDtoResult{
         HIT{
             @Override
@@ -26,7 +26,7 @@ public class DtoGuess implements Dto {
     private final String guess;
     private final eDtoResult result;
 
-    public DtoGuess(String guess, eDtoResult result) {
+    public DtoServerGuess(String guess, eDtoResult result) {
         this.guess = guess;
         this.result = result;
     }

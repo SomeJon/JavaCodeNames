@@ -4,7 +4,6 @@ import Adapter.AdapterAddon;
 import console.ChoiceNotifier;
 import console.MenuItem;
 import constant.attribute.AttributeNames;
-import dto.Dto;
 import dto.type.in.response.common.IntResponse;
 import dto.type.in.response.common.StringResponse;
 import dto.type.out.board.card.DtoGroupTeam;
@@ -129,6 +128,8 @@ public class Client2 implements ChoiceNotifier {
                 case GAME_SHOW:
                     showGame();
                     break;
+                case PLAY_TURN:
+                    //todo: make it
             }
             Data.CurrentAction = null;
         }
@@ -152,6 +153,18 @@ public class Client2 implements ChoiceNotifier {
                     break;
             }
             Data.CurrentInput = null;
+        }
+    }
+
+    private void playTurn(){
+        if(Data.GameData.getCurrentTurn() != null){
+            if(Data.GameData.getCurrentTurn().getPlayingTeamId() == Data.GameData.getTeamId()){
+
+            } else{
+                errorPrint("This is not your team turn!");
+            }
+        } else{
+            errorPrint("No turn data is available to play a turn!");
         }
     }
 
@@ -184,7 +197,8 @@ public class Client2 implements ChoiceNotifier {
             } else if(response.code() == HttpCode.UNAUTHORIZED) {
                 DtoEndResult ret = gson.fromJson(response.body().charStream(), DtoEndResult.class);
                 printGameEnd(ret);
-                //todo: exit the game
+                //todo: check exit
+                Data.rebuildMenu2(this);
             }
         } catch (IOException e){
             errorPrint("An IOException error occurred");
@@ -535,7 +549,7 @@ public class Client2 implements ChoiceNotifier {
                 if (!turn.getGuesses().isEmpty()) {
                     toPrint.append("Guesses done during turn:\n");
 
-                    for (DtoGuess guess : turn.getGuesses()) {
+                    for (DtoServerGuess guess : turn.getGuesses()) {
                         toPrint.append("   -Guess: ")
                                 .append(guess.getGuess())
                                 .append(" - Guess result: ")

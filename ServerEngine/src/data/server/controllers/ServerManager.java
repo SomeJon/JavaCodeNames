@@ -4,7 +4,7 @@ import data.server.data.ServerData;
 import data.server.data.ePermission;
 import data.user.UpdateContainer;
 import data.user.User;
-import dto.Dto;
+import dto.type.in.response.ingame.IdentificationResponse;
 import dto.type.in.response.load.LoadInputStreamsResponse;
 import dto.type.out.server.Choice.DtoServerGameChoice;
 import dto.type.out.server.Choice.DtoServerTeamChoice;
@@ -20,6 +20,10 @@ import engine.data.GameData;
 import exception.server.AdminOn;
 import exception.server.NameTaken;
 import exception.server.Unauthorized;
+import exception.server.mismatch.MismatchRole;
+import exception.server.mismatch.MismatchStage;
+import exception.server.mismatch.MismatchUpdate;
+import exception.turn.IdentificationException;
 
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
@@ -249,5 +253,21 @@ public class ServerManager {
         DtoSingleTurnUpdate dtoTurns = subServers.get(gameId - 1).getData().getTurnUpdates(i_User.getUpdates());
 
         return new DtoGameUpdate(dtoBoard, dtoTurns);
+    }
+
+    private SubServer getSubServer(int gameId){
+        return subServers.get(gameId - 1);
+    }
+
+    public void playIdentification(User i_User, IdentificationResponse i_Identification)
+            throws MismatchUpdate, MismatchRole, MismatchStage,
+            IndexOutOfBoundsException , IdentificationException {
+        SubServersLock.writeLock().lock();
+        try {
+            SubServer subServer = getSubServer(i_User.getGameId() - 1);
+            subServer.playIdentification(i_User, i_Identification);
+        } finally{
+            SubServersLock.writeLock().unlock();
+        }
     }
 }

@@ -20,7 +20,7 @@ public class CheckUpdateServlet extends HealthServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Integer GameId;
         User user = SessionUtils.getUser(request);
-        DtoSubServerChoice ret = null;
+        DtoSubServerChoice ret;
 
         try{
             GameId = Integer.parseInt(request.getParameter(AttributeNames.WANTED_GAME));
