@@ -1,5 +1,6 @@
 package admin.client;
 
+import Adapter.AdapterAddon;
 import admin.client.action.Action;
 import admin.client.data.ClientData;
 import admin.client.data.LinkConst;
@@ -14,6 +15,7 @@ import constant.client.ResponseType;
 import constant.response.Responses;
 import dto.type.in.response.common.IntResponse;
 import dto.type.in.response.load.LoadFilesResponse;
+import dto.type.out.server.Choice.DtoServerGameChoice;
 import dto.type.out.server.DtoResponse;
 import okhttp3.*;
 import request.CNRequest;
@@ -23,11 +25,14 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.util.Map;
 
+import static prints.Prints.parseGamesChoiceAdmin;
+import static request.CNRequest.getRequestStats;
 import static ui.input.InputHandling.errorPrint;
 
 
 public class Client implements ChoiceNotifier {
     private final ClientData Data;
+    private final static Gson gson = AdapterAddon.getGson();
 
     public Client(ClientData Data) {
         this.Data = Data;
@@ -90,7 +95,6 @@ public class Client implements ChoiceNotifier {
     public void Notify(Object sender) {
         Data.setCurrentAction(getCurrentAction(sender));
         Data.setCurrentInput(getInputHandling(sender));
-        //Data.getMain().pauseRunning();
 
         if(Data.getCurrentAction() != null) {
             switch (Data.getCurrentAction()) {
@@ -102,8 +106,18 @@ public class Client implements ChoiceNotifier {
                     Data.setCurrentAction(null);
                     showGames();
                     break;
+                case REFRESH:
+                    updateActiveGames();
+                    if(Data.getCurrentChoices() != null) {
+                        String toPrint = parseGamesChoiceAdmin(Data.getCurrentChoices());
+                    }
+                    break;
+                case FETCH:
+                    fetchStatus();
+                    break;
             }
         }
+        Data.setCurrentAction(null);
 
         if(Data.getCurrentInput() != null) {
             dto.type.in.response.Response resp = null;
@@ -120,6 +134,10 @@ public class Client implements ChoiceNotifier {
                     break;
             }
         }
+    }
+
+    private void fetchStatus() {
+        //todo
     }
 
     private void showGames(){
@@ -189,17 +207,52 @@ public class Client implements ChoiceNotifier {
 
     }
 
-
-    private void showGamesStates(){
-
+    private void updateActiveGames(){
+        updateChoices(ClientConst.SERVER_CONTEXT + LinkConst.GET_CHOICE_STATUSES,
+                AttributeNames.ACTIVE, Data.HTTP_CLIENT);
     }
 
-    private void showActiveGames(){
+    public void updateChoices(String i_Url, String i_GetTypes,
+                              OkHttpClient i_Client){
+        Request request = getRequestStats(i_Url, i_GetTypes);
 
+        Call call = i_Client.newCall(request);
+
+        try(Response response = call.execute()){
+            if (response.code() == HttpCode.OK) {
+                DtoResponse<DtoServerGameChoice> dtoResponse =
+                        gson.fromJson(response.body().charStream(), ResponseType.DTO_RESPONSE_CHOICE);
+                Data.setCurrentChoices(dtoResponse.getResult());
+            } else if (response.code() == HttpCode.NOT_FOUND || response.code() == HttpCode.BAD_REQUEST) {
+                DtoResponse<DtoServerGameChoice> dtoResponse =
+                        gson.fromJson(response.body().charStream(), ResponseType.DTO_RESPONSE_STATUS);
+                errorPrint(dtoResponse.getErrorMessage());
+                Data.getMain().setCurrentMenu(Data.getMain().getStartMenu());
+                Data.setCurrentChoices(null);
+            }
+        } catch (IOException e) {
+            errorPrint("IOException occurred: " + e.getMessage());
+            Data.getMain().cancelMenuChange();
+        }
     }
 
     private void enterGameView(){
-        //todo
+        int GameId = ((IntResponse)Data.getCurrentResponse()).getInt();
+        Data.setCurrentResponse(null);
+        Request request = CNRequest.getRequestCheckGame(
+                ClientConst.SERVER_CONTEXT + LinkConst.CONNECT_GAME, GameId);
+
+        Call call = Data.HTTP_CLIENT.newCall(request);
+
+        try(Response response = call.execute()){
+            if(response.code() == HttpCode.OK) {
+                System.out.println("Entered game: " + GameId); //todo change to name
+                Data.buildMenu3(this);
+            }
+        } catch (IOException e){
+            errorPrint("IOException occurred " +
+                    "while trying to connect to the server");
+        }
     }
 
     private Action getCurrentAction(Object sender) {
@@ -222,12 +275,10 @@ public class Client implements ChoiceNotifier {
         return ret;
     }
 
-    private boolean runNext(){
+    private void runNext(){
         Menu NextToRun = Data.getMain().getCurrentMenu();
-        //todo: add more checks for different cases
 
         Data.getMain().play();
 
-        return Data.getMain().isClosing();
     }
 }
