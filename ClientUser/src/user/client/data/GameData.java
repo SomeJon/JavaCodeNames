@@ -99,31 +99,35 @@ public class GameData {
     }
 
     public void loadTurn(DtoSingleTurnUpdate i_Turn){
-        GameLock.writeLock().lock();
-        try {
-            CurrentTurn = i_Turn;
-            if (CurrentTurn.getPlayingTeam().getName().equalsIgnoreCase(TeamName)) {
-                IsTeamTurn = true;
-                switch (Role) {
-                    case GUESSER:
-                        IsPlayerTurn = CurrentTurn.getTurnRole().equals(DtoSingleTurnUpdate.eDtoState.GUESSING);
-                        break;
-                    case IDENTIFIER:
-                        IsPlayerTurn = CurrentTurn.getTurnRole().equals(DtoSingleTurnUpdate.eDtoState.IDENTIFICATION);
-                        break;
+        if(i_Turn != null) {
+            GameLock.writeLock().lock();
+            try {
+                CurrentTurn = i_Turn;
+                if (CurrentTurn.getPlayingTeam().getName().equalsIgnoreCase(TeamName)) {
+                    IsTeamTurn = true;
+                    switch (Role) {
+                        case GUESSER:
+                            IsPlayerTurn = CurrentTurn.getTurnRole().equals(DtoSingleTurnUpdate.eDtoState.GUESSING);
+                            break;
+                        case IDENTIFIER:
+                            IsPlayerTurn = CurrentTurn.getTurnRole().equals(DtoSingleTurnUpdate.eDtoState.IDENTIFICATION);
+                            break;
+                    }
                 }
+            } finally {
+                GameLock.writeLock().unlock();
             }
-        } finally {
-            GameLock.writeLock().unlock();
         }
     }
 
     public void loadBoard(DtoBoardUpdate i_Board){
-        GameLock.writeLock().lock();
-        try {
-            CurrentBoard = i_Board;
-        } finally {
-            GameLock.writeLock().unlock();
+        if(i_Board != null) {
+            GameLock.writeLock().lock();
+            try {
+                CurrentBoard = i_Board;
+            } finally {
+                GameLock.writeLock().unlock();
+            }
         }
     }
 

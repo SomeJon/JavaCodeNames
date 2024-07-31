@@ -44,6 +44,6 @@ public class SubServer {
     }
 
     public int getUpdate(){
-        return Data.getBoardUpdate();
+        return Data.getGameUpdate();
     }
 }

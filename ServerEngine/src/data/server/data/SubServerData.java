@@ -26,26 +26,33 @@ public class SubServerData {
     private Boolean Active;
     private int TurnUpdate = 0;
     private int BoardUpdate = 0;
+    private int GameUpdate = 0;
     private EngineInterface Engine = null;
     private final List<ServerTeam> Teams;
     private final Map<ServerTeam, Integer> Result = new HashMap<>();
     private final List<data.server.data.game.Turn> Turns = new ArrayList<>(); //todo: remove final enable to delete for restart
-    private final ReadWriteLock TeamsLock = new ReentrantReadWriteLock(); //locks the team for reading and writing into them
-    private final ReadWriteLock TurnLock = new ReentrantReadWriteLock(); //locks Turn from changing while updating or reading
-    private final ReadWriteLock BoardLock = new ReentrantReadWriteLock(); //locks board from changing while board read
-
+    private final ReadWriteLock dataLock = new ReentrantReadWriteLock(); // Combined lock for all operations
 
     public SubServerData(EngineInterface engine, int id, DtoServerInfo dtoServerInfo) {
         name = dtoServerInfo.getServerName();
         Id = id;
         Engine = engine;
-        Teams = new ArrayList<ServerTeam>();
+        Teams = new ArrayList<>();
         List<DtoServerTeam> teams = dtoServerInfo.getServerTeams();
         Active = false;
 
         for (DtoServerTeam team : teams) {
             ServerTeam toAdd = new ServerTeam(team);
             Teams.add(toAdd);
+        }
+    }
+
+    public int getGameUpdate() {
+        dataLock.readLock().lock();
+        try {
+            return GameUpdate;
+        } finally {
+            dataLock.readLock().unlock();
         }
     }
 
@@ -58,21 +65,35 @@ public class SubServerData {
     }
 
     public Boolean getActive() {
-        return Active;
+        dataLock.readLock().lock();
+        try {
+            return Active;
+        } finally {
+            dataLock.readLock().unlock();
+        }
     }
 
     public int getTurnUpdate() {
-        return TurnUpdate;
+        dataLock.readLock().lock();
+        try {
+            return TurnUpdate;
+        } finally {
+            dataLock.readLock().unlock();
+        }
     }
 
-    public EngineInterface getEngine() {
-        return Engine;
+    public EngineInterface getEngine() { //todo delete
+        dataLock.readLock().lock();
+        try {
+            return Engine;
+        } finally {
+            dataLock.readLock().unlock();
+        }
     }
 
     public List<DtoServerTeam> getTeams() {
-        List<DtoServerTeam> teams = new ArrayList<>();
-
-        TeamsLock.readLock().lock();
+        List<DtoServerTeam> teams;
+        dataLock.readLock().lock();
         try {
             teams = Teams.stream()
                     .map(T ->
@@ -82,70 +103,68 @@ public class SubServerData {
                                     T.getCurrentNumIdentifiers()))
                     .collect(Collectors.toList());
         } finally {
-            TeamsLock.readLock().unlock();
+            dataLock.readLock().unlock();
         }
-
         return teams;
     }
 
     public void joinTeam(User i_User, int TeamId, int RoleChoice) {
-        eRoles toAdd;
-        if (RoleChoice == 0) {
-            toAdd = eRoles.Identifier;
-        } else {
-            toAdd = eRoles.Guesser;
-        }
-
-        TeamsLock.writeLock().lock();
+        eRoles toAdd = (RoleChoice == 0) ? eRoles.Identifier : eRoles.Guesser;
+        dataLock.writeLock().lock();
         try {
             Teams.get(TeamId - 1).addRole(toAdd, i_User);
-            BoardUpdate++;
+            GameUpdate++;
             StartTry();
-        }
-        catch(NoSpot error){
-            if(Teams.stream().allMatch(ServerTeam::isTeamReady)){
+        } catch (NoSpot error) {
+            if (Teams.stream().allMatch(ServerTeam::isTeamReady)) {
                 throw new NoSpot(NoSpot.eNoSpot.Game);
-            }
-            else{
+            } else {
                 throw error;
             }
         } finally {
-            TeamsLock.writeLock().unlock();
+            dataLock.writeLock().unlock();
         }
     }
 
-    private void StartTry(){
+    private void StartTry() {
         boolean check = Teams.stream().allMatch(ServerTeam::isTeamReady);
         if (check) {
             Active = true;
-            BoardLock.writeLock().lock();
-            TurnLock.writeLock().lock();
-            TurnUpdate++;
-            BoardUpdate++;
+            dataLock.writeLock().lock();
             try {
                 Engine.startGame();
                 Turns.add(buildTurn());
-            }finally {
-                TurnLock.writeLock().unlock();
-                BoardLock.writeLock().unlock();
+                TurnUpdate++;
+                BoardUpdate++;
+                GameUpdate++;
+            } finally {
+                dataLock.writeLock().unlock();
             }
         }
     }
 
     public int getBoardUpdate() {
-        return BoardUpdate;
+        int ret;
+        dataLock.readLock().lock();
+
+        try{
+            ret = BoardUpdate;
+        } finally {
+            dataLock.readLock().unlock();
+        }
+
+        return ret;
     }
 
-    private Turn buildTurn(){
-        DtoGroupTeam team = (DtoGroupTeam)Engine.getActiveTeam();
-        DtoGroupTeam nextTeam = (DtoGroupTeam)Engine.getNextTeam();
+    private Turn buildTurn() {
+        DtoGroupTeam team = (DtoGroupTeam) Engine.getActiveTeam();
+        DtoGroupTeam nextTeam = (DtoGroupTeam) Engine.getNextTeam();
         String targetName = team.getName();
         int teamId = -1;
         OptionalInt indexOpt = IntStream.range(0, Teams.size())
                 .filter(i -> Teams.get(i).getTeam().getName().equals(targetName))
                 .findFirst();
 
-        TurnUpdate++;
         if (indexOpt.isPresent()) {
             teamId = indexOpt.getAsInt();
         }
@@ -153,33 +172,31 @@ public class SubServerData {
         return new Turn(teamId + 1, Teams.get(teamId).upTurn(), team, nextTeam);
     }
 
-    public DtoSingleTurnUpdate getTurnUpdates(UpdateContainer io_Container){
+    public DtoSingleTurnUpdate getTurnUpdates(UpdateContainer io_Container) {
         DtoSingleTurnUpdate delta = null;
-        TurnLock.readLock();
-        try{
-            if(io_Container.checkTurnUpdate(TurnUpdate)) {
+        dataLock.readLock().lock();
+        try {
+            if (io_Container.checkTurnUpdate(TurnUpdate)) {
                 delta = Turns.get(Turns.size() - 1).getDto();
                 io_Container.setTurnUpdate(TurnUpdate);
             }
         } finally {
-            TurnLock.readLock().unlock();
+            dataLock.readLock().unlock();
         }
-
         return delta;
     }
 
-    public DtoBoardUpdate getBoardUpdates(UpdateContainer io_Container){
+    public DtoBoardUpdate getBoardUpdates(UpdateContainer io_Container) {
         DtoBoardUpdate ret = null;
-        BoardLock.readLock().lock();
-        try{
-            if(io_Container.checkBoardUpdate(BoardUpdate)) {
-                ret = new DtoBoardUpdate((DtoBoard)Engine.getActiveBoard(), Engine.didGameEng());
+        dataLock.readLock().lock();
+        try {
+            if (io_Container.checkBoardUpdate(BoardUpdate)) {
+                ret = new DtoBoardUpdate((DtoBoard) Engine.getActiveBoard(), Engine.didGameEng());
                 io_Container.setBoardUpdate(BoardUpdate);
             }
         } finally {
-            BoardLock.readLock().unlock();
+            dataLock.readLock().unlock();
         }
-
         return ret;
     }
 }

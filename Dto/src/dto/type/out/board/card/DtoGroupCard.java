@@ -9,6 +9,11 @@ public abstract class DtoGroupCard implements Dto {
     protected final int Cards;
     protected final int CardsFlipped;
 
+    public DtoGroupCard(int cards, int cardsFlipped) {
+        Cards = cards;
+        CardsFlipped = cardsFlipped;
+    }
+
     public DtoGroupCard(GroupCard groupCard) {
         Cards = groupCard.getCards();
         CardsFlipped = groupCard.getCardsFlipped();

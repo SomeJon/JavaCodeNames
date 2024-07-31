@@ -2,6 +2,9 @@ package Adapter;
 
 import com.google.gson.*;
 import dto.Dto;
+import dto.type.out.board.card.DtoGroupCard;
+import dto.type.out.board.card.DtoGroupNeutral;
+import dto.type.out.board.card.DtoGroupTeam;
 import dto.type.out.server.game.*;
 
 import java.lang.reflect.Type;
@@ -31,6 +34,10 @@ public class DtoTypeAdapter implements JsonSerializer<Dto>, JsonDeserializer<Dto
                     return context.deserialize(data, DtoSingleTurnUpdate.class);
                 case "DtoEndResult":
                     return context.deserialize(data, DtoEndResult.class);
+                case "DtoGroupTeam":
+                    return context.deserialize(data, DtoGroupTeam.class);
+                case "DtoGroupNeutral":
+                    return context.deserialize(data, DtoGroupNeutral.class);
                 default:
                     throw new JsonParseException("Unknown element type: " + type);
             }

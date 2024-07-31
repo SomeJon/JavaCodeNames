@@ -11,6 +11,13 @@ public class DtoCard implements Dto {
     private final Integer ID;
     private final DtoGroupCard Group;
 
+    public DtoCard(boolean flipped, String text, Integer ID, DtoGroupCard group) {
+        Flipped = flipped;
+        Text = text;
+        this.ID = ID;
+        Group = group;
+    }
+
     public DtoCard(Card card) {
         this.Flipped = card.isFlipped();
         this.Text = card.getText();

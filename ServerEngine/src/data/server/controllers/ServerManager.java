@@ -2,6 +2,7 @@ package data.server.controllers;
 
 import data.server.data.ServerData;
 import data.server.data.ePermission;
+import data.user.UpdateContainer;
 import data.user.User;
 import dto.Dto;
 import dto.type.in.response.load.LoadInputStreamsResponse;
@@ -217,44 +218,36 @@ public class ServerManager {
         return subServers.get(GameId - 1).getData().getActive();
     }
 
-    public DtoSubServerChoice getGameChoice(int GameId, Integer o_Update) {
+    public DtoSubServerChoice getGameChoice(int GameId, UpdateContainer i_Container) {
         SubServersLock.readLock().lock();
         try {
             SubServer subServer = subServers.get(GameId - 1);
-            List<DtoServerTeamChoice> teamsToAdd = IntStream.range(0, subServer.getServerTeams().size())
+            DtoSubServerChoice choice;
+            int update = subServer.getData().getGameUpdate();
+            if(i_Container.checkGameUpdate(update)) {
+                List<DtoServerTeamChoice> teamsToAdd = IntStream.range(0, subServer.getServerTeams().size())
                         .mapToObj(j -> new DtoServerTeamChoice(j + 1, subServer.getServerTeams().get(j)))
                         .collect(Collectors.toList());
-            DtoSubServerChoice choice = new DtoSubServerChoice(GameId, subServer.getActiveState(),
-                    subServer.getServerName(), teamsToAdd);
-
+                choice = new DtoSubServerChoice(GameId, subServer.getActiveState(),
+                        subServer.getServerName(), teamsToAdd);
+                i_Container.setGameUpdate(update);
+            } else{
+                choice = null;
+            }
             return choice;
         } finally {
-            o_Update = subServers.get(GameId - 1).getUpdate();
             SubServersLock.readLock().unlock();
         }
     }
 
-    public int getGameUpdate(int GameId){
-        return subServers.get(GameId - 1).getData().getBoardUpdate();
-    }
-
-    public Dto getUpdates(User i_User) throws Unauthorized{
+    public DtoGameUpdate getUpdates(User i_User) throws Unauthorized{
         int gameId = i_User.getGameId();
         if(gameId == 0)
             throw new Unauthorized();
 
         DtoBoardUpdate dtoBoard = subServers.get(gameId - 1).getData().getBoardUpdates(i_User.getUpdates());
         DtoSingleTurnUpdate dtoTurns = subServers.get(gameId - 1).getData().getTurnUpdates(i_User.getUpdates());
-        Dto ret = null;
 
-        if(dtoBoard != null && dtoTurns != null){
-            ret = new DtoGameUpdate(dtoBoard, dtoTurns);
-        } else if(dtoTurns != null){
-            ret = dtoTurns;
-        } else if(dtoBoard != null){
-            ret = dtoBoard;
-        }
-
-        return ret;
+        return new DtoGameUpdate(dtoBoard, dtoTurns);
     }
 }

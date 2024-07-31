@@ -5,6 +5,7 @@ import codenames.SessionUtils;
 import data.server.controllers.ServerManager;
 import data.user.User;
 import dto.Dto;
+import dto.type.out.server.game.DtoGameUpdate;
 import exception.server.Unauthorized;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -22,7 +23,7 @@ public class UpdateGameServlet extends HttpServlet {
 
         if (user != null) {
             try {
-                Dto update = manager.getUpdates(user);
+                DtoGameUpdate update = manager.getUpdates(user);
                 if (update != null) {
                     response.setStatus(HttpServletResponse.SC_OK);
                     ServerUtils.moveObjectIntoResponse(response, update);

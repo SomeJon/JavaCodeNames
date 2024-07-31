@@ -21,6 +21,14 @@ public class DtoBoard implements Dto {
     private final int NumOfColumns;
     private final int NumOfRows;
 
+    public DtoBoard(DtoCard[][] board, List<DtoGroupCard> cardGroups, List<DtoGroupTeam> groupTeams, int numOfColumns, int numOfRows) {
+        Board = board;
+        CardGroups = cardGroups;
+        GroupTeams = groupTeams;
+        NumOfColumns = numOfColumns;
+        NumOfRows = numOfRows;
+    }
+
     public int getBoardSize(){
         return NumOfRows * NumOfColumns;
     }

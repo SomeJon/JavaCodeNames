@@ -127,6 +127,8 @@ public class Client2 implements ChoiceNotifier {
                     joinGame();
                     break;
                 case GAME_SHOW:
+                    showGame();
+                    break;
             }
             Data.CurrentAction = null;
         }
@@ -155,12 +157,15 @@ public class Client2 implements ChoiceNotifier {
 
     private void showGame(){
         if(!Data.GameStarted){
-            updateData(true);
+            updateData(false);
             if(!Data.GameStarted){
+                printUpdate();
                 printStatusPending();
             }
-        }else{
+        }
+        if(Data.GameStarted){
             getGameUpdate();
+            printStatusActive();
         }
     }
 
@@ -172,25 +177,14 @@ public class Client2 implements ChoiceNotifier {
 
         try (Response response = call.execute()){
             if (response.code() == HttpCode.OK) {
-                Dto ret = gson.fromJson(response.body().charStream(), Dto.class);
+                DtoGameUpdate ret = gson.fromJson(response.body().charStream(), DtoGameUpdate.class);
+                Data.GameData.loadGame(ret);
+                Data.updateTurnChoice();
 
-                if(ret instanceof DtoGameUpdate){
-                    Data.GameData.loadGame((DtoGameUpdate) ret);
-                    Data.updateTurnChoice();
-                } else if(ret instanceof DtoBoardUpdate){
-                    Data.GameData.loadBoard((DtoBoardUpdate) ret);
-                    Data.updateTurnChoice();
-                } else if(ret instanceof DtoSingleTurnUpdate){
-                    Data.GameData.loadTurn((DtoSingleTurnUpdate) ret);
-                    Data.updateTurnChoice();
-                } else if(ret instanceof DtoEndResult){
-                    printGameEnd((DtoEndResult) ret);
-                    Data.rebuildMenu2(this);
-                } else{
-                    errorPrint("Unexpected server update error occurred");
-                }
             } else if(response.code() == HttpCode.UNAUTHORIZED) {
-                errorPrint("Unauthorized for updates!");
+                DtoEndResult ret = gson.fromJson(response.body().charStream(), DtoEndResult.class);
+                printGameEnd(ret);
+                //todo: exit the game
             }
         } catch (IOException e){
             errorPrint("An IOException error occurred");
@@ -243,6 +237,8 @@ public class Client2 implements ChoiceNotifier {
                 Data.GameStarted = Data.CurrentSubChoice.isActive();
                 Data.NewUpdate = true;
             } else if (response.code() == HttpCode.NO_CONTENT) {
+                if(i_PrintData)
+                    printUpdate();
                 Data.NewUpdate = false;
             } else
                 errorPrint("Unexpected server update error occurred!");
@@ -519,38 +515,40 @@ public class Client2 implements ChoiceNotifier {
     private void printStatusActive(){
         StringBuilder toPrint = new StringBuilder();
         DtoSingleTurnUpdate turn = Data.GameData.getCurrentTurn();
+        if(turn != null) {
         DtoGroupTeam playingTeam = turn.getPlayingTeam();
-        toPrint.append("Status: Active\nCurrent Playing Team: ")
-                .append(playingTeam.getName())
-                .append(" - Turn: ")
-                .append(turn.getTurnNum())
-                .append(" - Score(Flipped/Left): (")
-                .append(playingTeam.getCardsFlipped()).append("/").append(playingTeam.getCards())
-                .append(")\n");
+            toPrint.append("Status: Active\nCurrent Playing Team: ")
+                    .append(playingTeam.getName())
+                    .append(" - Turn: ")
+                    .append(turn.getTurnNum())
+                    .append(" - Score(Flipped/Left): (")
+                    .append(playingTeam.getCardsFlipped()).append("/").append(playingTeam.getCards())
+                    .append(")\n");
 
-        if(turn.getTurnIdentification().isSet()){
-            toPrint.append("Current identification Word: ")
-                    .append(turn.getTurnIdentification().getIdentification())
-                    .append(" - Related Words: ")
-                    .append(turn.getTurnIdentification().getRelatedWords())
-                    .append("\n");
+            if (turn.getTurnIdentification().isSet()) {
+                toPrint.append("Current identification Word: ")
+                        .append(turn.getTurnIdentification().getIdentification())
+                        .append(" - Related Words: ")
+                        .append(turn.getTurnIdentification().getRelatedWords())
+                        .append("\n");
 
-            if(!turn.getGuesses().isEmpty()) {
-                toPrint.append("Guesses done during turn:\n");
+                if (!turn.getGuesses().isEmpty()) {
+                    toPrint.append("Guesses done during turn:\n");
 
-                for (DtoGuess guess : turn.getGuesses()) {
-                    toPrint.append("   -Guess: ")
-                            .append(guess.getGuess())
-                            .append(" - Guess result: ")
-                            .append(guess.getResult().toString())
-                            .append("\n");
+                    for (DtoGuess guess : turn.getGuesses()) {
+                        toPrint.append("   -Guess: ")
+                                .append(guess.getGuess())
+                                .append(" - Guess result: ")
+                                .append(guess.getResult().toString())
+                                .append("\n");
+                    }
                 }
             }
+
+            toPrint.append(Data.GameData.getParsedBoard());
+
+            System.out.println(toPrint);
         }
-
-        toPrint.append(Data.GameData.getParsedBoard());
-
-        System.out.print(toPrint);
     }
 
     private void printGameEnd(DtoEndResult i_Result){
