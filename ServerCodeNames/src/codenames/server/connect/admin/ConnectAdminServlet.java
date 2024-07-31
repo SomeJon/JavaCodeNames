@@ -8,10 +8,7 @@ import data.server.controllers.ServerManager;
 import data.server.data.ePermission;
 import data.user.UpdateContainer;
 import data.user.User;
-import dto.Dto;
-import dto.type.in.response.ResponseJoin;
 import dto.type.out.server.Choice.DtoSubServerChoice;
-import exception.server.NoSpot;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -20,7 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet(name="Connecting Servlet", urlPatterns = "/connect/admin")
+@WebServlet(name="Connecting Admin Servlet", urlPatterns = "/connect/admin")
 public class ConnectAdminServlet extends HttpServlet {
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         ServerManager manager = ServerUtils.getServerManager(request.getServletContext());
