@@ -91,4 +91,34 @@ public class Prints {
 
         return ret.toString();
     }
+
+    public static String parseGamesChoiceAdmin(DtoServerGameChoice i_Choice){
+        StringBuilder ret = new StringBuilder();
+        int CounterActive = 0;
+        int CounterAll = 0;
+
+        for(DtoSubServerChoice choice : i_Choice.getSubServerChoices()){
+            String tab = "    ";
+            ret.append("------------------------\n")
+                    .append("Game Id: ").append(choice.getId())
+                    .append("\nGame Name: ").append(choice.getGameName())
+                    .append("\nTeams(Active/All): ");
+            for (DtoServerTeamChoice team : choice.getTeamChoices()) {
+                CounterAll++;
+                DtoServerTeam teamInfo = team.getTeamInfo();
+                if(teamInfo.getConnectedDefiners() > 0
+                        && teamInfo.getConnectedGuessers() > 0){
+                    CounterActive++;
+                }
+            }
+            ret.append("(")
+                    .append(CounterActive)
+                    .append("/")
+                    .append(CounterAll)
+                    .append(")\n");
+        }
+        ret.append("------------------------\n");
+
+        return ret.toString();
+    }
 }

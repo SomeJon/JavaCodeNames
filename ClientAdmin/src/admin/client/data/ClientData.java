@@ -4,8 +4,10 @@ import admin.client.Client;
 import admin.client.action.Action;
 import console.MainMenu;
 import console.Menu;
+import console.NotifyList;
 import cookiejar.copied.SimpleCookieManager;
 import dto.type.in.response.Response;
+import dto.type.out.server.Choice.DtoServerGameChoice;
 import okhttp3.OkHttpClient;
 import ui.input.InputHandling;
 
@@ -21,8 +23,19 @@ public class ClientData {
     private Action CurrentAction = null;
     private InputHandling CurrentInput = null;
     private Response CurrentResponse = null;
+    private int CurrentGameId;
     private File WaitingTxt = null;
     private File WaitingXml = null;
+    private DtoServerGameChoice CurrentChoices = null;
+
+
+    public DtoServerGameChoice getCurrentChoices() {
+        return CurrentChoices;
+    }
+
+    public void setCurrentChoices(DtoServerGameChoice i_CurrentChoices) {
+        CurrentChoices = i_CurrentChoices;
+    }
 
     public boolean isMenu2() {
         return Menu2;
@@ -103,11 +116,19 @@ public class ClientData {
     public void addFirstOptions(Client i_Client) {
         if (!Menu2) {
             Main.getStartMenu().createMenuOption("Showcase All Game States", Action.SHOW_GAMES, i_Client);
-            Menu toAdd = Main.getStartMenu().createSubMenu("Active Game Viewer");
-            toAdd.createMenuOption("Chose game", InputHandling.GET_GAME_ID, i_Client);
+            NotifyList notifiers = new NotifyList();
+            notifiers.addNotifyBefore(i_Client, Action.REFRESH);
+            Menu subMenu1 = Main.getStartMenu().createSubMenuWithActions("Watch a game as a spectator", notifiers);
+            subMenu1.createMenuOption("Refresh games info", Action.REFRESH, i_Client);
+            subMenu1.createMenuOption("Enter game id", InputHandling.GET_GAME_ID, i_Client);
             Menu2 = true;
         }
     }
 
-
+    public void buildMenu3(Client client) {
+        Menu Load = Main.getStartMenu().createSubMenu("Active Game Viewer");
+        Load.createMenuOption("Fetch game status", Action.FETCH, client);
+        Main.setCurrentMenu(Load);
+        Main.getStartMenu().getMenuItems().remove(2);
+    }
 }
