@@ -6,7 +6,7 @@ import codenames.server.health.HealthServlet;
 import constant.attribute.AttributeNames;
 import data.server.controllers.ServerManager;
 import data.user.User;
-import dto.type.out.server.choice.DtoSubServerChoice;
+import dto.type.out.server.Choice.DtoSubServerChoice;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;

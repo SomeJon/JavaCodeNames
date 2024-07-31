@@ -3,7 +3,7 @@ package codenames;
 import com.google.gson.Gson;
 import constant.attribute.AttributeNames;
 import data.server.controllers.ServerManager;
-import dto.type.out.server.choice.DtoSubServerChoice;
+import dto.type.out.server.Choice.DtoSubServerChoice;
 import dto.type.out.server.HasActive;
 import jakarta.servlet.http.HttpServletRequest;
 

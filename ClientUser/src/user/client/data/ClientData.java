@@ -2,9 +2,9 @@ package user.client.data;
 
 import console.*;
 import dto.type.in.response.Response;
-import dto.type.out.server.choice.DtoServerGameChoice;
-import dto.type.out.server.choice.DtoServerTeamChoice;
-import dto.type.out.server.choice.DtoSubServerChoice;
+import dto.type.out.server.Choice.DtoServerGameChoice;
+import dto.type.out.server.Choice.DtoServerTeamChoice;
+import dto.type.out.server.Choice.DtoSubServerChoice;
 import ui.input.InputHandling;
 
 import cookiejar.copied.SimpleCookieManager;
