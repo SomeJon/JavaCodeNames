@@ -21,10 +21,9 @@ import dto.type.out.server.game.DtoGameUpdate;
 import dto.type.out.server.game.DtoSingleTurnUpdate;
 import engine.Engine;
 import engine.data.GameData;
-import exception.server.AdminOn;
-import exception.server.InternalEngineErrorException;
-import exception.server.NameTaken;
-import exception.server.Unauthorized;
+import exception.loadxml.OutOfBoundLoad;
+import exception.loadxml.TeamNamesNotUnique;
+import exception.server.*;
 import exception.server.mismatch.MismatchRole;
 import exception.server.mismatch.MismatchStage;
 import exception.server.mismatch.MismatchTeam;
@@ -111,7 +110,8 @@ public class ServerManager {
      * @throws JAXBException if an error occurs during XML processing.
      * @throws IOException if an I/O error occurs.
      */
-    public void loadSubServerData(LoadInputStreamsResponse i_Response) throws JAXBException, IOException {
+    public void loadSubServerData(LoadInputStreamsResponse i_Response)
+            throws JAXBException, IOException, TxtFileNotMatch, TeamNamesNotUnique, OutOfBoundLoad {
         Engine toAdd = new Engine(new GameData());
         toAdd.loadFiles(i_Response);
 

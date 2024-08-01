@@ -11,6 +11,7 @@ import dto.type.in.response.common.StringResponse;
 import dto.type.in.response.ingame.GuesserResponse;
 import dto.type.in.response.ingame.IdentificationResponse;
 import dto.type.out.board.card.DtoGroupTeam;
+import dto.type.out.data.DtoGuessResult;
 import dto.type.out.data.DtoGuessResultWrapper;
 import dto.type.out.data.DtoIdentification;
 import dto.type.out.server.Choice.DtoServerGameChoice;
@@ -709,54 +710,55 @@ public class Client2 implements ChoiceNotifier {
 
     public void printGuessResult(DtoGuessResultWrapper i_ReceivedGuessResult, DtoGroupTeam i_PlayingTeam) {
         StringBuilder toPrint = new StringBuilder();
-        toPrint.append("You flipped a Card!\n");
-        int guessesLeft = Data.GameData.getCurrentTurn().getGuessesLeft() - 1;
+        if(i_ReceivedGuessResult.getGuessResult() == DtoGuessResult.TURN_SKIPPED){
+            toPrint.append("The turn was skipped!\n");
+        } else {
+            toPrint.append("You flipped a Card!\n");
+            int guessesLeft = Data.GameData.getCurrentTurn().getGuessesLeft() - 1;
 
-        switch(i_ReceivedGuessResult.getGuessResult()){
-            case SUCCESSFUL_GUESS:
-                toPrint.append("The card belonged to your team, and received a point!\n");
-                i_PlayingTeam = new DtoGroupTeam(i_PlayingTeam.getCards(),
-                        i_PlayingTeam.getCardsFlipped() + 1, i_PlayingTeam.getTeam());
-                if(guessesLeft > 0){
-                    toPrint.append("You can guess ")
-                            .append(guessesLeft)
-                            .append(" more times!\n");
-                }
-                else{
-                    toPrint.append("No guesses left! Turn Ends\n");
-                }
-                break;
-            case ENEMY_TEAM_HIT:
-                toPrint.append("The card belonged to an enemy Team!\n");
+            switch (i_ReceivedGuessResult.getGuessResult()) {
+                case SUCCESSFUL_GUESS:
+                    toPrint.append("The card belonged to your team, and received a point!\n");
+                    i_PlayingTeam = new DtoGroupTeam(i_PlayingTeam.getCards(),
+                            i_PlayingTeam.getCardsFlipped() + 1, i_PlayingTeam.getTeam());
+                    if (guessesLeft > 0) {
+                        toPrint.append("You can guess ")
+                                .append(guessesLeft)
+                                .append(" more times!\n");
+                    } else {
+                        toPrint.append("No guesses left! Turn Ends\n");
+                    }
+                    break;
+                case ENEMY_TEAM_HIT:
+                    toPrint.append("The card belonged to an enemy Team!\n");
 
-                if(guessesLeft > 0){
-                    toPrint.append("You can guess ")
-                            .append(guessesLeft)
-                            .append(" more times!\n");
-                }
-                else{
-                    toPrint.append("No guesses left! Turn Ends\n");
-                }
+                    if (guessesLeft > 0) {
+                        toPrint.append("You can guess ")
+                                .append(guessesLeft)
+                                .append(" more times!\n");
+                    } else {
+                        toPrint.append("No guesses left! Turn Ends\n");
+                    }
 
-                break;
-            case BLACK_HIT:
-                DtoGroupTeam teamLost = i_ReceivedGuessResult.getGroupTeam();
-                toPrint.append("Black card was flipped!" + "\n")
-                        .append(teamLost.getName())
-                        .append(" Lost the game!\n");
-                break;
-            case NEUTRAL_HIT:
-                toPrint.append("Card flipped was neutral!\n");
+                    break;
+                case BLACK_HIT:
+                    DtoGroupTeam teamLost = i_ReceivedGuessResult.getGroupTeam();
+                    toPrint.append("Black card was flipped!" + "\n")
+                            .append(teamLost.getName())
+                            .append(" Lost the game!\n");
+                    break;
+                case NEUTRAL_HIT:
+                    toPrint.append("Card flipped was neutral!\n");
 
-                if(guessesLeft > 0){
-                    toPrint.append("You can guess ")
-                            .append(guessesLeft)
-                            .append(" more times!\n");
-                }
-                else{
-                    toPrint.append("No guesses left! Turn Ends\n");
-                }
-                break;
+                    if (guessesLeft > 0) {
+                        toPrint.append("You can guess ")
+                                .append(guessesLeft)
+                                .append(" more times!\n");
+                    } else {
+                        toPrint.append("No guesses left! Turn Ends\n");
+                    }
+                    break;
+            }
         }
 
         toPrint.append(parseTeam(i_PlayingTeam));

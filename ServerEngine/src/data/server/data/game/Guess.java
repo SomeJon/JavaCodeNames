@@ -22,6 +22,12 @@ public class Guess {
             public DtoServerGuess.eDtoResult getDto() {
                 return DtoServerGuess.eDtoResult.BLACK_HIT;
             }
+        },
+        SKIP{
+            @Override
+            public DtoServerGuess.eDtoResult getDto() {
+                return DtoServerGuess.eDtoResult.SKIP;
+            }
         };
 
         public abstract DtoServerGuess.eDtoResult getDto();

@@ -3,6 +3,7 @@ package exception;
 public abstract class CodeNameException extends RuntimeException {
     public enum ExceptionType {
         LOAD_FILE,
+        LOAD_NAME,
         CHECK_PATH,
         TURN_EXCEPTION,
         CARD_FLIPPED,

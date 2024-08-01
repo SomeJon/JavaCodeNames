@@ -4,6 +4,8 @@ import dto.type.out.server.DtoServerInfo;
 import engine.data.GameData;
 import engine.data.GameStatus;
 import engine.data.Team;
+import exception.loadxml.OutOfBoundLoad;
+import exception.loadxml.TeamNamesNotUnique;
 import exception.server.TxtFileNotMatch;
 import jaxb.schema.ex02.generated.ECNGame;
 import jaxb.schema.ex02.generated.ECNTeam;
@@ -20,7 +22,8 @@ public class FileReaderEx02 {
     private static final String JAXB_XML_GAME_PACKAGE_NAME = "jaxb.schema.ex02.generated";
 
     public static void ReadFiles(InputStream i_XmlFile, InputStream i_WordDict, String i_TxtName,
-                                        GameData i_DataHolder, DtoServerInfo O_DtoToFill) throws JAXBException, IOException {
+                                        GameData i_DataHolder, DtoServerInfo O_DtoToFill)
+            throws JAXBException, IOException, TxtFileNotMatch, TeamNamesNotUnique, OutOfBoundLoad{
         ECNGame gameData = deserializeFrom(i_XmlFile);
         String gameName = gameData.getName();
         String nameOfDict = gameData.getECNDictionaryFile(); //todo check this line
@@ -34,7 +37,7 @@ public class FileReaderEx02 {
         //todo add check name of word dict
         words = readTxtStream(i_WordDict)
                 .trim()
-                .replaceAll("[!@#$%^&*)(-_,.?]","")
+                .replaceAll("[!@#$%^&*\")(-_,.?]","")
                 .split("[ \t\n]+");
         wordsSet = new HashSet<String>(Arrays.asList(words));
 

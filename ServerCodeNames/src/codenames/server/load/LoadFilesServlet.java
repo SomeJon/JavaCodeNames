@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @WebServlet(name = "Loading load", urlPatterns = "/load")
 @MultipartConfig
@@ -62,8 +63,7 @@ public class LoadFilesServlet extends HttpServlet {
                     result.put(Responses.CREATED, "Files uploaded and processed successfully into the server!");
                     response.setStatus(HttpServletResponse.SC_CREATED);
 
-                }
-                finally {
+                } finally {
                     if (xmlInputStream != null)
                         xmlInputStream.close();
                     if (txtInputStream != null)

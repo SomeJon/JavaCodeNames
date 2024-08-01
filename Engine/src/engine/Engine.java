@@ -17,6 +17,9 @@ import engine.board.card.GroupTeam;
 import engine.data.ActiveGame;
 import engine.data.GameData;
 import dto.type.out.data.DtoIdentification;
+import exception.loadxml.OutOfBoundLoad;
+import exception.loadxml.TeamNamesNotUnique;
+import exception.server.TxtFileNotMatch;
 import exception.turn.CardFlippedException;
 import exception.turn.GuessOutOfRangeException;
 import exception.turn.IdentificationException;
@@ -37,7 +40,8 @@ public class Engine implements EngineInterface, Serializable {
     }
 
     @Override
-    public void loadFiles(Response i_LoadFiles) throws JAXBException, IOException {
+    public void loadFiles(Response i_LoadFiles)
+            throws JAXBException, IOException, TxtFileNotMatch, TeamNamesNotUnique, OutOfBoundLoad {
         if(i_LoadFiles instanceof LoadInputStreamsResponse) {
             LoadInputStreamsResponse response = (LoadInputStreamsResponse) i_LoadFiles;
             FileReaderEx02.ReadFiles(response.getXmlInputStream(), response.getTxtInputStream(),
@@ -130,7 +134,7 @@ public class Engine implements EngineInterface, Serializable {
             GroupTeam groupTeam = (GroupTeam) cardGroup;
             if (groupTeam != playingTeam) {
                 DtoGuessResult.ENEMY_TEAM_HIT.setGroupTeam(new DtoGroupTeam(groupTeam));
-                DtoGuessResult res = DtoGuessResult.BLACK_HIT;
+                DtoGuessResult res = DtoGuessResult.ENEMY_TEAM_HIT;
                 res.setGroupTeam(new DtoGroupTeam(playingTeam));
                 if(groupTeam.getCardsFlipped() == groupTeam.getCards()) {
                     Data.getActiveData().endTeam(groupTeam);

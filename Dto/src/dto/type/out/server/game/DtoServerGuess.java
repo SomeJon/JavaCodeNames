@@ -21,6 +21,12 @@ public class DtoServerGuess implements Dto {
             public String toString() {
                 return "Hit a black card!";
             }
+        },
+        SKIP{
+            @Override
+            public String toString() {
+                return "Skipped the turn!";
+            }
         };
     }
     private final Integer guess;

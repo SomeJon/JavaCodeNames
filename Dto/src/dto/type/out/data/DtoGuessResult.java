@@ -8,7 +8,8 @@ public enum DtoGuessResult implements Dto {
     ENEMY_TEAM_HIT,
     NEUTRAL_HIT,
     BLACK_HIT,
-    GAME_NOT_END;
+    GAME_NOT_END,
+    TURN_SKIPPED;
 
     private DtoGroupTeam GroupTeam;
 

@@ -255,67 +255,71 @@ public class SubServerData {
         try {
             Turn currentTurn = getCurrentTurn();
             validateTurn(currentTurn, i_User, Turn.eState.GUESSING, UserMessage.eRole.Guesser);
-
-            Dto ServerSide = Engine.playTurnGuessers(i_Guess);
-            Guess toAdd;
-
             boolean turnEnd = false;
             boolean gameEnd = false;
             DtoGuessResult guessResult;
+            Guess toAdd;
 
-            if (ServerSide instanceof DtoGuessResult) {
-                guessResult = (DtoGuessResult) ServerSide;
-                toAdd = new Guess(i_Guess.getCardId(), guessResult);
-                if (guessResult == DtoGuessResult.BLACK_HIT) {
-                    DtoEndResult endResult = new DtoEndResult(guessResult, 0, false);
-                    currentTurn.getTurnTeam().cleanTeam(endResult);
-                    turnEnd = true;
-                }
-            } else if (ServerSide instanceof DtoGameEndResult) {
-                DtoGameEndResult gameEndResult = (DtoGameEndResult) ServerSide;
-                DtoEndResult endResult;
-                DtoEndResult winResult;
-                ServerTeam winningTeam;
-                guessResult = gameEndResult.getGuessResult();
-                toAdd = new Guess(i_Guess.getCardId(), guessResult);
-                gameEnd = Engine.didGameEnd();
+            if (i_Guess.getCardId() == 0) {
+                guessResult = DtoGuessResult.TURN_SKIPPED;
+                toAdd = new Guess(0, Guess.eResult.SKIP);
+                turnEnd = true;
+            } else {
 
-                switch (guessResult) {
-                    case BLACK_HIT:
-                        endResult = new DtoEndResult(guessResult, 0, gameEnd);
+                Dto ServerSide = Engine.playTurnGuessers(i_Guess);
+                if (ServerSide instanceof DtoGuessResult) {
+                    guessResult = (DtoGuessResult) ServerSide;
+                    toAdd = new Guess(i_Guess.getCardId(), guessResult);
+                    if (guessResult == DtoGuessResult.BLACK_HIT) {
+                        DtoEndResult endResult = new DtoEndResult(guessResult, 0, false);
                         currentTurn.getTurnTeam().cleanTeam(endResult);
-                        winResult = new DtoEndResult(guessResult, WinPlacement, gameEnd);
-                        WinPlacement++;
-                        winningTeam = getTeam(gameEndResult.getWinningTeam());
-                        winningTeam.cleanTeam(winResult);
                         turnEnd = true;
-                        break;
-                    case SUCCESSFUL_GUESS:
-                        winResult = new DtoEndResult(guessResult, WinPlacement, gameEnd);
-                        WinPlacement++;
-                        currentTurn.getTurnTeam().cleanTeam(winResult);
-                        turnEnd = true;
-                        if (gameEnd) {
-                            endResult = new DtoEndResult(guessResult, 0, gameEnd);
-                            winningTeam = getTeam(((DtoGroupTeam) Engine.getActiveTeam()));
-                            winningTeam.cleanTeam(endResult);
-                        }
-                        break;
-                    case ENEMY_TEAM_HIT:
-                        winResult = new DtoEndResult(guessResult, WinPlacement, gameEnd);
-                        WinPlacement++;
-                        winningTeam = getTeam(gameEndResult.getWinningTeam());
-                        winningTeam.cleanTeam(winResult);
-                        if (gameEnd) {
+                    }
+                } else if (ServerSide instanceof DtoGameEndResult) {
+                    DtoGameEndResult gameEndResult = (DtoGameEndResult) ServerSide;
+                    DtoEndResult endResult;
+                    DtoEndResult winResult;
+                    ServerTeam winningTeam;
+                    guessResult = gameEndResult.getGuessResult();
+                    toAdd = new Guess(i_Guess.getCardId(), guessResult);
+                    gameEnd = Engine.didGameEnd();
+
+                    switch (guessResult) {
+                        case BLACK_HIT:
                             endResult = new DtoEndResult(guessResult, 0, gameEnd);
                             currentTurn.getTurnTeam().cleanTeam(endResult);
-                        }
-                        break;
+                            winResult = new DtoEndResult(guessResult, WinPlacement, gameEnd);
+                            WinPlacement++;
+                            winningTeam = getTeam(gameEndResult.getWinningTeam());
+                            winningTeam.cleanTeam(winResult);
+                            turnEnd = true;
+                            break;
+                        case SUCCESSFUL_GUESS:
+                            winResult = new DtoEndResult(guessResult, WinPlacement, gameEnd);
+                            WinPlacement++;
+                            currentTurn.getTurnTeam().cleanTeam(winResult);
+                            turnEnd = true;
+                            if (gameEnd) {
+                                endResult = new DtoEndResult(guessResult, 0, gameEnd);
+                                winningTeam = getTeam(((DtoGroupTeam) Engine.getActiveTeam()));
+                                winningTeam.cleanTeam(endResult);
+                            }
+                            break;
+                        case ENEMY_TEAM_HIT:
+                            winResult = new DtoEndResult(guessResult, WinPlacement, gameEnd);
+                            WinPlacement++;
+                            winningTeam = getTeam(gameEndResult.getWinningTeam());
+                            winningTeam.cleanTeam(winResult);
+                            if (gameEnd) {
+                                endResult = new DtoEndResult(guessResult, 0, gameEnd);
+                                currentTurn.getTurnTeam().cleanTeam(endResult);
+                            }
+                            break;
+                    }
+                } else {
+                    throw new InternalEngineErrorException();
                 }
-            } else {
-                throw new InternalEngineErrorException();
             }
-
             currentTurn.guessDone();
             if (currentTurn.getGuessesLeft() < 1)
                 turnEnd = true;
@@ -329,9 +333,9 @@ public class SubServerData {
                 }
 
                 Turns.add(buildTurn());
-            } else{
-                currentTurn.setPlayingTeam((DtoGroupTeam)Engine.getActiveTeam());
-                currentTurn.setNextPlayingTeam((DtoGroupTeam)Engine.getNextTeam());
+            } else {
+                currentTurn.setPlayingTeam((DtoGroupTeam) Engine.getActiveTeam());
+                currentTurn.setNextPlayingTeam((DtoGroupTeam) Engine.getNextTeam());
             }
 
             GameUpdate++;

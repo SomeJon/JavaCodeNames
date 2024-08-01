@@ -9,6 +9,7 @@ public class TeamNamesNotUnique extends CodeNameException {
 
     public TeamNamesNotUnique(List<String> i_NunUniqueNames) {
         NonUniqueNames = i_NunUniqueNames;
+        setType(ExceptionType.LOAD_NAME);
     }
 
     public List<String> getNonUniqueNames() {
