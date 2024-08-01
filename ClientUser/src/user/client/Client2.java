@@ -4,8 +4,11 @@ import Adapter.AdapterAddon;
 import console.ChoiceNotifier;
 import console.MenuItem;
 import constant.attribute.AttributeNames;
+import dto.type.in.response.ResponseJoin;
 import dto.type.in.response.common.IntResponse;
 import dto.type.in.response.common.StringResponse;
+import dto.type.in.response.ingame.GuesserResponse;
+import dto.type.in.response.ingame.IdentificationResponse;
 import dto.type.out.board.card.DtoGroupTeam;
 import dto.type.out.server.Choice.DtoServerGameChoice;
 import dto.type.out.server.Choice.DtoServerTeamChoice;
@@ -129,7 +132,8 @@ public class Client2 implements ChoiceNotifier {
                     showGame();
                     break;
                 case PLAY_TURN:
-                    //todo: make it
+                    playTurn();
+                    break;
             }
             Data.CurrentAction = null;
         }
@@ -157,15 +161,45 @@ public class Client2 implements ChoiceNotifier {
     }
 
     private void playTurn(){
-        if(Data.GameData.getCurrentTurn() != null){
-            if(Data.GameData.getCurrentTurn().getPlayingTeamId() == Data.GameData.getTeamId()){
-
+        DtoSingleTurnUpdate turn = Data.GameData.getCurrentTurn();
+        if(turn != null){
+            if(turn.getPlayingTeamId() == Data.GameData.getTeamId()){
+                switch(turn.getTurnRole()){
+                    case GUESSING:
+                        if(Data.GameData.getRole() == GameData.roleChoice.GUESSER)
+                            playGuesser();
+                        else
+                            errorPrint("You cant guess while turn state is on identification!");
+                        break;
+                    case IDENTIFICATION:
+                        if(Data.GameData.getRole() == GameData.roleChoice.IDENTIFIER)
+                            playIdentifier();
+                        else
+                            errorPrint("You cant identify while turn state is on Guessing!");
+                        break;
+                }
             } else{
                 errorPrint("This is not your team turn!");
             }
         } else{
             errorPrint("No turn data is available to play a turn!");
         }
+    }
+
+    private void playGuesser(){
+        GuesserResponse resp = new GuesserResponse();
+        Data.GameData.getRole().getInput(resp);
+
+    }
+
+    private void playIdentifier(){
+        IdentificationResponse resp = new IdentificationResponse();
+        Data.GameData.getRole().getInput(resp);
+
+    }
+
+    private void play(String url, Response i_Response) {
+
     }
 
     private void showGame(){
@@ -183,7 +217,7 @@ public class Client2 implements ChoiceNotifier {
     }
 
     private void getGameUpdate(){
-        Request request = getRequestUpdateGameData
+        Request request = getRequest
                 (ClientConst.SERVER_CONTEXT + ClientConst.GET_UPDATED_GAME_DATA);
 
         Call call = Data.HTTP_CLIENT.newCall(request);
@@ -217,8 +251,8 @@ public class Client2 implements ChoiceNotifier {
         boolean ret = false;
 
         if(Data.NewUpdate) {
-            Request request = getRequestCheckGame(ClientConst.SERVER_CONTEXT + LinkConst.CHECK_GAME,
-                    Data.GameData.getGameId());
+            Request request = getRequestQueryParameter(ClientConst.SERVER_CONTEXT + LinkConst.CHECK_GAME,
+                    AttributeNames.WANTED_GAME, Data.GameData.getGameId().toString());
 
             Call call = Data.HTTP_CLIENT.newCall(request);
 
@@ -236,8 +270,8 @@ public class Client2 implements ChoiceNotifier {
     }
 
     private void updateData(boolean i_PrintData){
-        Request request = getRequestCheckGame(ClientConst.SERVER_CONTEXT + LinkConst.UPDATE_GAME_STATUS,
-                Data.GameData.getGameId());
+        Request request = getRequestQueryParameter(ClientConst.SERVER_CONTEXT + LinkConst.UPDATE_GAME_STATUS,
+                AttributeNames.WANTED_GAME, Data.GameData.getGameId().toString());
 
         Call call = Data.HTTP_CLIENT.newCall(request);
 
@@ -275,8 +309,11 @@ public class Client2 implements ChoiceNotifier {
     }
 
     private void joinGame(){
-        Request request = putRequestJoin(ClientConst.SERVER_CONTEXT + LinkConst.JOIN_GAME,
-                Data.GameData.getGameId(), Data.GameData.getTeamId(), Data.GameData.getRole().GetChoice());
+        ResponseJoin join = new ResponseJoin(
+                Data.GameData.getGameId(),
+                Data.GameData.getTeamId(),
+                Data.GameData.getRole().GetChoice());
+        Request request = requestWithObject(ClientConst.SERVER_CONTEXT + LinkConst.JOIN_GAME, join, "PUT");
 
         Call call = Data.HTTP_CLIENT.newCall(request);
 
@@ -391,7 +428,7 @@ public class Client2 implements ChoiceNotifier {
 
     private void showPendingGames(){
         printGameChoices(ClientConst.SERVER_CONTEXT + LinkConst.GET_CHOICE_STATUSES,
-                AttributeNames.PENDING, Data.HTTP_CLIENT, false);
+                AttributeNames.PENDING, Data.HTTP_CLIENT);
     }
 
     private Action getCurrentAction(Object sender) {
@@ -415,8 +452,8 @@ public class Client2 implements ChoiceNotifier {
     }
 
     public void printGameChoices(String i_Url, String i_GetTypes,
-                                        OkHttpClient i_Client, boolean adminRequest){
-        Request request = getRequestStats(i_Url, i_GetTypes);
+                                        OkHttpClient i_Client){
+        Request request = getRequestQueryParameter(i_Url, AttributeNames.WANTED_STATUS, i_GetTypes);
 
         Call call = i_Client.newCall(request);
 

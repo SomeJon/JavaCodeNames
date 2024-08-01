@@ -1,9 +1,11 @@
 package user.client.data;
 
+import dto.type.in.response.Response;
 import dto.type.out.server.game.DtoBoardUpdate;
 import dto.type.out.server.game.DtoGameUpdate;
 import dto.type.out.server.game.DtoSingleTurnUpdate;
 import prints.boardprinting.BoardPrinting;
+import ui.input.InputHandling;
 
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -20,6 +22,11 @@ public class GameData {
             public int GetChoice() {
                 return 0;
             }
+
+            @Override
+            public void getInput(Response o_Response) {
+                InputHandling.GUESSER.getInput(o_Response);
+            }
         },
         GUESSER{
             @Override
@@ -31,14 +38,20 @@ public class GameData {
             public int GetChoice() {
                 return 1;
             }
+
+            @Override
+            public void getInput(Response o_Response) {
+                InputHandling.GUESSER.getInput(o_Response);
+            }
         };
 
         public abstract String toString();
         public abstract int GetChoice();
+        public abstract void getInput(Response o_Response);
     }
 
     private String GameName = null;
-    private Integer GameId = null;
+    private Integer GameId = 0;
     private String TeamName = null;
     private Integer TeamId = null;
     private roleChoice Role = null;

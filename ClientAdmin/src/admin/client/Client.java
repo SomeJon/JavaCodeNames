@@ -7,9 +7,7 @@ import admin.client.data.LinkConst;
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import console.ChoiceNotifier;
-import console.Menu;
 import console.MenuItem;
-import console.PauseConsole;
 import constant.attribute.AttributeNames;
 import constant.client.ClientConst;
 import constant.client.HttpCode;
@@ -35,7 +33,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static prints.Prints.parseGamesChoiceAdmin;
-import static request.CNRequest.getRequestStats;
+import static request.CNRequest.getRequestQueryParameter;
 import static ui.input.InputHandling.errorPrint;
 
 
@@ -148,8 +146,9 @@ public class Client implements ChoiceNotifier {
 
     private void fetchStatus() {
         int GameId = Data.getCurrentId();
-        Request request = CNRequest.getRequestCheckGame(
-                ClientConst.SERVER_CONTEXT + LinkConst.GET_CHOICE_ACTIVE, GameId);
+        Request request = CNRequest.getRequestQueryParameter(
+                ClientConst.SERVER_CONTEXT + LinkConst.GET_CHOICE_ACTIVE,
+                AttributeNames.WANTED_GAME, Integer.toString(GameId));
 
         Call call = Data.HTTP_CLIENT.newCall(request);
 
@@ -249,7 +248,7 @@ public class Client implements ChoiceNotifier {
 
     public void updateChoices(String i_Url, String i_GetTypes,
                               OkHttpClient i_Client){
-        Request request = getRequestStats(i_Url, i_GetTypes);
+        Request request = getRequestQueryParameter(i_Url, AttributeNames.WANTED_STATUS, i_GetTypes);
 
         Call call = i_Client.newCall(request);
 
@@ -272,10 +271,11 @@ public class Client implements ChoiceNotifier {
     }
 
     private void enterGameView(){
-        int GameId = ((IntResponse)Data.getCurrentResponse()).getInt();
+        Integer GameId = ((IntResponse)Data.getCurrentResponse()).getInt();
         Data.setCurrentResponse(null);
-        Request request = CNRequest.getRequestCheckGame(
-                ClientConst.SERVER_CONTEXT + LinkConst.CONNECT_GAME, GameId);
+        Request request = CNRequest.getRequestQueryParameter(
+                ClientConst.SERVER_CONTEXT + LinkConst.CONNECT_GAME,
+                AttributeNames.WANTED_GAME, GameId.toString());
 
         Call call = Data.HTTP_CLIENT.newCall(request);
 

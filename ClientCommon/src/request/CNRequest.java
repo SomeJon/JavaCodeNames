@@ -10,34 +10,24 @@ import dto.type.out.server.DtoServerStatus;
 import okhttp3.*;
 
 import java.io.IOException;
+import java.util.List;
 
 import static prints.Prints.parseGamesStatus;
 import static ui.input.InputHandling.errorPrint;
 
 public class CNRequest {
-    public static Request getRequestStats(String i_Url, String i_GetTypes) {
-        String url = HttpUrl
-                .parse(i_Url)
-                .newBuilder()
-                .addQueryParameter(AttributeNames.WANTED_STATUS, i_GetTypes)
-                .build().toString();
+    public static <T> Request requestWithObject(String url, T object, String method) {
+        Gson gson = new Gson();
+        String json = gson.toJson(object);
 
-        return new Request.Builder()
+        MediaType JSON = MediaType.get("application/json; charset=utf-8");
+        RequestBody body = RequestBody.create(json, JSON);
+
+        Request.Builder builder = new Request.Builder()
                 .url(url)
-                .get()
-                .build();
-    }
+                .method(method.toUpperCase(), body);  // Use the method specified (POST or PUT)
 
-    public static Request putRequestJoin(String i_Url, Integer GameId, Integer TeamId, Integer RoleChoice) {
-        ResponseJoin join = new ResponseJoin(GameId, TeamId, RoleChoice);
-        String json = new Gson().toJson(join);
-
-        RequestBody body = RequestBody.create(json, MediaType.parse("application/json"));
-
-        return new Request.Builder()
-                .url(i_Url)
-                .put(body)
-                .build();
+        return builder.build();
     }
 
     public static Request getRequestCheckGame(String i_Url, Integer GameId) {
@@ -53,16 +43,53 @@ public class CNRequest {
                 .build();
     }
 
-    public static Request getRequestUpdateGameData(String i_Url) {
+    public static Request getRequestQueryParameter(String baseUrl, String queryKey, String queryValue) {
+        HttpUrl.Builder urlBuilder = HttpUrl
+                .parse(baseUrl)
+                .newBuilder();
+
+        if (queryKey != null && queryValue != null) {
+            urlBuilder.addQueryParameter(queryKey, queryValue);
+        }
+
+        String url = urlBuilder.build().toString();
+
         return new Request.Builder()
-                .url(i_Url)
+                .url(url)
                 .get()
                 .build();
     }
 
+    public static Request getRequestQueryParametersList(String baseUrl, List<String> queryKeys, List<String> queryValues) {
+        HttpUrl.Builder urlBuilder = HttpUrl
+                .parse(baseUrl)
+                .newBuilder();
+
+        if (queryKeys != null && queryValues != null) {
+            if (queryKeys.size() != queryValues.size()) {
+                throw new IllegalArgumentException("Query keys and values lists must have the same size");
+            }
+
+            for (int i = 0; i < queryKeys.size(); i++) {
+                urlBuilder.addQueryParameter(queryKeys.get(i), queryValues.get(i));
+            }
+        }
+
+        String url = urlBuilder.build().toString();
+
+        return new Request.Builder()
+                .url(url)
+                .get()
+                .build();
+    }
+
+    public static Request getRequest(String baseUrl) {
+        return getRequestQueryParametersList(baseUrl, null, null);
+    }
+
     public static void printStats(String i_Url, String i_GetTypes,
                                   OkHttpClient i_Client, boolean printCurrentPlayers){
-        Request request = getRequestStats(i_Url, i_GetTypes);
+        Request request = getRequestQueryParameter(i_Url, AttributeNames.WANTED_STATUS, i_GetTypes);
 
         Call call = i_Client.newCall(request);
 
