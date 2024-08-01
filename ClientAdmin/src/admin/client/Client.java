@@ -119,6 +119,7 @@ public class Client implements ChoiceNotifier {
                     updateActiveGames();
                     if(Data.getCurrentChoices() != null) {
                         String toPrint = parseGamesChoiceAdmin(Data.getCurrentChoices());
+                        System.out.print(toPrint);
                     }
                     break;
                 case FETCH:
@@ -320,10 +321,7 @@ public class Client implements ChoiceNotifier {
     }
 
     private void runNext(){
-        Menu NextToRun = Data.getMain().getCurrentMenu();
-
         Data.getMain().play();
-
     }
 
     public void showActiveGameStatus(DtoActiveGameStatus i_Data) {
@@ -338,7 +336,7 @@ public class Client implements ChoiceNotifier {
                         groupTeams.stream()
                                 .map(this::parseTeam)
                                 .collect(Collectors.joining("\n")))
-                .append("Team playing next turn: ")
+                .append("\nTeam playing next turn: ")
                 .append(currentGroupTeam.getName())
                 .append("\n");
 

@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@WebServlet(name = "Server Status", urlPatterns = "/state/status")
+@WebServlet(name = "Server Status state.status", urlPatterns = "/state/status")
 public class ServerStatusServlet extends HttpServlet {
 
     /**

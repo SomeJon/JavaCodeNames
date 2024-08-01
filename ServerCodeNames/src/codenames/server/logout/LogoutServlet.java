@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-@WebServlet(name = "logout", urlPatterns = "/logout")
+@WebServlet(name = "logout logout", urlPatterns = "/logout")
 public class LogoutServlet extends HttpServlet {
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         User user = SessionUtils.getUser(request);

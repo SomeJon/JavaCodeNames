@@ -15,7 +15,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet(name="Connecting Servlet", urlPatterns = "/connect")
+@WebServlet(name="Connecting Servlet connect", urlPatterns = "/connect")
 public class ConnectServlet extends HttpServlet {
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         ServerManager manager = ServerUtils.getServerManager(request.getServletContext());

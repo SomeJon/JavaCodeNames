@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-@WebServlet(name="AdminLogin", urlPatterns = "/login/admin")
+@WebServlet(name="AdminLogin login.admin", urlPatterns = "/login/admin")
 public class AdminLoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");

@@ -10,7 +10,7 @@ public class DtoSingleTurnUpdate implements Dto {
         IDENTIFICATION{
             @Override
             public String toString() {
-                return "DtoServerIdentification";
+                return "Identification";
             }
         },
         GUESSING{

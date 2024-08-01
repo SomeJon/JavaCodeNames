@@ -127,7 +127,7 @@ public class ClientData {
         if (!Menu2) {
             Main.getStartMenu().createMenuOption("Showcase All Game States", Action.SHOW_GAMES, i_Client);
             NotifyList notifiers = new NotifyList();
-            notifiers.addNotifyBefore(i_Client, Action.REFRESH);
+            notifiers.addNotifyAfter(i_Client, Action.REFRESH);
             Menu subMenu1 = Main.getStartMenu().createSubMenuWithActions("Watch a game as a spectator", notifiers);
             subMenu1.createMenuOption("Refresh games info", Action.REFRESH, i_Client);
             subMenu1.createMenuOption("Enter game id", InputHandling.GET_GAME_ID, i_Client);
@@ -139,7 +139,7 @@ public class ClientData {
         Menu Load = Main.getStartMenu().createSubMenu("Active Game Viewer");
         Load.createMenuOption("Fetch game status", Action.FETCH, client);
         Main.setCurrentMenu(Load);
-        Main.getStartMenu().getMenuItems().remove(2);
+        Main.getStartMenu().getMenuItems().remove(3);
     }
 
     public BoardPrinting getPrinting() {

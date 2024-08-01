@@ -16,7 +16,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet(name="Games Info Servlet", urlPatterns = "/state/game/admin")
+@WebServlet(name="Games Admin Info Servlet state.game.admin", urlPatterns = "/state/game/admin")
 public class ActiveGameServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         ServerManager manager = ServerUtils.getServerManager(request.getServletContext());

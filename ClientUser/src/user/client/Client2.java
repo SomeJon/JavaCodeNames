@@ -558,8 +558,10 @@ public class Client2 implements ChoiceNotifier {
                     }
                 }
             }
-
-            toPrint.append(Data.GameData.getParsedBoard());
+            toPrint.append("Next turn playing team: ")
+                    .append(turn.getNextPlayingTeam().getName())
+                    .append("\n")
+                    .append(Data.GameData.getParsedBoard());
 
             System.out.println(toPrint);
         }

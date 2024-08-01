@@ -2,7 +2,6 @@ package codenames.server.connect.admin;
 
 import codenames.ServerUtils;
 import codenames.SessionUtils;
-import codenames.Utils;
 import constant.attribute.AttributeNames;
 import data.server.controllers.ServerManager;
 import data.server.data.ePermission;
@@ -17,9 +16,9 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet(name="Connecting Admin Servlet", urlPatterns = "/connect/admin")
+@WebServlet(name="Checks if admin can connect Servlet connect.admin", urlPatterns = "/connect/admin")
 public class ConnectAdminServlet extends HttpServlet {
-    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         ServerManager manager = ServerUtils.getServerManager(request.getServletContext());
         User user = SessionUtils.getUser(request);
         Integer GameId;

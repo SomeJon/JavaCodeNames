@@ -15,7 +15,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet(name = "Get data about a single game", urlPatterns = "/connect/check/update")
+@WebServlet(name = "Get data about a single game connect.check.update", urlPatterns = "/connect/check/update")
 public class CheckUpdateServlet extends HealthServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Integer GameId;

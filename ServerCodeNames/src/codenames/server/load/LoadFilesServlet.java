@@ -30,7 +30,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-@WebServlet(name = "Loading", urlPatterns = "/load")
+@WebServlet(name = "Loading load", urlPatterns = "/load")
 @MultipartConfig
 public class LoadFilesServlet extends HttpServlet {
     @Override

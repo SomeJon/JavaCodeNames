@@ -11,7 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet(name="Sub servers checker", urlPatterns = "/state/subserver")
+@WebServlet(name="Sub servers checker state.subserver", urlPatterns = "/state/subserver")
 public class OpenedSubServerServlet extends HttpServlet {
 
     @Override

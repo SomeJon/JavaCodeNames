@@ -18,7 +18,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet(name="Games Info Servlet", urlPatterns = "/state/game")
+@WebServlet(name="Games Info Servlet state.game", urlPatterns = "/state/game")
 public class GamesInfoServlet extends HttpServlet {
 
     /**

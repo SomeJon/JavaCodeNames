@@ -11,7 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet(name = "Did game start", urlPatterns = "/connect/check")
+@WebServlet(name = "Did game start connect.check", urlPatterns = "/connect/check")
 public class CheckStartServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Integer GameId;

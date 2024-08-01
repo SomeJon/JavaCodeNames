@@ -17,7 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet(name="Identifier Play", urlPatterns = "/game/play/identifier")
+@WebServlet(name="Identifier Play game.play.identifier", urlPatterns = "/game/play/identifier")
 public class PlayIdentifierServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         ServerManager manager = ServerUtils.getServerManager(request.getServletContext());
