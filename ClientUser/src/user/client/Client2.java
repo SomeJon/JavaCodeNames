@@ -239,6 +239,11 @@ public class Client2 implements ChoiceNotifier {
 
     private void playIdentifier(){
         IdentificationResponse resp = new IdentificationResponse();
+        StringBuilder toPrint = new StringBuilder();
+        toPrint.append(parseTeam(Data.GameData.getCurrentTurn().getPlayingTeam()))
+                .append("\n")
+                .append(Data.GameData.getParsedBoard());
+        System.out.println(toPrint);
         Data.GameData.getRole().getInput(resp);
         Request request = requestWithObject(
                 ClientConst.SERVER_CONTEXT + LinkConst.PLAY_IDENTIFIER,

@@ -114,10 +114,11 @@ public class ClientData {
     }
 
     public void buildMenu1Or2(boolean i_OpenGame, Client client){
-        Menu Load = Main.getStartMenu().createSubMenu("Load Game Files");
-        Load.createMenuOption("Chose a file path to a .xml file", InputHandling.FILE_PATH, client);
-        //Load.createMenuOption("Chose a file path to a .txt file", InputHandling.FILE_PATH, client);
-        Load.createMenuOption("Upload to server", Action.UPLOAD, client);
+        //Menu Load = Main.getStartMenu().createSubMenu("Load Game Files");
+        //Load.createMenuOption("Chose a file path to a .xml file", InputHandling.FILE_PATH, client);
+        ////Load.createMenuOption("Chose a file path to a .txt file", InputHandling.FILE_PATH, client);
+        //Load.createMenuOption("Upload to server", Action.UPLOAD, client);
+        Main.getStartMenu().createMenuOption("Upload a file to the server", Action.UPLOAD2, client);
         if(i_OpenGame){
             addFirstOptions(client);
         }

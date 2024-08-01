@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 
 import static prints.Prints.parseGamesChoiceAdmin;
 import static request.CNRequest.getRequestQueryParameter;
+import static ui.input.InputHandling.FILE_PATH;
 import static ui.input.InputHandling.errorPrint;
 
 
@@ -106,9 +107,13 @@ public class Client implements ChoiceNotifier {
 
         if(Data.getCurrentAction() != null) {
             switch (Data.getCurrentAction()) {
+                case UPLOAD2:
+                    Data.setCurrentAction(null);
+                    upload2();
+                    break;
                 case UPLOAD:
                     Data.setCurrentAction(null);
-                    upload();
+                    upload(true);
                     break;
                 case SHOW_GAMES:
                     Data.setCurrentAction(null);
@@ -134,7 +139,7 @@ public class Client implements ChoiceNotifier {
                 case FILE_PATH:
                     resp = new LoadFilesResponse();
                     Data.activateCurrentInput(resp);
-                    loadFiles();
+                    loadFiles(true);
                     break;
                 case GET_GAME_ID:
                     resp = new IntResponse();
@@ -143,6 +148,14 @@ public class Client implements ChoiceNotifier {
                     break;
             }
         }
+    }
+
+    private void upload2(){
+        Data.setCurrentInput(FILE_PATH);
+        dto.type.in.response.Response resp = new LoadFilesResponse();
+        Data.activateCurrentInput(resp);
+        loadFiles(false);
+        upload(false);
     }
 
     private void fetchStatus() {
@@ -188,22 +201,25 @@ public class Client implements ChoiceNotifier {
                         AttributeNames.ALL, Data.HTTP_CLIENT, false);
     }
 
-    private void loadFiles(){
+    private void loadFiles(boolean changeMenu){
         LoadFilesResponse resp = (LoadFilesResponse) Data.getCurrentResponse();
         Data.setCurrentResponse(null);
         if(resp.receivedResponse()) {
-            Data.getMain().getCurrentMenu().getMenuItems().get(0)
-                    .setItemText("Load a different xml path\n" +
-                            "   Current Loaded Files:\n" +
-                            "       Xml file: " + resp.getXmlFileName() + "\n" +
-                            "       Txt file: " + resp.getTxtFileName());
+            if (changeMenu) {
+                Data.getMain().getCurrentMenu().getMenuItems().get(0)
+                        .setItemText("Load a different xml path\n" +
+                                "   Current Loaded Files:\n" +
+                                "       Xml file: " + resp.getXmlFileName() + "\n" +
+                                "       Txt file: " + resp.getTxtFileName());
+            }
             Data.setWaitingTxt(resp.getTxtFile());
             Data.setWaitingXml(resp.getXmlFile());
+
             System.out.println("Loaded: \"" + resp.getXmlFileName() + "\" and \"" + resp.getTxtFileName() + "\" into the client successfully");
         }
     }
 
-    private void upload() {
+    private void upload(boolean withSubMenu) {
         if (Data.getWaitingTxt() != null && Data.getWaitingXml() != null) {
             RequestBody requestBody = new MultipartBody.Builder()
                     .setType(MultipartBody.FORM)
@@ -245,7 +261,9 @@ public class Client implements ChoiceNotifier {
             } catch (IOException e) {
                 System.out.println("Upload failed: " + e.getMessage());
             }
-        }else errorPrint("Please first enter an xml file path before trying to upload into the server!");
+        }
+        else if(withSubMenu)
+            errorPrint("Please first enter an xml file path before trying to upload into the server!");
 
     }
 
