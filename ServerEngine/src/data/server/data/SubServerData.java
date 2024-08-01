@@ -15,12 +15,14 @@ import dto.type.out.board.card.DtoGroupTeam;
 import dto.type.out.data.DtoActiveGameStatus;
 import dto.type.out.data.DtoGameEndResult;
 import dto.type.out.data.DtoGuessResult;
+import dto.type.out.data.DtoGuessResultWrapper;
 import dto.type.out.server.DtoServerInfo;
 import dto.type.out.server.DtoServerTeam;
 import dto.type.out.server.game.DtoBoardUpdate;
 import dto.type.out.server.game.DtoEndResult;
 import dto.type.out.server.game.DtoSingleTurnUpdate;
 import engine.EngineInterface;
+import engine.board.card.GroupTeam;
 import exception.server.InternalEngineErrorException;
 import exception.server.NoSpot;
 import exception.server.Unauthorized;
@@ -199,9 +201,9 @@ public class SubServerData {
         DtoSingleTurnUpdate delta = null;
         dataLock.readLock().lock();
         try {
-            if (io_Container.checkTurnUpdate(TurnUpdate)) {
+            if (io_Container.checkTurnUpdate(GameUpdate)) {
                 delta = Turns.get(Turns.size() - 1).getDto();
-                io_Container.setTurnUpdate(TurnUpdate);
+                io_Container.setTurnUpdate(GameUpdate);
             }
         } finally {
             dataLock.readLock().unlock();
@@ -229,13 +231,14 @@ public class SubServerData {
         dataLock.writeLock().lock();
         try {
             Turn currentTurn = getCurrentTurn();
-            validateTurn(currentTurn, i_User);
+            validateTurn(currentTurn, i_User, Turn.eState.IDENTIFICATION, UserMessage.eRole.Definer);
 
             dto.type.out.data.DtoIdentification ServerSide =
                     Engine.playTurnIdentification(i_Identification);
             Identification toAdd = new Identification(
                     ServerSide.getIdentification(), ServerSide.getRelated());
             currentTurn.setTurnIdentification(toAdd);
+            currentTurn.setState(Turn.eState.GUESSING);
             GameUpdate++;
             TurnUpdate++;
 
@@ -244,14 +247,14 @@ public class SubServerData {
         }
     }
 
-    public DtoGuessResult playGuesser(User i_User, GuesserResponse i_Guess)
+    public DtoGuessResultWrapper playGuesser(User i_User, GuesserResponse i_Guess)
             throws MismatchUpdate, MismatchRole, MismatchStage, MismatchTeam,
             IndexOutOfBoundsException, InternalEngineErrorException,
             GuessOutOfRangeException, CardFlippedException {
         dataLock.writeLock().lock();
         try {
             Turn currentTurn = getCurrentTurn();
-            validateTurn(currentTurn, i_User);
+            validateTurn(currentTurn, i_User, Turn.eState.GUESSING, UserMessage.eRole.Guesser);
 
             Dto ServerSide = Engine.playTurnGuessers(i_Guess);
             Guess toAdd;
@@ -272,6 +275,7 @@ public class SubServerData {
                 DtoGameEndResult gameEndResult = (DtoGameEndResult) ServerSide;
                 DtoEndResult endResult;
                 DtoEndResult winResult;
+                ServerTeam winningTeam;
                 guessResult = gameEndResult.getGuessResult();
                 toAdd = new Guess(i_Guess.getCardId(), guessResult);
                 gameEnd = Engine.didGameEnd();
@@ -282,7 +286,8 @@ public class SubServerData {
                         currentTurn.getTurnTeam().cleanTeam(endResult);
                         winResult = new DtoEndResult(guessResult, WinPlacement, gameEnd);
                         WinPlacement++;
-                        Teams.get(0).cleanTeam(winResult);
+                        winningTeam = getTeam(gameEndResult.getWinningTeam());
+                        winningTeam.cleanTeam(winResult);
                         turnEnd = true;
                         break;
                     case SUCCESSFUL_GUESS:
@@ -292,13 +297,14 @@ public class SubServerData {
                         turnEnd = true;
                         if (gameEnd) {
                             endResult = new DtoEndResult(guessResult, 0, gameEnd);
-                            Teams.get(0).cleanTeam(endResult);
+                            winningTeam = getTeam(((DtoGroupTeam) Engine.getActiveTeam()));
+                            winningTeam.cleanTeam(endResult);
                         }
                         break;
                     case ENEMY_TEAM_HIT:
                         winResult = new DtoEndResult(guessResult, WinPlacement, gameEnd);
                         WinPlacement++;
-                        ServerTeam winningTeam = getTeam(gameEndResult.getWinningTeam());
+                        winningTeam = getTeam(gameEndResult.getWinningTeam());
                         winningTeam.cleanTeam(winResult);
                         if (gameEnd) {
                             endResult = new DtoEndResult(guessResult, 0, gameEnd);
@@ -311,7 +317,7 @@ public class SubServerData {
             }
 
             currentTurn.guessDone();
-            if (currentTurn.getGuessesLeft() == 0)
+            if (currentTurn.getGuessesLeft() < 1)
                 turnEnd = true;
             currentTurn.addGuess(toAdd);
 
@@ -322,7 +328,10 @@ public class SubServerData {
                     Engine.nextTeam();
                 }
 
-                buildTurn();
+                Turns.add(buildTurn());
+            } else{
+                currentTurn.setPlayingTeam((DtoGroupTeam)Engine.getActiveTeam());
+                currentTurn.setNextPlayingTeam((DtoGroupTeam)Engine.getNextTeam());
             }
 
             GameUpdate++;
@@ -331,7 +340,7 @@ public class SubServerData {
             if (gameEnd) {
                 cleanGame();
             }
-            return guessResult;
+            return new DtoGuessResultWrapper(guessResult);
 
         } finally {
             dataLock.writeLock().unlock();
@@ -342,18 +351,19 @@ public class SubServerData {
         return Turns.get(Turns.size() - 1);
     }
 
-    private void validateTurn(Turn currentTurn, User user)
+    private void validateTurn(Turn currentTurn, User user,
+                              Turn.eState wantedState, UserMessage.eRole wantedRole)
         throws MismatchTeam, MismatchStage, MismatchUpdate, MismatchRole {
         if (currentTurn.getTeamId() != user.getTeamId()) {
             throw new MismatchTeam();
         }
-        if (currentTurn.getState() != Turn.eState.GUESSING) {
+        if (currentTurn.getState() != wantedState) {
             throw new MismatchStage();
         }
         if (!user.getUpdates().checkTurnUpdate(TurnUpdate)) {
             throw new MismatchUpdate();
         }
-        if (user.getRole() != UserMessage.eRole.Definer) {
+        if (user.getRole() != wantedRole) {
             throw new MismatchRole();
         }
     }

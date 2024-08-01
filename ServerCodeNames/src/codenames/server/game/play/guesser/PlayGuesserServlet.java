@@ -6,7 +6,7 @@ import codenames.Utils;
 import data.server.controllers.ServerManager;
 import data.user.User;
 import dto.type.in.response.ingame.GuesserResponse;
-import dto.type.out.data.DtoGuessResult;
+import dto.type.out.data.DtoGuessResultWrapper;
 import exception.CodeNameException;
 import exception.OutOfBoundException;
 import jakarta.servlet.ServletException;
@@ -30,7 +30,7 @@ public class PlayGuesserServlet extends HttpServlet {
                 if(gameId != 0) {
                     try {
                         GuesserResponse rec = Utils.fromJsonRequest(request, GuesserResponse.class);
-                        DtoGuessResult result = manager.playGuess(user, rec);
+                        DtoGuessResultWrapper result = manager.playGuess(user, rec);
                         if(result != null) {
                             response.setStatus(HttpServletResponse.SC_OK);
                             ServerUtils.moveObjectIntoResponse(response, result);

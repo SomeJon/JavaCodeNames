@@ -30,8 +30,8 @@ public class Turn {
     private final ServerTeam TurnTeam;
     private final int TeamId;
     private final int TurnNum;
-    private final DtoGroupTeam PlayingTeam;
-    private final DtoGroupTeam NextPlayingTeam;
+    private DtoGroupTeam PlayingTeam;
+    private DtoGroupTeam NextPlayingTeam;
     private eState State;
     private Identification TurnIdentification = new Identification();
     private final List<Guess> Guesses = new ArrayList<Guess>();
@@ -49,6 +49,14 @@ public class Turn {
 
     public ServerTeam getTurnTeam() {
         return TurnTeam;
+    }
+
+    public void setPlayingTeam(DtoGroupTeam i_PlayingTeam) {
+        PlayingTeam = i_PlayingTeam;
+    }
+
+    public void setNextPlayingTeam(DtoGroupTeam i_NextPlayingTeam) {
+        NextPlayingTeam = i_NextPlayingTeam;
     }
 
     public int getTeamId() {

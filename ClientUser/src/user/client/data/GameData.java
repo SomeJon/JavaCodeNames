@@ -25,7 +25,7 @@ public class GameData {
 
             @Override
             public void getInput(Response o_Response) {
-                InputHandling.GUESSER.getInput(o_Response);
+                InputHandling.IDENTIFICATION.getInput(o_Response);
             }
         },
         GUESSER{

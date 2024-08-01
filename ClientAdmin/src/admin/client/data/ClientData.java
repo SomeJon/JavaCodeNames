@@ -128,7 +128,7 @@ public class ClientData {
             Main.getStartMenu().createMenuOption("Showcase All Game States", Action.SHOW_GAMES, i_Client);
             NotifyList notifiers = new NotifyList();
             notifiers.addNotifyAfter(i_Client, Action.REFRESH);
-            Menu subMenu1 = Main.getStartMenu().createSubMenuWithActions("Watch a game as a spectator", notifiers);
+            Menu subMenu1 = Main.getStartMenu().createSubMenuWithActionsOnEnter("Watch a game as a spectator", notifiers);
             subMenu1.createMenuOption("Refresh games info", Action.REFRESH, i_Client);
             subMenu1.createMenuOption("Enter game id", InputHandling.GET_GAME_ID, i_Client);
             Menu2 = true;

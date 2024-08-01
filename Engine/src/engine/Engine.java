@@ -114,10 +114,11 @@ public class Engine implements EngineInterface, Serializable {
         if(cardGroup instanceof GroupNeutral) {
             GroupNeutral NeutralGroup = (GroupNeutral) cardGroup;
             if (NeutralGroup.isBlack()) {
-                DtoGuessResult.BLACK_HIT.setGroupTeam(new DtoGroupTeam(playingTeam));
+                DtoGuessResult res = DtoGuessResult.BLACK_HIT;
+                res.setGroupTeam(new DtoGroupTeam(playingTeam));
                 Data.getActiveData().endCurrentTeam();
                 if (Data.getActiveData().getPlayingTeams().size() == 1) {
-                    returnedValue = new DtoGameEndResult(Data.getActiveData().getPlayingTeamGroup(), DtoGuessResult.BLACK_HIT);
+                    returnedValue = new DtoGameEndResult(Data.getActiveData().getPlayingTeamGroup(), res);
                 } else {
                     returnedValue = DtoGuessResult.BLACK_HIT;
                 }
@@ -129,9 +130,11 @@ public class Engine implements EngineInterface, Serializable {
             GroupTeam groupTeam = (GroupTeam) cardGroup;
             if (groupTeam != playingTeam) {
                 DtoGuessResult.ENEMY_TEAM_HIT.setGroupTeam(new DtoGroupTeam(groupTeam));
+                DtoGuessResult res = DtoGuessResult.BLACK_HIT;
+                res.setGroupTeam(new DtoGroupTeam(playingTeam));
                 if(groupTeam.getCardsFlipped() == groupTeam.getCards()) {
                     Data.getActiveData().endTeam(groupTeam);
-                    returnedValue = new DtoGameEndResult(groupTeam, DtoGuessResult.ENEMY_TEAM_HIT);
+                    returnedValue = new DtoGameEndResult(groupTeam, res);
                 }
                 else{
                     returnedValue = DtoGuessResult.ENEMY_TEAM_HIT;

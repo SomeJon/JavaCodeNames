@@ -42,7 +42,7 @@ public class ActiveGameServlet extends HttpServlet {
                         errorMessage = "Game not found!";
                     }
                 } catch (Unauthorized e) {
-                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     errorMessage = "Game is not active!";
                 } catch (IndexOutOfBoundsException e) {
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

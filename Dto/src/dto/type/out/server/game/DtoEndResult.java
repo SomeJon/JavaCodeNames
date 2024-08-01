@@ -1,6 +1,7 @@
 package dto.type.out.server.game;
 
 import dto.Dto;
+import dto.type.out.board.card.DtoGroupTeam;
 import dto.type.out.data.DtoGuessResult;
 
 public class DtoEndResult implements Dto {

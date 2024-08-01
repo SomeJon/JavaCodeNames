@@ -8,6 +8,7 @@ import dto.type.in.response.ingame.IdentificationResponse;
 import dto.type.out.data.DtoActiveGameStatus;
 import dto.type.out.data.DtoGameDetails;
 import dto.type.out.data.DtoGuessResult;
+import dto.type.out.data.DtoGuessResultWrapper;
 import dto.type.out.server.DtoServerInfo;
 import dto.type.out.server.DtoServerTeam;
 import dto.type.out.server.DtoSubServerStatus;
@@ -67,7 +68,7 @@ public class SubServer {
         Data.playIdentification(i_User, i_Identification);
     }
 
-    public DtoGuessResult playGuess(User i_User, GuesserResponse i_Guess)
+    public DtoGuessResultWrapper playGuess(User i_User, GuesserResponse i_Guess)
             throws MismatchUpdate, MismatchRole, MismatchStage, MismatchTeam,
             IndexOutOfBoundsException, InternalEngineErrorException,
             GuessOutOfRangeException, CardFlippedException {

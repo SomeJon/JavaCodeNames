@@ -61,7 +61,7 @@ public class Menu implements Serializable {
             return addedSubMenu;
         }
 
-        public Menu createSubMenuWithActions(String i_SubMenuName, NotifyList i_Notifiers) {
+        public Menu createSubMenuWithActionsOnEnter(String i_SubMenuName, NotifyList i_Notifiers) {
             final boolean SUB_MENU = false;
 
             Menu addedSubMenu = new Menu(i_SubMenuName, SUB_MENU, this, MenuChange);

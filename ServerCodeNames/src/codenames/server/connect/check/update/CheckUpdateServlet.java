@@ -29,14 +29,20 @@ public class CheckUpdateServlet extends HealthServlet {
         }
 
         if(GameId != null && user != null) {
-            ServerManager manager = ServerUtils.getServerManager(request.getSession().getServletContext());
-            UpdateContainer toSend = user.getUpdates();
-            ret = manager.getGameChoice(GameId, toSend);
-            if(ret != null) {
-                response.setStatus(HttpServletResponse.SC_OK);
-                ServerUtils.moveObjectIntoResponse(response, ret);
-            } else{
-                response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+            if(!user.getEndResult().isEnd()) {
+                ServerManager manager = ServerUtils.getServerManager(request.getSession().getServletContext());
+                UpdateContainer toSend = user.getUpdates();
+                ret = manager.getGameChoice(GameId, toSend);
+                if (ret != null) {
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    ServerUtils.moveObjectIntoResponse(response, ret);
+                } else {
+                    response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+                }
+            }
+            else{
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                ServerUtils.moveObjectIntoResponse(response, user.getEndResult());
             }
         }else {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

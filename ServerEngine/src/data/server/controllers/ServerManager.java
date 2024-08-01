@@ -9,6 +9,7 @@ import dto.type.in.response.ingame.IdentificationResponse;
 import dto.type.in.response.load.LoadInputStreamsResponse;
 import dto.type.out.data.DtoActiveGameStatus;
 import dto.type.out.data.DtoGuessResult;
+import dto.type.out.data.DtoGuessResultWrapper;
 import dto.type.out.server.Choice.DtoServerGameChoice;
 import dto.type.out.server.Choice.DtoServerTeamChoice;
 import dto.type.out.server.Choice.DtoSubServerChoice;
@@ -284,20 +285,20 @@ public class ServerManager {
             IndexOutOfBoundsException , IdentificationException {
         SubServersLock.writeLock().lock();
         try {
-            SubServer subServer = getSubServer(i_User.getGameId() - 1);
+            SubServer subServer = getSubServer(i_User.getGameId());
             subServer.playIdentification(i_User, i_Identification);
         } finally{
             SubServersLock.writeLock().unlock();
         }
     }
 
-    public DtoGuessResult playGuess(User i_User, GuesserResponse i_Guess)
+    public DtoGuessResultWrapper playGuess(User i_User, GuesserResponse i_Guess)
         throws MismatchUpdate, MismatchRole, MismatchStage, MismatchTeam,
             IndexOutOfBoundsException, InternalEngineErrorException,
             GuessOutOfRangeException, CardFlippedException {
         SubServersLock.writeLock().lock();
         try {
-            return getSubServer(i_User.getGameId() - 1).playGuess(i_User, i_Guess);
+            return getSubServer(i_User.getGameId()).playGuess(i_User, i_Guess);
         } finally{
             SubServersLock.writeLock().unlock();
         }

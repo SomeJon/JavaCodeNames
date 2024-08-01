@@ -4,7 +4,6 @@ import Adapter.AdapterAddon;
 import com.google.gson.JsonSyntaxException;
 import console.ChoiceNotifier;
 import console.MenuItem;
-import console.PauseConsole;
 import constant.attribute.AttributeNames;
 import dto.type.in.response.ResponseJoin;
 import dto.type.in.response.common.IntResponse;
@@ -12,7 +11,8 @@ import dto.type.in.response.common.StringResponse;
 import dto.type.in.response.ingame.GuesserResponse;
 import dto.type.in.response.ingame.IdentificationResponse;
 import dto.type.out.board.card.DtoGroupTeam;
-import dto.type.out.data.DtoGuessResult;
+import dto.type.out.data.DtoGuessResultWrapper;
+import dto.type.out.data.DtoIdentification;
 import dto.type.out.server.Choice.DtoServerGameChoice;
 import dto.type.out.server.Choice.DtoServerTeamChoice;
 import dto.type.out.server.Choice.DtoSubServerChoice;
@@ -168,16 +168,18 @@ public class Client2 implements ChoiceNotifier {
         DtoSingleTurnUpdate turn = Data.GameData.getCurrentTurn();
         if(turn != null){
             if(turn.getPlayingTeamId() == Data.GameData.getTeamId()){
-                switch(turn.getTurnRole()){
-                    case GUESSING:
-                        if(Data.GameData.getRole() == GameData.roleChoice.GUESSER)
+                switch(Data.GameData.getRole()){
+                    case GUESSER:
+                        if(Data.GameData.getCurrentTurn().getTurnRole()
+                                == DtoSingleTurnUpdate.eDtoState.GUESSING)
                             playGuesser();
                         else
                             errorPrint("You cant guess while turn state is on identification!");
                         getGameUpdate();
                         break;
-                    case IDENTIFICATION:
-                        if(Data.GameData.getRole() == GameData.roleChoice.IDENTIFIER)
+                    case IDENTIFIER:
+                        if(Data.GameData.getCurrentTurn().getTurnRole()
+                                == DtoSingleTurnUpdate.eDtoState.IDENTIFICATION)
                             playIdentifier();
                         else
                             errorPrint("You cant identify while turn state is on Guessing!");
@@ -194,6 +196,12 @@ public class Client2 implements ChoiceNotifier {
 
     private void playGuesser(){
         GuesserResponse resp = new GuesserResponse();
+        DtoServerIdentification identification = Data.GameData.getCurrentTurn().getTurnIdentification();
+        int GuessesLeft = Data.GameData.getCurrentTurn().getGuessesLeft();
+        System.out.println("Current Identi");
+        System.out.println("Identification: " + identification.getIdentification() +
+                "\nNumber of related words: " + identification.getRelatedWords() +
+                "\nNumber of guesses left: " + GuessesLeft);
         Data.GameData.getRole().getInput(resp);
         Request request = requestWithObject(
                 ClientConst.SERVER_CONTEXT + LinkConst.PLAY_GUESSER,
@@ -206,7 +214,7 @@ public class Client2 implements ChoiceNotifier {
             int code = response.code();
             if(code == HttpCode.OK){
                 try {
-                    DtoGuessResult result = gson.fromJson(response.body().string(), DtoGuessResult.class);
+                    DtoGuessResultWrapper result = gson.fromJson(response.body().string(), DtoGuessResultWrapper.class);
                     printGuessResult(result, Data.GameData.getCurrentTurn().getPlayingTeam());
                 } catch(JsonSyntaxException e){
                     errorPrint("Error parsing response");
@@ -288,8 +296,13 @@ public class Client2 implements ChoiceNotifier {
             } else if(response.code() == HttpCode.UNAUTHORIZED) {
                 DtoEndResult ret = gson.fromJson(response.body().charStream(), DtoEndResult.class);
                 printGameEnd(ret);
-                //todo: check exit
+                Data.GameStarted = false;
+                Data.GameData = new GameData();
                 Data.rebuildMenu2(this);
+            } else if(response.code() == HttpCode.BAD_REQUEST) {
+                Data.GameData = new GameData();
+                Data.rebuildMenu2(this);
+                errorPrint("Unexpected server error occurred, returning to main menu");
             }
         } catch (IOException e){
             errorPrint("An IOException error occurred");
@@ -339,9 +352,16 @@ public class Client2 implements ChoiceNotifier {
                 Data.GameStarted = Data.CurrentSubChoice.isActive();
                 Data.NewUpdate = true;
             } else if (response.code() == HttpCode.NO_CONTENT) {
-                if(i_PrintData)
+                if (i_PrintData)
                     printUpdate();
                 Data.NewUpdate = false;
+            } else if (response.code() == HttpCode.UNAUTHORIZED) {
+                DtoEndResult ret = gson.fromJson(response.body().charStream(), DtoEndResult.class);
+                Data.CurrentSubChoice = null;
+                Data.GameStarted = false;
+                printGameEnd(ret);
+                Data.GameData = new GameData();
+                Data.rebuildMenu2(this);
             } else
                 errorPrint("Unexpected server update error occurred!");
         } catch (IOException e){
@@ -351,15 +371,16 @@ public class Client2 implements ChoiceNotifier {
 
     private void printUpdate(){
         StringBuilder toPrint = new StringBuilder();
+        if(Data.CurrentSubChoice != null) {
+            for (DtoServerTeamChoice teamChoice : Data.CurrentSubChoice.getTeamChoices()) {
+                DtoServerTeam team = teamChoice.getTeamInfo();
+                toPrint.append(team.getTeam().getName())
+                        .append(" - Roles state(Connected/Needed): ")
+                        .append(parseRolesShort(team)).append("\n");
+            }
 
-        for(DtoServerTeamChoice teamChoice : Data.CurrentSubChoice.getTeamChoices()){
-            DtoServerTeam team = teamChoice.getTeamInfo();
-            toPrint.append(team.getTeam().getName())
-                    .append(" - Roles state(Connected/Needed): ")
-                    .append(parseRolesShort(team)).append("\n");
+            System.out.println(toPrint);
         }
-
-        System.out.println(toPrint);
     }
 
     private void joinGame(){
@@ -666,31 +687,36 @@ public class Client2 implements ChoiceNotifier {
     private void printGameEnd(DtoEndResult i_Result){
         StringBuilder toPrint = new StringBuilder();
         if(!i_Result.isEnd()){
-            toPrint.append("Your user is not connected to the game!");
+            toPrint.append("Your user is not connected to the game!\n");
         } else{
             if(i_Result.isGameEnd()){
                 toPrint.append("The game has ended!");
             } else{
                 toPrint.append("Your team has finished playing in the game!");
             }
-            toPrint.append("\nStats:\n  -Placement: ");
+            toPrint.append("\nStats:\n   ");
             if(i_Result.getPlacement() == 0){
                 toPrint.append("Lost!");
             }
             else{
-                toPrint.append(i_Result.getResult());
+                toPrint.append("Win! -Placement:")
+                        .append(i_Result.getPlacement());
             }
         }
+
+        System.out.print(toPrint);
     }
 
-    public void printGuessResult(DtoGuessResult i_ReceivedGuessResult, DtoGroupTeam i_PlayingTeam) {
+    public void printGuessResult(DtoGuessResultWrapper i_ReceivedGuessResult, DtoGroupTeam i_PlayingTeam) {
         StringBuilder toPrint = new StringBuilder();
         toPrint.append("You flipped a Card!\n");
         int guessesLeft = Data.GameData.getCurrentTurn().getGuessesLeft() - 1;
 
-        switch(i_ReceivedGuessResult){
+        switch(i_ReceivedGuessResult.getGuessResult()){
             case SUCCESSFUL_GUESS:
                 toPrint.append("The card belonged to your team, and received a point!\n");
+                i_PlayingTeam = new DtoGroupTeam(i_PlayingTeam.getCards(),
+                        i_PlayingTeam.getCardsFlipped() + 1, i_PlayingTeam.getTeam());
                 if(guessesLeft > 0){
                     toPrint.append("You can guess ")
                             .append(guessesLeft)

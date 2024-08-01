@@ -4,6 +4,6 @@ import exception.CodeNameException;
 
 public class MismatchRole extends CodeNameException{
     public MismatchRole() {
-        setType(CodeNameException.ExceptionType.UNAUTHORIZED);
+        setType(ExceptionType.MISMATCH_ROLE);
     }
 }

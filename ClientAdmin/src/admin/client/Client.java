@@ -165,8 +165,15 @@ public class Client implements ChoiceNotifier {
                 }
             } else if (response.code() == HttpCode.NOT_FOUND || response.code() == HttpCode.BAD_REQUEST
                     || response.code() == HttpCode.UNAUTHORIZED || response.code() == HttpCode.FORBIDDEN) {
-                assert response.body() != null;
-                errorPrint(response.body().string());
+                String str = response.body().string();
+                if(str != null) {
+                    errorPrint(str);
+                }
+                else{
+                    errorPrint("Unexpected error");
+                }
+
+                Data.getMain().setCurrentMenu(Data.getMain().getStartMenu());
             } else {
                 errorPrint("An unexpected error occurred");
             }

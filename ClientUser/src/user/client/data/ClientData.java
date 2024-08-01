@@ -21,7 +21,7 @@ public class ClientData {
                 .cookieJar(new SimpleCookieManager())
                 .build();
     public boolean LoggedIn = false;
-    public final GameData GameData = new GameData();
+    public GameData GameData = new GameData();
     public Response CurrentResponse = null;
     public Action CurrentAction = null;
     public InputHandling CurrentInput = null;
@@ -49,7 +49,7 @@ public class ClientData {
         NotifyList notifiers = new NotifyList();
         notifiers.addNotifyAfter(i_Client, Action.CLEAN_CHOICE);
         notifiers.addNotifyBefore(i_Client, Action.SHOW_PENDING_GAMES);
-        Menu subMenu1 = Main.getStartMenu().createSubMenuWithActions("Join Game", notifiers);
+        Menu subMenu1 = Main.getStartMenu().createSubMenuWithActionsOnEnter("Join Game", notifiers);
         subMenu1.createMenuOption("Refresh games info", Action.REFRESH, i_Client);
         subMenu1.createMenuOption("Enter game id", InputHandling.GET_GAME_ID, i_Client);
     }
@@ -138,7 +138,10 @@ public class ClientData {
 
         main.getMenuItems().remove(1);
 
-        Menu newGameMenu = main.createSubMenu("Joined Game Menu - " + GameData.getGameName());
+        NotifyList notifiers = new NotifyList();
+        notifiers.addNotifyAfter(i_Client, Action.GAME_SHOW);
+        Menu newGameMenu = main.createSubMenuWithActionsOnEnter("Joined Game Menu - "
+                + GameData.getGameName() + " - " + GameData.getTeamName() + " - " + GameData.getRole().toString(), notifiers);
         Main.setCurrentMenu(newGameMenu);
         newGameMenu.createMenuOption("Fetch Game Status", Action.GAME_SHOW, i_Client);
         newGameMenu.createMenuOption("Play turn {Waiting for game to start}", Action.PLAY_TURN, i_Client);
@@ -180,7 +183,7 @@ public class ClientData {
         NotifyList notifiers = new NotifyList();
         notifiers.addNotifyAfter(i_Client, Action.CLEAN_CHOICE);
         notifiers.addNotifyBefore(i_Client, Action.SHOW_PENDING_GAMES);
-        Menu subMenu1 = Main.getStartMenu().createSubMenuWithActions("Join Game", notifiers);
+        Menu subMenu1 = Main.getStartMenu().createSubMenuWithActionsOnEnter("Join Game", notifiers);
         subMenu1.createMenuOption("Refresh games info", Action.REFRESH, i_Client);
         subMenu1.createMenuOption("Enter game id", InputHandling.GET_GAME_ID, i_Client);
         Main.previousMenu();

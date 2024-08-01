@@ -19,4 +19,11 @@ public enum DtoGuessResult implements Dto {
     public void setGroupTeam(DtoGroupTeam i_playingTeam) {
         GroupTeam = i_playingTeam;
     }
+
+    DtoGuessResult(DtoGroupTeam groupTeam) {
+        GroupTeam = groupTeam;
+    }
+
+    DtoGuessResult() {
+    }
 }
