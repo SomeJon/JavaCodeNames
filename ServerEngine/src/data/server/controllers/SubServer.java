@@ -4,11 +4,13 @@ import data.server.data.SubServerChat;
 import data.server.data.SubServerData;
 import data.user.User;
 import dto.type.in.response.ingame.IdentificationResponse;
+import dto.type.out.data.DtoActiveGameStatus;
 import dto.type.out.data.DtoGameDetails;
 import dto.type.out.server.DtoServerInfo;
 import dto.type.out.server.DtoServerTeam;
 import dto.type.out.server.DtoSubServerStatus;
 import engine.EngineInterface;
+import exception.server.Unauthorized;
 import exception.server.mismatch.MismatchRole;
 import exception.server.mismatch.MismatchStage;
 import exception.server.mismatch.MismatchUpdate;
@@ -57,5 +59,9 @@ public class SubServer {
             throws MismatchUpdate, MismatchRole, MismatchStage,
             IndexOutOfBoundsException , IdentificationException {
         Data.playIdentification(i_User, i_Identification);
+    }
+
+    public DtoActiveGameStatus getActiveGameStatus() throws Unauthorized {
+        return Data.getActiveGameStatus();
     }
 }

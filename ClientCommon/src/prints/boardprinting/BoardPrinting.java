@@ -12,6 +12,10 @@ import java.util.*;
 public class BoardPrinting implements BoardConst {
     private final BoardData Data = new BoardData();
 
+    public void newBoard(){
+        Data.setActiveGame(false);
+    }
+
     public String parse(DtoBoard i_ReceivedBoard, boolean i_Visible) {
         DtoCard[][] board = i_ReceivedBoard.getBoard();
         int rows = i_ReceivedBoard.getNumOfRows();

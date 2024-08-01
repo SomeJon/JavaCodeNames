@@ -138,7 +138,6 @@ public enum InputHandling {
                 }
             } while (continueLoop);
 
-            System.out.println();
             o_Response.loadResponse(new GuesserResponse(CardId));
         }
     },
@@ -161,7 +160,6 @@ public enum InputHandling {
                 }
             } while (continueLoop);
 
-            System.out.println();
             o_Response.loadResponse(new IntResponse(Int));
         }
     },
@@ -184,7 +182,6 @@ public enum InputHandling {
                 }
             } while (continueLoop);
 
-            System.out.println();
             o_Response.loadResponse(new IntResponse(Int));
         }
     },
@@ -213,7 +210,6 @@ public enum InputHandling {
                 }
             } while (continueLoop);
 
-            System.out.println();
             o_Response.loadResponse(new IntResponse(Int));
         }
     },

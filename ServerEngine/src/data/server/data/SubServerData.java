@@ -9,12 +9,15 @@ import data.user.User;
 import dto.type.in.response.ingame.IdentificationResponse;
 import dto.type.out.board.DtoBoard;
 import dto.type.out.board.card.DtoGroupTeam;
+import dto.type.out.data.DtoActiveGameStatus;
 import dto.type.out.server.DtoServerInfo;
 import dto.type.out.server.DtoServerTeam;
 import dto.type.out.server.game.DtoBoardUpdate;
 import dto.type.out.server.game.DtoSingleTurnUpdate;
 import engine.EngineInterface;
+import exception.CodeNameException;
 import exception.server.NoSpot;
+import exception.server.Unauthorized;
 import exception.server.mismatch.MismatchRole;
 import exception.server.mismatch.MismatchStage;
 import exception.server.mismatch.MismatchUpdate;
@@ -236,6 +239,17 @@ public class SubServerData {
             }
         } finally {
             dataLock.writeLock().unlock();
+        }
+    }
+
+    public DtoActiveGameStatus getActiveGameStatus() throws Unauthorized{
+        dataLock.readLock().lock();
+        try{
+            if(!Active)
+                throw new Unauthorized();
+            return Engine.getActiveGameStatus();
+        } finally {
+            dataLock.readLock().unlock();
         }
     }
 }

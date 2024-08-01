@@ -6,6 +6,7 @@ import data.user.UpdateContainer;
 import data.user.User;
 import dto.type.in.response.ingame.IdentificationResponse;
 import dto.type.in.response.load.LoadInputStreamsResponse;
+import dto.type.out.data.DtoActiveGameStatus;
 import dto.type.out.server.Choice.DtoServerGameChoice;
 import dto.type.out.server.Choice.DtoServerTeamChoice;
 import dto.type.out.server.Choice.DtoSubServerChoice;
@@ -239,6 +240,15 @@ public class ServerManager {
                 choice = null;
             }
             return choice;
+        } finally {
+            SubServersLock.readLock().unlock();
+        }
+    }
+
+    public DtoActiveGameStatus getActiveGameStatus(int GameId) throws Unauthorized, IndexOutOfBoundsException{
+        SubServersLock.readLock().lock();
+        try{
+            return subServers.get(GameId - 1).getActiveGameStatus();
         } finally {
             SubServersLock.readLock().unlock();
         }

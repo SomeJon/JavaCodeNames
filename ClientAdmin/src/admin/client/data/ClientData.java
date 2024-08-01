@@ -9,6 +9,7 @@ import cookiejar.copied.SimpleCookieManager;
 import dto.type.in.response.Response;
 import dto.type.out.server.Choice.DtoServerGameChoice;
 import okhttp3.OkHttpClient;
+import prints.boardprinting.BoardPrinting;
 import ui.input.InputHandling;
 
 import java.io.File;
@@ -27,7 +28,16 @@ public class ClientData {
     private File WaitingTxt = null;
     private File WaitingXml = null;
     private DtoServerGameChoice CurrentChoices = null;
+    private BoardPrinting Printing = new BoardPrinting();
+    private int CurrentId;
 
+    public int getCurrentId() {
+        return CurrentId;
+    }
+
+    public void setCurrentId(int i_CurrentId) {
+        CurrentId = i_CurrentId;
+    }
 
     public DtoServerGameChoice getCurrentChoices() {
         return CurrentChoices;
@@ -130,5 +140,13 @@ public class ClientData {
         Load.createMenuOption("Fetch game status", Action.FETCH, client);
         Main.setCurrentMenu(Load);
         Main.getStartMenu().getMenuItems().remove(2);
+    }
+
+    public BoardPrinting getPrinting() {
+        return Printing;
+    }
+
+    public void setPrinting(BoardPrinting i_Printing) {
+        Printing = i_Printing;
     }
 }

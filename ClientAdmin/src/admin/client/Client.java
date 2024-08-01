@@ -5,9 +5,11 @@ import admin.client.action.Action;
 import admin.client.data.ClientData;
 import admin.client.data.LinkConst;
 import com.google.gson.Gson;
+import com.google.gson.JsonIOException;
 import console.ChoiceNotifier;
 import console.Menu;
 import console.MenuItem;
+import console.PauseConsole;
 import constant.attribute.AttributeNames;
 import constant.client.ClientConst;
 import constant.client.HttpCode;
@@ -15,7 +17,11 @@ import constant.client.ResponseType;
 import constant.response.Responses;
 import dto.type.in.response.common.IntResponse;
 import dto.type.in.response.load.LoadFilesResponse;
+import dto.type.out.board.DtoBoard;
+import dto.type.out.board.card.DtoGroupTeam;
+import dto.type.out.data.DtoActiveGameStatus;
 import dto.type.out.server.Choice.DtoServerGameChoice;
+import dto.type.out.server.Choice.DtoSubServerChoice;
 import dto.type.out.server.DtoResponse;
 import okhttp3.*;
 import request.CNRequest;
@@ -23,7 +29,10 @@ import ui.input.InputHandling;
 
 import java.io.IOException;
 import java.net.ConnectException;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static prints.Prints.parseGamesChoiceAdmin;
 import static request.CNRequest.getRequestStats;
@@ -137,7 +146,32 @@ public class Client implements ChoiceNotifier {
     }
 
     private void fetchStatus() {
-        //todo
+        int GameId = Data.getCurrentId();
+        Request request = CNRequest.getRequestCheckGame(
+                ClientConst.SERVER_CONTEXT + LinkConst.GET_CHOICE_ACTIVE, GameId);
+
+        Call call = Data.HTTP_CLIENT.newCall(request);
+
+        try(Response response = call.execute()){
+            if(response.code() == HttpCode.OK) {
+                try {
+                    DtoActiveGameStatus choice = gson.fromJson(response.body().charStream(), DtoActiveGameStatus.class);
+                    showActiveGameStatus(choice);
+                } catch(JsonIOException e){
+                    errorPrint("IOException occurred while reading active game");
+                } catch (NullPointerException e){
+                    errorPrint("NullPointerException occurred while printing active game");
+                }
+            } else if (response.code() == HttpCode.NOT_FOUND || response.code() == HttpCode.BAD_REQUEST
+                    || response.code() == HttpCode.UNAUTHORIZED || response.code() == HttpCode.FORBIDDEN) {
+                assert response.body() != null;
+                errorPrint(response.body().string());
+            } else {
+                errorPrint("An unexpected error occurred");
+            }
+        } catch (IOException e) {
+            errorPrint("IOException occurred while fetching status");
+        }
     }
 
     private void showGames(){
@@ -246,8 +280,18 @@ public class Client implements ChoiceNotifier {
 
         try(Response response = call.execute()){
             if(response.code() == HttpCode.OK) {
-                System.out.println("Entered game: " + GameId); //todo change to name
                 Data.buildMenu3(this);
+                Data.getPrinting().newBoard();
+                Data.setCurrentId(GameId);
+                Optional<DtoSubServerChoice> choice = Data.getCurrentChoices()
+                        .getSubServerChoices().stream()
+                        .filter(T -> T.getId() == GameId)
+                        .findFirst();
+                if (choice.isPresent()) {
+                    System.out.println("Entered game: " + choice.get().getGameName());
+                } else {
+                    System.out.println("Entered game with id: " + GameId);
+                }
             }
         } catch (IOException e){
             errorPrint("IOException occurred " +
@@ -280,5 +324,34 @@ public class Client implements ChoiceNotifier {
 
         Data.getMain().play();
 
+    }
+
+    public void showActiveGameStatus(DtoActiveGameStatus i_Data) {
+        DtoBoard board = i_Data.getBoard();
+        List<DtoGroupTeam> groupTeams = board.getGroupTeams();
+        DtoGroupTeam currentGroupTeam = i_Data.getNextPlayingTeam();
+        StringBuilder toPrint = new StringBuilder();
+
+        toPrint.append("Board:\n")
+                .append(Data.getPrinting().parse(board, true))
+                .append("Teams in game:\n").append(
+                        groupTeams.stream()
+                                .map(this::parseTeam)
+                                .collect(Collectors.joining("\n")))
+                .append("Team playing next turn: ")
+                .append(currentGroupTeam.getName())
+                .append("\n");
+
+        System.out.print(toPrint);
+    }
+
+    public StringBuilder parseTeam(DtoGroupTeam i_PlayingTeam) {
+        return new StringBuilder().append("--------------------------\n")
+                .append(i_PlayingTeam.getName())
+                .append(" Current score ")
+                .append(i_PlayingTeam.getCardsFlipped())
+                .append("/")
+                .append(i_PlayingTeam.getCards())
+                .append("\n--------------------------");
     }
 }
