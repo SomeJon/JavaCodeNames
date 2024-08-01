@@ -4,9 +4,11 @@ import data.server.data.ServerData;
 import data.server.data.ePermission;
 import data.user.UpdateContainer;
 import data.user.User;
+import dto.type.in.response.ingame.GuesserResponse;
 import dto.type.in.response.ingame.IdentificationResponse;
 import dto.type.in.response.load.LoadInputStreamsResponse;
 import dto.type.out.data.DtoActiveGameStatus;
+import dto.type.out.data.DtoGuessResult;
 import dto.type.out.server.Choice.DtoServerGameChoice;
 import dto.type.out.server.Choice.DtoServerTeamChoice;
 import dto.type.out.server.Choice.DtoSubServerChoice;
@@ -19,11 +21,15 @@ import dto.type.out.server.game.DtoSingleTurnUpdate;
 import engine.Engine;
 import engine.data.GameData;
 import exception.server.AdminOn;
+import exception.server.InternalEngineErrorException;
 import exception.server.NameTaken;
 import exception.server.Unauthorized;
 import exception.server.mismatch.MismatchRole;
 import exception.server.mismatch.MismatchStage;
+import exception.server.mismatch.MismatchTeam;
 import exception.server.mismatch.MismatchUpdate;
+import exception.turn.CardFlippedException;
+import exception.turn.GuessOutOfRangeException;
 import exception.turn.IdentificationException;
 
 import javax.xml.bind.JAXBException;
@@ -258,11 +264,15 @@ public class ServerManager {
         int gameId = i_User.getGameId();
         if(gameId == 0)
             throw new Unauthorized();
+        SubServersLock.readLock().lock();
+        try {
+            DtoBoardUpdate dtoBoard = subServers.get(gameId - 1).getData().getBoardUpdates(i_User.getUpdates());
+            DtoSingleTurnUpdate dtoTurns = subServers.get(gameId - 1).getData().getTurnUpdates(i_User.getUpdates());
 
-        DtoBoardUpdate dtoBoard = subServers.get(gameId - 1).getData().getBoardUpdates(i_User.getUpdates());
-        DtoSingleTurnUpdate dtoTurns = subServers.get(gameId - 1).getData().getTurnUpdates(i_User.getUpdates());
-
-        return new DtoGameUpdate(dtoBoard, dtoTurns);
+            return new DtoGameUpdate(dtoBoard, dtoTurns);
+        } finally {
+            SubServersLock.readLock().unlock();
+        }
     }
 
     private SubServer getSubServer(int gameId){
@@ -270,12 +280,24 @@ public class ServerManager {
     }
 
     public void playIdentification(User i_User, IdentificationResponse i_Identification)
-            throws MismatchUpdate, MismatchRole, MismatchStage,
+            throws MismatchUpdate, MismatchRole, MismatchStage, MismatchTeam,
             IndexOutOfBoundsException , IdentificationException {
         SubServersLock.writeLock().lock();
         try {
             SubServer subServer = getSubServer(i_User.getGameId() - 1);
             subServer.playIdentification(i_User, i_Identification);
+        } finally{
+            SubServersLock.writeLock().unlock();
+        }
+    }
+
+    public DtoGuessResult playGuess(User i_User, GuesserResponse i_Guess)
+        throws MismatchUpdate, MismatchRole, MismatchStage, MismatchTeam,
+            IndexOutOfBoundsException, InternalEngineErrorException,
+            GuessOutOfRangeException, CardFlippedException {
+        SubServersLock.writeLock().lock();
+        try {
+            return getSubServer(i_User.getGameId() - 1).playGuess(i_User, i_Guess);
         } finally{
             SubServersLock.writeLock().unlock();
         }

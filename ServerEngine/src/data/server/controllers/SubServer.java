@@ -3,17 +3,23 @@ package data.server.controllers;
 import data.server.data.SubServerChat;
 import data.server.data.SubServerData;
 import data.user.User;
+import dto.type.in.response.ingame.GuesserResponse;
 import dto.type.in.response.ingame.IdentificationResponse;
 import dto.type.out.data.DtoActiveGameStatus;
 import dto.type.out.data.DtoGameDetails;
+import dto.type.out.data.DtoGuessResult;
 import dto.type.out.server.DtoServerInfo;
 import dto.type.out.server.DtoServerTeam;
 import dto.type.out.server.DtoSubServerStatus;
 import engine.EngineInterface;
+import exception.server.InternalEngineErrorException;
 import exception.server.Unauthorized;
 import exception.server.mismatch.MismatchRole;
 import exception.server.mismatch.MismatchStage;
+import exception.server.mismatch.MismatchTeam;
 import exception.server.mismatch.MismatchUpdate;
+import exception.turn.CardFlippedException;
+import exception.turn.GuessOutOfRangeException;
 import exception.turn.IdentificationException;
 
 import java.util.List;
@@ -56,9 +62,16 @@ public class SubServer {
     }
 
     public void playIdentification(User i_User, IdentificationResponse i_Identification)
-            throws MismatchUpdate, MismatchRole, MismatchStage,
+            throws MismatchUpdate, MismatchRole, MismatchStage, MismatchTeam,
             IndexOutOfBoundsException , IdentificationException {
         Data.playIdentification(i_User, i_Identification);
+    }
+
+    public DtoGuessResult playGuess(User i_User, GuesserResponse i_Guess)
+            throws MismatchUpdate, MismatchRole, MismatchStage, MismatchTeam,
+            IndexOutOfBoundsException, InternalEngineErrorException,
+            GuessOutOfRangeException, CardFlippedException {
+        return Data.playGuesser(i_User, i_Guess);
     }
 
     public DtoActiveGameStatus getActiveGameStatus() throws Unauthorized {

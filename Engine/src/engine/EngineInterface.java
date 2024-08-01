@@ -19,10 +19,11 @@ public interface EngineInterface{
         public Dto getActiveBoard();
         public Dto getActiveTeam();
         public DtoIdentification playTurnIdentification(IdentificationResponse i_Response);
-        public Dto playTurnGuessers(DtoIdentification i_CurrentIdentification, GuesserResponse i_Response);
+        public Dto playTurnGuessers(GuesserResponse i_Response);
         public Dto checkCardReturnContinue(Card i_GuessedCard);
         public DtoGroupTeam nextTeam();
         public Dto getNextTeam();
         public DtoActiveGameStatus getActiveGameStatus();
-        public boolean didGameEng();
+        public boolean didGameEnd();
+        public int numOfPlayingTeams();
 }

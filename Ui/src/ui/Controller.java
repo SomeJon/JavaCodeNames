@@ -150,7 +150,7 @@ public class Controller{
             }
             else {
                 try {
-                    engineResult = Engine.playTurnGuessers(i_Identification, response);
+                    engineResult = Engine.playTurnGuessers(response);
                     if (engineResult instanceof DtoGameEndResult) {
                         guessResult = ((DtoGameEndResult) engineResult).getGuessResult();
                         gameEnded = true;

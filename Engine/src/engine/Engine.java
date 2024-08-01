@@ -14,6 +14,7 @@ import engine.board.card.Card;
 import engine.board.card.GroupCard;
 import engine.board.card.GroupNeutral;
 import engine.board.card.GroupTeam;
+import engine.data.ActiveGame;
 import engine.data.GameData;
 import dto.type.out.data.DtoIdentification;
 import exception.turn.CardFlippedException;
@@ -83,8 +84,7 @@ public class Engine implements EngineInterface, Serializable {
     }
 
     @Override
-    public Dto playTurnGuessers(DtoIdentification i_CurrentIdentification, GuesserResponse i_Response){
-        GroupTeam playingTeam = Data.getActiveData().getPlayingTeamGroup();
+    public Dto playTurnGuessers(GuesserResponse i_Response){
         Board playingBoard = Data.getActiveData().getPlayingBoard();
         int maxId = Data.getStatus().getNumOfCards() + Data.getStatus().getNumOfBlackCards();
         int cardId = i_Response.getCardId();
@@ -168,9 +168,12 @@ public class Engine implements EngineInterface, Serializable {
     }
 
     @Override
-    public boolean didGameEng() {
+    public boolean didGameEnd() {
         return Data.getActiveData().getPlayingTeams().size() == 1;
     }
 
-
+    @Override
+    public int numOfPlayingTeams() {
+        return Data.getActiveData().getPlayingTeams().size();
+    }
 }

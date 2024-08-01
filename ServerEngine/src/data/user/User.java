@@ -13,7 +13,7 @@ public class User {
     private int TeamId; //0 = not in a team
     private final ePermission PermissionLevel;
     private ServerTeam ConnectedTeam;
-    private eRole Role;
+    private eRole Role = null;
     private final UpdateContainer Updates = new UpdateContainer();
     private DtoEndResult EndResult = new DtoEndResult();
 

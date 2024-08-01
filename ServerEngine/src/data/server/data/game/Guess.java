@@ -1,5 +1,6 @@
 package data.server.data.game;
 
+import dto.type.out.data.DtoGuessResult;
 import dto.type.out.server.game.DtoServerGuess;
 
 public class Guess {
@@ -25,15 +26,35 @@ public class Guess {
 
         public abstract DtoServerGuess.eDtoResult getDto();
     }
-    private final String guess;
+    private final Integer guess;
     private final eResult result;
 
-    public Guess(String guess, eResult result) {
+    public Guess(Integer guess, eResult result) {
         this.guess = guess;
         this.result = result;
     }
 
-    public String getGuess() {
+    public Guess(Integer i_Guess, DtoGuessResult i_Result) {
+        this.guess = i_Guess;
+
+        switch (i_Result) {
+            case NEUTRAL_HIT:
+            case ENEMY_TEAM_HIT:
+                result = eResult.MISS;
+                break;
+            case BLACK_HIT:
+                result = eResult.BLACK_HIT;
+                break;
+            case SUCCESSFUL_GUESS:
+                result = eResult.HIT;
+                break;
+            default:
+                result = null;
+                break;
+        }
+    }
+
+    public Integer getGuess() {
         return guess;
     }
 

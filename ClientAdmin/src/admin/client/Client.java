@@ -22,6 +22,7 @@ import dto.type.out.server.Choice.DtoServerGameChoice;
 import dto.type.out.server.Choice.DtoSubServerChoice;
 import dto.type.out.server.DtoResponse;
 import okhttp3.*;
+import prints.Prints;
 import request.CNRequest;
 import ui.input.InputHandling;
 
@@ -334,22 +335,12 @@ public class Client implements ChoiceNotifier {
                 .append(Data.getPrinting().parse(board, true))
                 .append("Teams in game:\n").append(
                         groupTeams.stream()
-                                .map(this::parseTeam)
+                                .map(Prints::parseTeam)
                                 .collect(Collectors.joining("\n")))
                 .append("\nTeam playing next turn: ")
                 .append(currentGroupTeam.getName())
                 .append("\n");
 
         System.out.print(toPrint);
-    }
-
-    public StringBuilder parseTeam(DtoGroupTeam i_PlayingTeam) {
-        return new StringBuilder().append("--------------------------\n")
-                .append(i_PlayingTeam.getName())
-                .append(" Current score ")
-                .append(i_PlayingTeam.getCardsFlipped())
-                .append("/")
-                .append(i_PlayingTeam.getCards())
-                .append("\n--------------------------");
     }
 }

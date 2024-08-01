@@ -14,6 +14,8 @@ public abstract class CodeNameException extends RuntimeException {
         MISMATCH_UPDATE,
         MISMATCH_ROLE,
         MISMATCH_TURN_STAGE,
+        MISMATCH_TEAM,
+        ENGINE,
     }
 
     private ExceptionType Type;

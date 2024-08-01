@@ -23,15 +23,15 @@ public class DtoServerGuess implements Dto {
             }
         };
     }
-    private final String guess;
+    private final Integer guess;
     private final eDtoResult result;
 
-    public DtoServerGuess(String guess, eDtoResult result) {
+    public DtoServerGuess(Integer guess, eDtoResult result) {
         this.guess = guess;
         this.result = result;
     }
 
-    public String getGuess() {
+    public Integer getGuess() {
         return guess;
     }
 

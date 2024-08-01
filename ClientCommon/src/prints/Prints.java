@@ -1,5 +1,6 @@
 package prints;
 
+import dto.type.out.board.card.DtoGroupTeam;
 import dto.type.out.server.Choice.DtoServerGameChoice;
 import dto.type.out.server.Choice.DtoServerTeamChoice;
 import dto.type.out.server.Choice.DtoSubServerChoice;
@@ -120,5 +121,15 @@ public class Prints {
         ret.append("------------------------\n");
 
         return ret.toString();
+    }
+
+    public static StringBuilder parseTeam(DtoGroupTeam i_PlayingTeam) {
+        return new StringBuilder().append("--------------------------\n")
+                .append(i_PlayingTeam.getName())
+                .append(" Current score ")
+                .append(i_PlayingTeam.getCardsFlipped())
+                .append("/")
+                .append(i_PlayingTeam.getCards())
+                .append("\n--------------------------");
     }
 }

@@ -39,6 +39,9 @@ public class PlayIdentifierServlet extends HttpServlet {
                     } catch(CodeNameException error){
                         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                         switch(error.getType()){
+                            case MISMATCH_TEAM:
+                                errorMessage = "This is not your team turn!";
+                                break;
                             case MISMATCH_TURN_STAGE:
                                 errorMessage = "Identification already logged in the server!";
                                 break;

@@ -2,6 +2,7 @@ package data.server.data.group;
 
 import data.user.User;
 import dto.type.out.server.DtoServerTeam;
+import dto.type.out.server.game.DtoEndResult;
 import engine.data.Team;
 import exception.server.NoSpot;
 import exception.server.NotEnoughRole;
@@ -166,16 +167,49 @@ public class ServerTeam {
 
     public void removeUser(User i_User){
         Lock.writeLock().lock();
-        for(Role role : Guessers){
-            if(role.getUser() == i_User){
-                role.setUser(null);
+        try {
+            for (Role role : Guessers) {
+                if (role.getUser() == i_User) {
+                    role.setUser(null);
+                }
             }
-        }
-        for(Role role : Identifiers){
-            if(role.getUser() == i_User){
-                role.setUser(null);
+            for (Role role : Identifiers) {
+                if (role.getUser() == i_User) {
+                    role.setUser(null);
+                }
             }
+        } finally {
+            Lock.writeLock().unlock();
         }
-        Lock.writeLock().unlock();
+    }
+
+    public void cleanTeam(DtoEndResult i_EndResult) {
+        Lock.writeLock().lock();
+        try {
+            cleanRole(Guessers, i_EndResult);
+            cleanRole(Identifiers, i_EndResult);
+            CurrentNumGuessers = 0;
+            CurrentNumIdentifiers = 0;
+            CurrentTurnNum = 0;
+            TeamReady = false;
+        } finally {
+            Lock.writeLock().unlock();
+        }
+    }
+
+    private void cleanRole(List<Role> i_Roles, DtoEndResult i_EndResult) {
+        i_Roles.forEach(T -> {
+                    User user = T.getUser();
+                    if (user != null) {
+                        user.setRole(null);
+                        user.getUpdates().clear();
+                        user.setTeamId(0);
+                        user.setGameId(0);
+                        user.setConnectedTeam(null);
+                        user.setEndResult(i_EndResult);
+                        T.setUser(null);
+                    }
+                }
+            );
     }
 }

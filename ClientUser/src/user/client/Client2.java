@@ -1,8 +1,10 @@
 package user.client;
 
 import Adapter.AdapterAddon;
+import com.google.gson.JsonSyntaxException;
 import console.ChoiceNotifier;
 import console.MenuItem;
+import console.PauseConsole;
 import constant.attribute.AttributeNames;
 import dto.type.in.response.ResponseJoin;
 import dto.type.in.response.common.IntResponse;
@@ -10,6 +12,7 @@ import dto.type.in.response.common.StringResponse;
 import dto.type.in.response.ingame.GuesserResponse;
 import dto.type.in.response.ingame.IdentificationResponse;
 import dto.type.out.board.card.DtoGroupTeam;
+import dto.type.out.data.DtoGuessResult;
 import dto.type.out.server.Choice.DtoServerGameChoice;
 import dto.type.out.server.Choice.DtoServerTeamChoice;
 import dto.type.out.server.Choice.DtoSubServerChoice;
@@ -34,6 +37,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static prints.Prints.parseGamesChoice;
+import static prints.Prints.parseTeam;
 import static request.CNRequest.*;
 import static ui.input.InputHandling.errorPrint;
 
@@ -195,6 +199,33 @@ public class Client2 implements ChoiceNotifier {
                 ClientConst.SERVER_CONTEXT + LinkConst.PLAY_GUESSER,
                 resp,
                 "POST");
+
+        Call call = Data.HTTP_CLIENT.newCall(request);
+
+        try(Response response = call.execute()){
+            int code = response.code();
+            if(code == HttpCode.OK){
+                try {
+                    DtoGuessResult result = gson.fromJson(response.body().string(), DtoGuessResult.class);
+                    printGuessResult(result, Data.GameData.getCurrentTurn().getPlayingTeam());
+                } catch(JsonSyntaxException e){
+                    errorPrint("Error parsing response");
+                }
+            } else if(code == HttpCode.BAD_REQUEST
+                    || code == HttpCode.FORBIDDEN
+                    || code == HttpCode.UNAUTHORIZED) {
+                String str = response.body().string();
+                if (!str.isEmpty()) {
+                    errorPrint(str);
+                } else {
+                    errorPrint("Internal Server Error");
+                }
+            } else {
+                errorPrint("Unexpected server error occurred");
+            }
+        }catch(IOException e){
+            errorPrint("An IOException has occurred!");
+        }
     }
 
     private void playIdentifier(){
@@ -650,5 +681,59 @@ public class Client2 implements ChoiceNotifier {
                 toPrint.append(i_Result.getResult());
             }
         }
+    }
+
+    public void printGuessResult(DtoGuessResult i_ReceivedGuessResult, DtoGroupTeam i_PlayingTeam) {
+        StringBuilder toPrint = new StringBuilder();
+        toPrint.append("You flipped a Card!\n");
+        int guessesLeft = Data.GameData.getCurrentTurn().getGuessesLeft() - 1;
+
+        switch(i_ReceivedGuessResult){
+            case SUCCESSFUL_GUESS:
+                toPrint.append("The card belonged to your team, and received a point!\n");
+                if(guessesLeft > 0){
+                    toPrint.append("You can guess ")
+                            .append(guessesLeft)
+                            .append(" more times!\n");
+                }
+                else{
+                    toPrint.append("No guesses left! Turn Ends\n");
+                }
+                break;
+            case ENEMY_TEAM_HIT:
+                toPrint.append("The card belonged to an enemy Team!\n");
+
+                if(guessesLeft > 0){
+                    toPrint.append("You can guess ")
+                            .append(guessesLeft)
+                            .append(" more times!\n");
+                }
+                else{
+                    toPrint.append("No guesses left! Turn Ends\n");
+                }
+
+                break;
+            case BLACK_HIT:
+                DtoGroupTeam teamLost = i_ReceivedGuessResult.getGroupTeam();
+                toPrint.append("Black card was flipped!" + "\n")
+                        .append(teamLost.getName())
+                        .append(" Lost the game!\n");
+                break;
+            case NEUTRAL_HIT:
+                toPrint.append("Card flipped was neutral!\n");
+
+                if(guessesLeft > 0){
+                    toPrint.append("You can guess ")
+                            .append(guessesLeft)
+                            .append(" more times!\n");
+                }
+                else{
+                    toPrint.append("No guesses left! Turn Ends\n");
+                }
+                break;
+        }
+
+        toPrint.append(parseTeam(i_PlayingTeam));
+        System.out.println(toPrint);
     }
 }

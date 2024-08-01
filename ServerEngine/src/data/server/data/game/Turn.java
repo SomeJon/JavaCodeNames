@@ -1,5 +1,6 @@
 package data.server.data.game;
 
+import data.server.data.group.ServerTeam;
 import dto.type.out.board.card.DtoGroupTeam;
 import dto.type.out.server.game.DtoServerGuess;
 import dto.type.out.server.game.DtoSingleTurnUpdate;
@@ -26,6 +27,7 @@ public class Turn {
         public abstract DtoSingleTurnUpdate.eDtoState getDto();
     }
 
+    private final ServerTeam TurnTeam;
     private final int TeamId;
     private final int TurnNum;
     private final DtoGroupTeam PlayingTeam;
@@ -36,12 +38,17 @@ public class Turn {
     private int GuessesLeft;
 
 
-    public Turn(int teamId, int turnNum, DtoGroupTeam playingTeam, DtoGroupTeam nextPlayingTeam) {
+    public Turn(ServerTeam turnTeam, int teamId, int turnNum, DtoGroupTeam playingTeam, DtoGroupTeam nextPlayingTeam) {
+        TurnTeam = turnTeam;
         TeamId = teamId;
         TurnNum = turnNum;
         PlayingTeam = playingTeam;
         State = eState.IDENTIFICATION;
         NextPlayingTeam = nextPlayingTeam;
+    }
+
+    public ServerTeam getTurnTeam() {
+        return TurnTeam;
     }
 
     public int getTeamId() {
