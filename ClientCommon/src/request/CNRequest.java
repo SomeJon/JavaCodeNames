@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import constant.attribute.AttributeNames;
 import constant.client.HttpCode;
 import constant.client.ResponseType;
-import dto.type.in.response.ResponseJoin;
 import dto.type.out.server.DtoResponse;
 import dto.type.out.server.DtoServerStatus;
 import okhttp3.*;
@@ -16,7 +15,7 @@ import static prints.Prints.parseGamesStatus;
 import static ui.input.InputHandling.errorPrint;
 
 public class CNRequest {
-    public static <T> Request requestWithObject(String url, T object, String method) {
+    public static <T> Request requestWithObject(String i_Url, T object, String method) {
         Gson gson = new Gson();
         String json = gson.toJson(object);
 
@@ -24,23 +23,10 @@ public class CNRequest {
         RequestBody body = RequestBody.create(json, JSON);
 
         Request.Builder builder = new Request.Builder()
-                .url(url)
+                .url(i_Url)
                 .method(method.toUpperCase(), body);  // Use the method specified (POST or PUT)
 
         return builder.build();
-    }
-
-    public static Request getRequestCheckGame(String i_Url, Integer GameId) {
-        String url = HttpUrl
-                .parse(i_Url)
-                .newBuilder()
-                .addQueryParameter(AttributeNames.WANTED_GAME, GameId.toString())
-                .build().toString();
-
-        return new Request.Builder()
-                .url(url)
-                .get()
-                .build();
     }
 
     public static Request getRequestQueryParameter(String baseUrl, String queryKey, String queryValue) {

@@ -40,7 +40,7 @@ public class PlayIdentifierServlet extends HttpServlet {
                         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                         switch(error.getType()){
                             case MISMATCH_TURN_STAGE:
-                                errorMessage = "Identification already logged in!";
+                                errorMessage = "Identification already logged in the server!";
                                 break;
                             case MISMATCH_ROLE:
                                 errorMessage = "User is not of the correct role!";

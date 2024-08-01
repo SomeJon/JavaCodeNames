@@ -170,12 +170,14 @@ public class Client2 implements ChoiceNotifier {
                             playGuesser();
                         else
                             errorPrint("You cant guess while turn state is on identification!");
+                        getGameUpdate();
                         break;
                     case IDENTIFICATION:
                         if(Data.GameData.getRole() == GameData.roleChoice.IDENTIFIER)
                             playIdentifier();
                         else
                             errorPrint("You cant identify while turn state is on Guessing!");
+                        getGameUpdate();
                         break;
                 }
             } else{
@@ -189,17 +191,41 @@ public class Client2 implements ChoiceNotifier {
     private void playGuesser(){
         GuesserResponse resp = new GuesserResponse();
         Data.GameData.getRole().getInput(resp);
-
+        Request request = requestWithObject(
+                ClientConst.SERVER_CONTEXT + LinkConst.PLAY_GUESSER,
+                resp,
+                "POST");
     }
 
     private void playIdentifier(){
         IdentificationResponse resp = new IdentificationResponse();
         Data.GameData.getRole().getInput(resp);
+        Request request = requestWithObject(
+                ClientConst.SERVER_CONTEXT + LinkConst.PLAY_IDENTIFIER,
+                resp,
+                "POST");
 
-    }
+        Call call = Data.HTTP_CLIENT.newCall(request);
 
-    private void play(String url, Response i_Response) {
-
+        try(Response response = call.execute()){
+            int code = response.code();
+            if(code == HttpCode.OK){
+                System.out.println("Identification entered successfully");
+            } else if(code == HttpCode.BAD_REQUEST
+                    || code == HttpCode.FORBIDDEN
+                    || code == HttpCode.UNAUTHORIZED) {
+                String str = response.body().string();
+                if (!str.isEmpty()) {
+                    errorPrint(str);
+                } else {
+                    errorPrint("Internal Server Error");
+                }
+            } else {
+                errorPrint("Unexpected server error occurred");
+            }
+        }catch(IOException e){
+            errorPrint("An IOException has occurred!");
+        }
     }
 
     private void showGame(){
@@ -242,9 +268,6 @@ public class Client2 implements ChoiceNotifier {
     private void waitForGame(){
         Data.buildMenu3(this);
         updateData(true);
-
-        //todo: start game update thread with some infos
-        //todo: start chat update thread
     }
 
     private boolean didGameStart(){
@@ -318,7 +341,7 @@ public class Client2 implements ChoiceNotifier {
         Call call = Data.HTTP_CLIENT.newCall(request);
 
         try(Response response = call.execute()){
-            String str = null;
+            String str;
             if(response.code() == HttpCode.OK) {
                 str = "Joined game " + Data.GameData.getGameName() +
                         "!\nPlease wait for other users to join...";
@@ -327,9 +350,14 @@ public class Client2 implements ChoiceNotifier {
             }
             else if (response.code() == HttpCode.GONE || response.code() == HttpCode.BAD_REQUEST
                     || response.code() == HttpCode.UNAUTHORIZED) {
-                assert response.body() != null;
                 str = response.body().string();
-                System.out.println(str);
+                if (!str.isEmpty()) {
+                    errorPrint(str);
+                } else {
+                    errorPrint("Internal Server Error");
+                }
+            } else{
+                errorPrint("Unexpected Server Error");
             }
         } catch (IOException e) {
             errorPrint("IOException occurred: " + e.getMessage());
