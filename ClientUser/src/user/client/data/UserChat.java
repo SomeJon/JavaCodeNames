@@ -39,7 +39,7 @@ public class UserChat extends ChatData implements ChoiceNotifier {
     private volatile boolean running = true;
     private volatile boolean userTyping = false;
     private final OkHttpClient client;
-    private final Gson gson = AdapterAddon.getGson();;
+    private final Gson gson = AdapterAddon.getGson();
     private List<Message> WaitingList = new ArrayList<>();
 
     public UserChat(Format userFormatPrint, Format systemFormatUpdate, OkHttpClient client) {
@@ -53,6 +53,7 @@ public class UserChat extends ChatData implements ChoiceNotifier {
     }
 
     public void printMessages() {
+        System.out.println("Entering printMessages()");
         lock.readLock().lock();
         try {
             List<Message> toPrint = new ArrayList<>(Messages);
@@ -82,9 +83,11 @@ public class UserChat extends ChatData implements ChoiceNotifier {
         } finally {
             lock.readLock().unlock();
         }
+        System.out.println("Exiting printMessages()");
     }
 
     public void printMessages(List<Message> messages) {
+        System.out.println("Entering printMessages(messages)");
         lock.readLock().lock();
         try {
             List<Message> toPrint = new ArrayList<>(messages);
@@ -114,6 +117,7 @@ public class UserChat extends ChatData implements ChoiceNotifier {
         } finally {
             lock.readLock().unlock();
         }
+        System.out.println("Exiting printMessages(messages)");
     }
 
     @Override
@@ -172,6 +176,7 @@ public class UserChat extends ChatData implements ChoiceNotifier {
     }
 
     private void openChat() {
+        System.out.println("Entering openChat()");
         running = true;
         printMessages();
 
@@ -191,9 +196,11 @@ public class UserChat extends ChatData implements ChoiceNotifier {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+        System.out.println("Exiting openChat()");
     }
 
     private void handleUserInput() {
+        System.out.println("Entering handleUserInput()");
         try (InputStreamReader reader = new InputStreamReader(System.in);
              Scanner scanner = new Scanner(System.in)) {
             while (running) {
@@ -205,70 +212,74 @@ public class UserChat extends ChatData implements ChoiceNotifier {
                     if ("exit".equalsIgnoreCase(input.trim())) {
                         running = false;
                     } else {
-                       sendMessage(input);
+                        sendMessage(input);
                     }
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+        System.out.println("Exiting handleUserInput()");
     }
 
     private void sendMessage(String message) {
+        System.out.println("Entering sendMessage()");
         Request request = CNRequest.requestWithObject(
                 ClientConst.SERVER_CONTEXT + LinkConst.CHAT_END_POINT, message, "POST");
 
-
         Call call = client.newCall(request);
 
-        try(Response response = call.execute()){
-            if(response.code() == HttpCode.OK){
+        try (Response response = call.execute()) {
+            if (response.code() == HttpCode.OK) {
                 System.out.println("Message uploaded successfully");
-            } else if(response.code() == HttpCode.UNAUTHORIZED
+            } else if (response.code() == HttpCode.UNAUTHORIZED
                     || response.code() == HttpCode.BAD_REQUEST
-                    || response.code() == HttpCode.NOT_FOUND){
+                    || response.code() == HttpCode.NOT_FOUND) {
                 String str = response.body().string();
                 if (!str.isEmpty()) {
                     errorPrint(str);
                 } else {
                     errorPrint("Internal Server Error");
                 }
-            } else{
+            } else {
                 errorPrint("Unexpected update error");
             }
         } catch (IOException e) {
             System.out.println("Chat update failed");
         }
+        System.out.println("Exiting sendMessage()");
     }
 
     private void getMessage() {
+        System.out.println("Entering getMessage()");
         Request request = CNRequest.getRequest(
                 ClientConst.SERVER_CONTEXT + LinkConst.CHAT_END_POINT);
 
         Call call = client.newCall(request);
-        try(Response response = call.execute()){
-            if(response.code() == HttpCode.OK){
-                System.out.println("Message uploaded successfully");
+        try (Response response = call.execute()) {
+            if (response.code() == HttpCode.OK) {
                 DtoServerChat ret = gson.fromJson(response.body().charStream(), DtoServerChat.class);
                 WaitingList.addAll(ret.getReceivedMessages());
                 Messages.addAll(ret.getReceivedMessages());
-            } else if(response.code() == HttpCode.UNAUTHORIZED
-                    || response.code() == HttpCode.NOT_FOUND){
+            } else if (response.code() == HttpCode.UNAUTHORIZED
+                    || response.code() == HttpCode.NOT_FOUND) {
                 String str = response.body().string();
                 if (!str.isEmpty()) {
                     errorPrint(str);
                 } else {
                     errorPrint("Internal Server Error");
                 }
-            } else{
+            } else {
                 errorPrint("Unexpected update error");
             }
         } catch (IOException e) {
             System.out.println("Chat update failed");
         }
+        System.out.println("Exiting getMessage()");
     }
 
     private void fetchUpdates() {
+        System.out.println("Entering fetchUpdates()");
         while (running) {
             try {
                 Thread.sleep(3000); // Simulate delay
@@ -297,5 +308,6 @@ public class UserChat extends ChatData implements ChoiceNotifier {
                 }
             }
         }
+        System.out.println("Exiting fetchUpdates()");
     }
 }

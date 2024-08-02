@@ -18,7 +18,7 @@ public class SubServerChat extends ChatData {
         UserMessage newMessage = new UserMessage(i_Message, i_User.getName(),
                 i_User.getRole(), i_User.getConnectedTeam().getTeam().getName());
 
-        chatData.AddMessage(newMessage);
+        AddMessage(newMessage);
     }
 
     public void addSystemMessage(String i_Message) {
