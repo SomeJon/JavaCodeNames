@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SubServerChat extends ChatData {
-    private final ChatData chatData = new ChatData();
 
     public void addUserMessage(User i_User, String i_Message) {
         UserMessage newMessage = new UserMessage(i_Message, i_User.getName(),
@@ -24,7 +23,7 @@ public class SubServerChat extends ChatData {
     public void addSystemMessage(String i_Message) {
         SystemMessage newMessage = new SystemMessage(i_Message, SystemMessage.eType.Result);
 
-        chatData.AddMessage(newMessage);
+        AddMessage(newMessage);
     }
 
     public DtoServerChat getNewMessages(UpdateContainer io_Container) {

@@ -52,79 +52,65 @@ public class UserChat extends ChatData implements ChoiceNotifier {
         menuToChange = i_menuToChange;
     }
 
-    public void printMessages() {
-        System.out.println("Entering printMessages()");
-        lock.readLock().lock();
-        try {
-            List<Message> toPrint = new ArrayList<>(Messages);
-            StringBuilder strs = new StringBuilder();
+    private void printMessages() {
+        List<Message> toPrint = new ArrayList<>(Messages);
+        StringBuilder strs = new StringBuilder();
 
-            for (Message m : toPrint) {
-                if (m instanceof UserMessage) {
-                    switch (((UserMessage) m).getRole()) {
-                        case Guesser:
-                            if (printGuesser) {
-                                strs.append(m.getMessage(UserFormatPrint)).append("\n");
-                            }
-                            break;
-                        case Definer:
-                            if (printIdentifier) {
-                                strs.append(m.getMessage(SystemFormatUpdate)).append("\n");
-                            }
-                            break;
-                    }
-                } else {
-                    if (printSystem) {
-                        strs.append(m.getMessage(UserFormatPrint)).append("\n");
-                    }
+        for (Message m : toPrint) {
+            if (m instanceof UserMessage) {
+                switch (((UserMessage) m).getRole()) {
+                    case Guesser:
+                        if (printGuesser) {
+                            strs.append(m.getMessage(UserFormatPrint)).append("\n");
+                        }
+                        break;
+                    case Definer:
+                        if (printIdentifier) {
+                            strs.append(m.getMessage(UserFormatPrint)).append("\n");
+                        }
+                        break;
+                }
+            } else {
+                if (printSystem) {
+                    strs.append(m.getMessage(SystemFormatUpdate)).append("\n");
                 }
             }
-            System.out.println(strs.toString());
-        } finally {
-            lock.readLock().unlock();
         }
-        System.out.println("Exiting printMessages()");
+        System.out.println(strs.toString());
     }
 
-    public void printMessages(List<Message> messages) {
-        System.out.println("Entering printMessages(messages)");
-        lock.readLock().lock();
-        try {
-            List<Message> toPrint = new ArrayList<>(messages);
-            StringBuilder strs = new StringBuilder();
+    private void printMessages(List<Message> messages) {
+        List<Message> toPrint = new ArrayList<>(messages);
+        StringBuilder strs = new StringBuilder();
 
-            for (Message m : toPrint) {
-                if (m instanceof UserMessage) {
-                    switch (((UserMessage) m).getRole()) {
-                        case Guesser:
-                            if (printGuesser) {
-                                strs.append(m.getMessage(UserFormatPrint)).append("\n");
-                            }
-                            break;
-                        case Definer:
-                            if (printIdentifier) {
-                                strs.append(m.getMessage(SystemFormatUpdate)).append("\n");
-                            }
-                            break;
-                    }
-                } else {
-                    if (printSystem) {
-                        strs.append(m.getMessage(UserFormatPrint)).append("\n");
-                    }
+        for (Message m : toPrint) {
+            if (m instanceof UserMessage) {
+                switch (((UserMessage) m).getRole()) {
+                    case Guesser:
+                        if (printGuesser) {
+                            strs.append(m.getMessage(UserFormatPrint)).append("\n");
+                        }
+                        break;
+                    case Definer:
+                        if (printIdentifier) {
+                            strs.append(m.getMessage(UserFormatPrint)).append("\n");
+                        }
+                        break;
+                }
+            } else {
+                if (printSystem) {
+                    strs.append(m.getMessage(SystemFormatUpdate)).append("\n");
                 }
             }
-            System.out.println(strs.toString());
-        } finally {
-            lock.readLock().unlock();
         }
-        System.out.println("Exiting printMessages(messages)");
+        System.out.println(strs.toString());
     }
 
     @Override
     public void Notify(Object sender) {
         ChatSetting ret = null;
 
-        if (((MenuItem) sender).getItemValue() instanceof InputHandling) {
+        if (((MenuItem) sender).getItemValue() instanceof ChatSetting) {
             ret = (ChatSetting) ((MenuItem) sender).getItemValue();
         }
 
@@ -176,7 +162,6 @@ public class UserChat extends ChatData implements ChoiceNotifier {
     }
 
     private void openChat() {
-        System.out.println("Entering openChat()");
         running = true;
         printMessages();
 
@@ -196,11 +181,9 @@ public class UserChat extends ChatData implements ChoiceNotifier {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        System.out.println("Exiting openChat()");
     }
 
     private void handleUserInput() {
-        System.out.println("Entering handleUserInput()");
         try (InputStreamReader reader = new InputStreamReader(System.in);
              Scanner scanner = new Scanner(System.in)) {
             while (running) {
@@ -209,21 +192,21 @@ public class UserChat extends ChatData implements ChoiceNotifier {
                 String input = (char) firstChar + scanner.nextLine();
                 userTyping = false;
                 synchronized (this) {
+                    System.out.println("User input synchronized block entered");
                     if ("exit".equalsIgnoreCase(input.trim())) {
                         running = false;
                     } else {
                         sendMessage(input);
                     }
+                    System.out.println("User input synchronized block exited");
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("Exiting handleUserInput()");
     }
 
     private void sendMessage(String message) {
-        System.out.println("Entering sendMessage()");
         Request request = CNRequest.requestWithObject(
                 ClientConst.SERVER_CONTEXT + LinkConst.CHAT_END_POINT, message, "POST");
 
@@ -247,11 +230,9 @@ public class UserChat extends ChatData implements ChoiceNotifier {
         } catch (IOException e) {
             System.out.println("Chat update failed");
         }
-        System.out.println("Exiting sendMessage()");
     }
 
     private void getMessage() {
-        System.out.println("Entering getMessage()");
         Request request = CNRequest.getRequest(
                 ClientConst.SERVER_CONTEXT + LinkConst.CHAT_END_POINT);
 
@@ -259,8 +240,15 @@ public class UserChat extends ChatData implements ChoiceNotifier {
         try (Response response = call.execute()) {
             if (response.code() == HttpCode.OK) {
                 DtoServerChat ret = gson.fromJson(response.body().charStream(), DtoServerChat.class);
-                WaitingList.addAll(ret.getReceivedMessages());
-                Messages.addAll(ret.getReceivedMessages());
+                System.out.println("Acquired write lock in getMessage");
+                lock.writeLock().lock();
+                try {
+                    WaitingList.addAll(ret.getReceivedMessages());
+                    Messages.addAll(ret.getReceivedMessages());
+                } finally {
+                    lock.writeLock().unlock();
+                    System.out.println("Released write lock in getMessage");
+                }
             } else if (response.code() == HttpCode.UNAUTHORIZED
                     || response.code() == HttpCode.NOT_FOUND) {
                 String str = response.body().string();
@@ -275,11 +263,9 @@ public class UserChat extends ChatData implements ChoiceNotifier {
         } catch (IOException e) {
             System.out.println("Chat update failed");
         }
-        System.out.println("Exiting getMessage()");
     }
 
     private void fetchUpdates() {
-        System.out.println("Entering fetchUpdates()");
         while (running) {
             try {
                 Thread.sleep(3000); // Simulate delay
@@ -292,22 +278,25 @@ public class UserChat extends ChatData implements ChoiceNotifier {
                 break;
             }
 
-            lock.writeLock().lock();
-            try {
-                getMessage();
-            } finally {
-                lock.writeLock().unlock();
-            }
+            getMessage();
 
             if (!userTyping) {
+                System.out.println("User typing synchronized block entered");
                 synchronized (this) {
                     if (running) {
-                        printMessages(WaitingList);
-                        WaitingList.clear();
+                        System.out.println("Acquired write lock in fetchUpdates");
+                        lock.writeLock().lock();
+                        try {
+                            printMessages(WaitingList);
+                            WaitingList.clear();
+                        } finally {
+                            lock.writeLock().unlock();
+                            System.out.println("Released write lock in fetchUpdates");
+                        }
                     }
                 }
+                System.out.println("User typing synchronized block exited");
             }
         }
-        System.out.println("Exiting fetchUpdates()");
     }
 }
