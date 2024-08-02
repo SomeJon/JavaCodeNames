@@ -30,6 +30,17 @@ public class UserMessage extends message.Message {
     private final eRole Role;
     private final String Team;
 
+    public String getSenderName() {
+        return SenderName;
+    }
+
+    public eRole getRole() {
+        return Role;
+    }
+
+    public String getTeam() {
+        return Team;
+    }
 
     public UserMessage(String i_Message, String i_SenderName, eRole i_Role, String i_Team) {
         super(i_Message);

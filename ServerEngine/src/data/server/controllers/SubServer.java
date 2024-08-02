@@ -2,6 +2,7 @@ package data.server.controllers;
 
 import data.server.data.SubServerChat;
 import data.server.data.SubServerData;
+import data.user.UpdateContainer;
 import data.user.User;
 import dto.type.in.response.ingame.GuesserResponse;
 import dto.type.in.response.ingame.IdentificationResponse;
@@ -12,6 +13,7 @@ import dto.type.out.data.DtoGuessResultWrapper;
 import dto.type.out.server.DtoServerInfo;
 import dto.type.out.server.DtoServerTeam;
 import dto.type.out.server.DtoSubServerStatus;
+import dto.type.out.server.chat.DtoServerChat;
 import engine.EngineInterface;
 import exception.server.InternalEngineErrorException;
 import exception.server.Unauthorized;
@@ -77,5 +79,13 @@ public class SubServer {
 
     public DtoActiveGameStatus getActiveGameStatus() throws Unauthorized {
         return Data.getActiveGameStatus();
+    }
+
+    public void addUserMessage(User i_User, String i_Message){
+        Data.addUserMessage(i_User, i_Message);
+    }
+
+    public DtoServerChat getNewMessages(UpdateContainer io_Container){
+        return Data.getNewMessages(io_Container);
     }
 }

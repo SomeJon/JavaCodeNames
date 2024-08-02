@@ -18,6 +18,7 @@ import dto.type.out.data.DtoGuessResult;
 import dto.type.out.data.DtoGuessResultWrapper;
 import dto.type.out.server.DtoServerInfo;
 import dto.type.out.server.DtoServerTeam;
+import dto.type.out.server.chat.DtoServerChat;
 import dto.type.out.server.game.DtoBoardUpdate;
 import dto.type.out.server.game.DtoEndResult;
 import dto.type.out.server.game.DtoSingleTurnUpdate;
@@ -53,6 +54,7 @@ public class SubServerData {
     private List<data.server.data.game.Turn> Turns = new ArrayList<>();
     private final ReadWriteLock dataLock = new ReentrantReadWriteLock();
     private int WinPlacement = 1;
+    private SubServerChat Chat = new SubServerChat();
 
     public SubServerData(EngineInterface engine, int id, DtoServerInfo dtoServerInfo) {
         name = dtoServerInfo.getServerName();
@@ -81,32 +83,10 @@ public class SubServerData {
         return name;
     }
 
-    public int getId() {
-        return Id;
-    }
-
     public Boolean getActive() {
         dataLock.readLock().lock();
         try {
             return Active;
-        } finally {
-            dataLock.readLock().unlock();
-        }
-    }
-
-    public int getTurnUpdate() {
-        dataLock.readLock().lock();
-        try {
-            return TurnUpdate;
-        } finally {
-            dataLock.readLock().unlock();
-        }
-    }
-
-    public EngineInterface getEngine() { //todo delete
-        dataLock.readLock().lock();
-        try {
-            return Engine;
         } finally {
             dataLock.readLock().unlock();
         }
@@ -233,6 +213,15 @@ public class SubServerData {
             Turn currentTurn = getCurrentTurn();
             validateTurn(currentTurn, i_User, Turn.eState.IDENTIFICATION, UserMessage.eRole.Definer);
 
+            StringBuilder systemMessage = new StringBuilder();
+            DtoGroupTeam team = currentTurn.getPlayingTeam();
+            systemMessage.append("Team: ")
+                    .append(team.getName())
+                    .append("Identification of: ")
+                    .append(i_Identification.getIdentification())
+                    .append(" - related: ")
+                    .append(i_Identification.getRelated());
+
             dto.type.out.data.DtoIdentification ServerSide =
                     Engine.playTurnIdentification(i_Identification);
             Identification toAdd = new Identification(
@@ -241,7 +230,7 @@ public class SubServerData {
             currentTurn.setState(Turn.eState.GUESSING);
             GameUpdate++;
             TurnUpdate++;
-
+            Chat.addSystemMessage(systemMessage.toString());
         } finally {
             dataLock.writeLock().unlock();
         }
@@ -254,7 +243,16 @@ public class SubServerData {
         dataLock.writeLock().lock();
         try {
             Turn currentTurn = getCurrentTurn();
+            StringBuilder systemMessage = new StringBuilder();
+
             validateTurn(currentTurn, i_User, Turn.eState.GUESSING, UserMessage.eRole.Guesser);
+
+            DtoGroupTeam team = currentTurn.getPlayingTeam();
+            systemMessage.append("Team: ")
+                    .append(team.getName())
+                    .append("Guess attempt id: ")
+                    .append(i_Guess.getCardId());
+
             boolean turnEnd = false;
             boolean gameEnd = false;
             DtoGuessResult guessResult;
@@ -264,6 +262,7 @@ public class SubServerData {
                 guessResult = DtoGuessResult.TURN_SKIPPED;
                 toAdd = new Guess(0, Guess.eResult.SKIP);
                 turnEnd = true;
+                systemMessage.append("- Skipped the turn");
             } else {
 
                 Dto ServerSide = Engine.playTurnGuessers(i_Guess);
@@ -319,7 +318,10 @@ public class SubServerData {
                 } else {
                     throw new InternalEngineErrorException();
                 }
+                systemMessage.append(" - resulting in: ")
+                        .append(guessResult.toString());
             }
+
             currentTurn.guessDone();
             if (currentTurn.getGuessesLeft() < 1)
                 turnEnd = true;
@@ -341,6 +343,8 @@ public class SubServerData {
             GameUpdate++;
             TurnUpdate++;
             BoardUpdate++;
+            Chat.addSystemMessage(systemMessage.toString());
+
             if (gameEnd) {
                 cleanGame();
             }
@@ -405,12 +409,20 @@ public class SubServerData {
         for(ServerTeam i_Team : Teams){
             i_Team.cleanTeam(endResult);
         }
-
+        Chat.clean();
         Active = false;
         TurnUpdate = 0;
         BoardUpdate = 0;
         GameUpdate = 0;
         Turns = new ArrayList<>();
         WinPlacement = 1;
+    }
+
+    public void addUserMessage(User i_User, String i_Message){
+        Chat.addUserMessage(i_User, i_Message);
+    }
+
+    public DtoServerChat getNewMessages(UpdateContainer io_Container){
+        return Chat.getNewMessages(io_Container);
     }
 }

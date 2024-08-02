@@ -5,11 +5,13 @@ import data.user.UpdateContainer;
 import data.user.User;
 import dto.type.out.server.chat.DtoServerChat;
 import message.Message;
+import message.SystemMessage;
 import message.UserMessage;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class SubServerChat {
+public class SubServerChat extends ChatData {
     private final ChatData chatData = new ChatData();
 
     public void addUserMessage(User i_User, String i_Message) {
@@ -19,13 +21,25 @@ public class SubServerChat {
         chatData.AddMessage(newMessage);
     }
 
+    public void addSystemMessage(String i_Message) {
+        SystemMessage newMessage = new SystemMessage(i_Message, SystemMessage.eType.Result);
+
+        chatData.AddMessage(newMessage);
+    }
+
     public DtoServerChat getNewMessages(UpdateContainer io_Container) {
-        List<Message> newMessages = chatData.getMessages(io_Container.getChatUpdate());
         DtoServerChat ret = null;
 
-        if(newMessages != null){
-            io_Container.setChatUpdate(chatData.getCurrentUpdate());
-            ret = new DtoServerChat(io_Container.getChatUpdate(), newMessages);
+        lock.readLock().lock();
+        try{
+            int from = io_Container.getChatUpdate();
+            if (Messages.size() >= from) {
+                List<Message> newMessages = new ArrayList<>(Messages.subList(from, Messages.size()));
+                io_Container.setChatUpdate(Messages.size());
+                ret = new DtoServerChat(Messages.size(), newMessages);
+            }
+        }finally{
+            lock.readLock().unlock();
         }
 
         return ret;

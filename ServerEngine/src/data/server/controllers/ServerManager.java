@@ -16,6 +16,7 @@ import dto.type.out.server.Choice.DtoSubServerChoice;
 import dto.type.out.server.DtoServerInfo;
 import dto.type.out.server.DtoServerStatus;
 import dto.type.out.server.DtoSubServerStatus;
+import dto.type.out.server.chat.DtoServerChat;
 import dto.type.out.server.game.DtoBoardUpdate;
 import dto.type.out.server.game.DtoGameUpdate;
 import dto.type.out.server.game.DtoSingleTurnUpdate;
@@ -301,6 +302,38 @@ public class ServerManager {
             return getSubServer(i_User.getGameId()).playGuess(i_User, i_Guess);
         } finally{
             SubServersLock.writeLock().unlock();
+        }
+    }
+
+    public void addUserMessage(User i_User, String i_Message){
+        SubServer toUpload = null;
+        SubServersLock.readLock().lock();
+        try{
+            toUpload = getSubServer(i_User.getGameId());
+        } finally {
+            SubServersLock.readLock().unlock();
+        }
+
+        if(toUpload != null){
+            toUpload.addUserMessage(i_User, i_Message);
+        } else{
+            throw new IndexOutOfBoundsException();
+        }
+    }
+
+    public DtoServerChat getNewMessages(User i_User){
+        SubServer toRead = null;
+        SubServersLock.readLock().lock();
+        try{
+            toRead = getSubServer(i_User.getGameId());
+        } finally {
+            SubServersLock.readLock().unlock();
+        }
+
+        if(toRead != null){
+            return toRead.getNewMessages(i_User.getUpdates());
+        } else{
+            throw new IndexOutOfBoundsException();
         }
     }
 }

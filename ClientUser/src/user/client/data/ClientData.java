@@ -1,10 +1,15 @@
 package user.client.data;
 
 import console.*;
+import data.ChatData;
 import dto.type.in.response.Response;
 import dto.type.out.server.Choice.DtoServerGameChoice;
 import dto.type.out.server.Choice.DtoServerTeamChoice;
 import dto.type.out.server.Choice.DtoSubServerChoice;
+import message.format.SystemMessageConsoleFormat;
+import message.format.UserInfoMessageConsoleFormat;
+import message.format.UserMessageConsoleFormat;
+import okhttp3.OkHttp;
 import ui.input.InputHandling;
 
 import cookiejar.copied.SimpleCookieManager;
@@ -30,6 +35,7 @@ public class ClientData {
     public DtoServerTeamChoice CurrentTeamChoice = null;
     public boolean NewUpdate = false;
     public boolean GameStarted = false;
+    public UserChat Chat;
 
     public ClientData() {
         Main = new MainMenu("User Client");
@@ -138,35 +144,41 @@ public class ClientData {
 
         main.getMenuItems().remove(1);
 
+        switch(GameData.getRole()){
+            case GUESSER:
+                Chat = new UserChat(new UserMessageConsoleFormat(), new SystemMessageConsoleFormat(), HTTP_CLIENT);
+                break;
+            default:
+                Chat = new UserChat(new UserInfoMessageConsoleFormat(), new SystemMessageConsoleFormat(), HTTP_CLIENT);
+                break;
+        }
+
         NotifyList notifiers = new NotifyList();
         notifiers.addNotifyAfter(i_Client, Action.GAME_SHOW);
         Menu newGameMenu = main.createSubMenuWithActionsOnEnter("Joined Game Menu - "
-                + GameData.getGameName() + " - " + GameData.getTeamName() + " - " + GameData.getRole().toString(), notifiers);
+                + GameData.getGameName() + " - " + GameData.getTeamName() + " - "
+                + GameData.getRole().toString(), notifiers);
         Main.setCurrentMenu(newGameMenu);
         newGameMenu.createMenuOption("Fetch Game Status", Action.GAME_SHOW, i_Client);
         newGameMenu.createMenuOption("Play turn {Waiting for game to start}", Action.PLAY_TURN, i_Client);
         PlayTurn = newGameMenu.getMenuItems().get(1);
 
         Menu chatMenu = newGameMenu.createSubMenu("Chat");
-        chatMenu.createMenuOption("Enter Chat", Action.CHAT_OPEN, i_Client); //todo: might change it to a chat object
+        chatMenu.createMenuOption("Enter Chat", ChatSetting.CHAT_OPEN, Chat);
         Menu chatSettings = chatMenu.createSubMenu("Settings");
         chatSettings.createMenuOption("Show game messages - ON" +
                 "\n-Show messages created by the server to log actions",
-                ChatSetting.CHAT_SERVER, i_Client); //todo:same
-        Menu entrySetting = chatSettings.createSubMenu("Mode setting - Current: {All/Partly:10/None}" +
-                "\n-All: Shows all chat messages on each entry into the chat" +
-                "\n-Partly: Shows only the top 10 messages" +
-                "\n-None: Does not show any previous messages, only new ones");
+                ChatSetting.CHAT_SERVER, Chat);
+
         if(GameData.getRole() == user.client.data.GameData.roleChoice.IDENTIFIER){
             chatSettings.createMenuOption("Show Identifiers Messages - On",
-                    ChatSetting.CHAT_IDENTIFIER, i_Client); //todo: same
+                    ChatSetting.CHAT_IDENTIFIER, Chat);
             chatSettings.createMenuOption("Show Guessers Messages - On",
-                    ChatSetting.CHAT_GUESSER, i_Client); //todo: same
+                    ChatSetting.CHAT_GUESSER, Chat);
+            Chat.printIdentifier = true;
         }
 
-        entrySetting.createMenuOption("All - ON", ChatSetting.CHAT_ALL, i_Client);
-        entrySetting.createMenuOption("Partly - OFF", ChatSetting.CHAT_PARTLY, i_Client);
-        entrySetting.createMenuOption("None - OFF", ChatSetting.CHAT_NONE, i_Client);
+        Chat.setMenuToChange(chatSettings);
     }
 
     public void updateTurnChoice(String i_PlayingTeam){
