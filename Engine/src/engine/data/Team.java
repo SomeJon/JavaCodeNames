@@ -1,5 +1,7 @@
 package engine.data;
 
+import dto.type.out.data.DtoTeam;
+
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -24,6 +26,11 @@ public class Team implements Serializable {
     public Team(Team i_Team) {
         this.Name = i_Team.Name;
         this.PointGoal = i_Team.PointGoal;
+    }
+
+    public Team(DtoTeam i_Team) {
+        this.Name = i_Team.getName();
+        this.PointGoal = i_Team.getPointGoal();
     }
 
     @Override

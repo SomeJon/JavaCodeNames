@@ -2,8 +2,19 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/ChatData/ChatData.iml" filepath="$PROJECT_DIR$/ChatData/ChatData.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ClientAdmin/ClientAdmin.iml" filepath="$PROJECT_DIR$/ClientAdmin/ClientAdmin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ClientCommon/ClientCommon.iml" filepath="$PROJECT_DIR$/ClientCommon/ClientCommon.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ClientUser/ClientUser.iml" filepath="$PROJECT_DIR$/ClientUser/ClientUser.iml" />
+      <module fileurl="file://$PROJECT_DIR$/CodeNamesExceptions/CodeNamesExceptions.iml" filepath="$PROJECT_DIR$/CodeNamesExceptions/CodeNamesExceptions.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ConsoleMenu/ConsoleMenu.iml" filepath="$PROJECT_DIR$/ConsoleMenu/ConsoleMenu.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Consts/Consts.iml" filepath="$PROJECT_DIR$/Consts/Consts.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Dto/Dto.iml" filepath="$PROJECT_DIR$/Dto/Dto.iml" />
       <module fileurl="file://$PROJECT_DIR$/Engine/Engine.iml" filepath="$PROJECT_DIR$/Engine/Engine.iml" />
+      <module fileurl="file://$PROJECT_DIR$/GsonCodeNamesAdapter/GsonCodeNamesAdapter.iml" filepath="$PROJECT_DIR$/GsonCodeNamesAdapter/GsonCodeNamesAdapter.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/JavaCodeNames.iml" filepath="$PROJECT_DIR$/.idea/JavaCodeNames.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ServerCodeNames/ServerCodeNames.iml" filepath="$PROJECT_DIR$/ServerCodeNames/ServerCodeNames.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ServerEngine/ServerEngine.iml" filepath="$PROJECT_DIR$/ServerEngine/ServerEngine.iml" />
       <module fileurl="file://$PROJECT_DIR$/Ui/Ui.iml" filepath="$PROJECT_DIR$/Ui/Ui.iml" />
     </modules>
   </component>

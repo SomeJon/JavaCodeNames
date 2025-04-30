@@ -43,6 +43,10 @@ public class ActiveGame implements Serializable {
         PlayingTeams.remove(toRemove);
     }
 
+    public void endTeam(GroupTeam toRemove){
+        PlayingTeams.remove(toRemove);
+    }
+
     public GroupTeam getNextTeam(){
         int currentTeamIndex = PlayingTeams.indexOf(PlayingTeamGroup);
         int numberOfTeams = PlayingTeams.size();

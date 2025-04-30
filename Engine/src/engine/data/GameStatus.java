@@ -1,7 +1,7 @@
 package engine.data;
 
-import engine.exception.loadxml.OutOfBoundLoad;
-import engine.exception.loadxml.TeamNamesNotUnique;
+import exception.loadxml.OutOfBoundLoad;
+import exception.loadxml.TeamNamesNotUnique;
 
 import java.io.Serializable;
 import java.util.List;
@@ -50,7 +50,7 @@ public class GameStatus implements Serializable {
                     .collect(Collectors.toList());
             throw new TeamNamesNotUnique(teamNames);
         }
-        if(numOfWords < numOfCards){
+        if(numOfWords < numOfCards + numOfBlackCards){
             throw new OutOfBoundLoad("Cards amount", numOfCards, numOfWords, 0);
         }
         if(numOfBlackWords < numOfBlackCards){

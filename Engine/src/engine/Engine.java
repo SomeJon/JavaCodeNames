@@ -1,23 +1,30 @@
 package engine;
 
 import dto.Dto;
-import dto.type.board.DtoBoard;
-import dto.type.data.*;
+import dto.type.in.response.*;
+import dto.type.in.response.ingame.GuesserResponse;
+import dto.type.in.response.ingame.IdentificationResponse;
+import dto.type.in.response.load.LoadInputStreamsResponse;
+import dto.type.in.response.load.LoadXmlResponse;
+import dto.type.out.board.DtoBoard;
+import dto.type.out.board.card.DtoGroupTeam;
+import dto.type.out.data.*;
 import engine.board.Board;
 import engine.board.card.Card;
 import engine.board.card.GroupCard;
 import engine.board.card.GroupNeutral;
 import engine.board.card.GroupTeam;
+import engine.data.ActiveGame;
 import engine.data.GameData;
-import engine.data.Identification;
-import engine.exception.turn.CardFlippedException;
-import engine.exception.turn.GuessOutOfRangeException;
-import engine.exception.turn.IdentificationException;
-import engine.response.GuesserResponse;
-import engine.response.IdentificationResponse;
-import engine.response.LoadXmlResponse;
-import engine.response.Response;
+import dto.type.out.data.DtoIdentification;
+import exception.loadxml.OutOfBoundLoad;
+import exception.loadxml.TeamNamesNotUnique;
+import exception.server.TxtFileNotMatch;
+import exception.turn.CardFlippedException;
+import exception.turn.GuessOutOfRangeException;
+import exception.turn.IdentificationException;
 import jaxb.schema.FileReader;
+import jaxb.schema.FileReaderEx02;
 
 import javax.xml.bind.JAXBException;
 import java.io.File;
@@ -28,16 +35,23 @@ public class Engine implements EngineInterface, Serializable {
 
     private final GameData Data;
 
-    public Engine() {
-        Data = new GameData();
+    public Engine(GameData i_Data) {
+        Data = i_Data;
     }
 
     @Override
-    public void loadXml(Response i_LoadXml) throws JAXBException, IOException {
-        LoadXmlResponse loadXml = (LoadXmlResponse) i_LoadXml;
-
-        File responseFile = loadXml.getInputFile();
-        FileReader.ReadXml(responseFile, Data);
+    public void loadFiles(Response i_LoadFiles)
+            throws JAXBException, IOException, TxtFileNotMatch, TeamNamesNotUnique, OutOfBoundLoad {
+        if(i_LoadFiles instanceof LoadInputStreamsResponse) {
+            LoadInputStreamsResponse response = (LoadInputStreamsResponse) i_LoadFiles;
+            FileReaderEx02.ReadFiles(response.getXmlInputStream(), response.getTxtInputStream(),
+                    response.getTxtFileName(), Data, response.getDtoToLoad());
+        }
+        else {
+            LoadXmlResponse loadXml = (LoadXmlResponse) i_LoadFiles;
+            File responseFile = loadXml.getXmlFile();
+            FileReader.ReadXml(responseFile, Data);
+        }
     }
 
     @Override
@@ -61,7 +75,7 @@ public class Engine implements EngineInterface, Serializable {
     }
 
     @Override
-    public Identification playTurnIdentification(IdentificationResponse i_Response) {
+    public DtoIdentification playTurnIdentification(IdentificationResponse i_Response) {
         GroupTeam playingTeam = Data.getActiveData().getPlayingTeamGroup();
 
         if (i_Response.getRelated() >
@@ -70,12 +84,11 @@ public class Engine implements EngineInterface, Serializable {
                     playingTeam.getCards() - playingTeam.getCardsFlipped(), 1);
         }
 
-        return new Identification(i_Response.getIdentification(), i_Response.getRelated());
+        return new DtoIdentification(i_Response.getIdentification(), i_Response.getRelated());
     }
 
     @Override
-    public Dto playTurnGuessers(Identification i_CurrentIdentification, GuesserResponse i_Response){
-        GroupTeam playingTeam = Data.getActiveData().getPlayingTeamGroup();
+    public Dto playTurnGuessers(GuesserResponse i_Response){
         Board playingBoard = Data.getActiveData().getPlayingBoard();
         int maxId = Data.getStatus().getNumOfCards() + Data.getStatus().getNumOfBlackCards();
         int cardId = i_Response.getCardId();
@@ -105,10 +118,11 @@ public class Engine implements EngineInterface, Serializable {
         if(cardGroup instanceof GroupNeutral) {
             GroupNeutral NeutralGroup = (GroupNeutral) cardGroup;
             if (NeutralGroup.isBlack()) {
-                DtoGuessResult.BLACK_HIT.setGroupTeam(new DtoGroupTeam(playingTeam));
+                DtoGuessResult res = DtoGuessResult.BLACK_HIT;
+                res.setGroupTeam(new DtoGroupTeam(playingTeam));
                 Data.getActiveData().endCurrentTeam();
                 if (Data.getActiveData().getPlayingTeams().size() == 1) {
-                    returnedValue = new DtoGameEndResult(Data.getActiveData().getPlayingTeamGroup(), DtoGuessResult.BLACK_HIT);
+                    returnedValue = new DtoGameEndResult(Data.getActiveData().getPlayingTeamGroup(), res);
                 } else {
                     returnedValue = DtoGuessResult.BLACK_HIT;
                 }
@@ -120,14 +134,18 @@ public class Engine implements EngineInterface, Serializable {
             GroupTeam groupTeam = (GroupTeam) cardGroup;
             if (groupTeam != playingTeam) {
                 DtoGuessResult.ENEMY_TEAM_HIT.setGroupTeam(new DtoGroupTeam(groupTeam));
+                DtoGuessResult res = DtoGuessResult.ENEMY_TEAM_HIT;
+                res.setGroupTeam(new DtoGroupTeam(playingTeam));
                 if(groupTeam.getCardsFlipped() == groupTeam.getCards()) {
-                    returnedValue = new DtoGameEndResult(groupTeam, DtoGuessResult.ENEMY_TEAM_HIT);
+                    Data.getActiveData().endTeam(groupTeam);
+                    returnedValue = new DtoGameEndResult(groupTeam, res);
                 }
                 else{
                     returnedValue = DtoGuessResult.ENEMY_TEAM_HIT;
                 }
             } else {
                 if (groupTeam.getCardsFlipped() == groupTeam.getCards()) {
+                    Data.getActiveData().endCurrentTeam();
                     returnedValue = new DtoGameEndResult(groupTeam, DtoGuessResult.SUCCESSFUL_GUESS);
                 } else {
                     returnedValue = DtoGuessResult.SUCCESSFUL_GUESS;
@@ -145,8 +163,24 @@ public class Engine implements EngineInterface, Serializable {
     }
 
     @Override
+    public Dto getNextTeam() {
+        GroupTeam nextTeam = Data.getActiveData().getNextTeam();
+        return new DtoGroupTeam(nextTeam);
+    }
+
+    @Override
     public DtoActiveGameStatus getActiveGameStatus() {
         return new DtoActiveGameStatus(Data.getActiveData().getPlayingBoard(),
                 Data.getActiveData().getPlayingTeamGroup());
+    }
+
+    @Override
+    public boolean didGameEnd() {
+        return Data.getActiveData().getPlayingTeams().size() == 1;
+    }
+
+    @Override
+    public int numOfPlayingTeams() {
+        return Data.getActiveData().getPlayingTeams().size();
     }
 }

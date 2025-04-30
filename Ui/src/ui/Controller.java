@@ -1,19 +1,18 @@
 package ui;
 
 import dto.Dto;
-import dto.type.board.DtoBoard;
-import dto.type.data.DtoGameDetails;
-import dto.type.data.DtoGameEndResult;
-import dto.type.data.DtoGuessResult;
-import dto.type.data.DtoGroupTeam;
+import dto.type.out.board.DtoBoard;
+import dto.type.out.board.card.DtoGroupTeam;
+import dto.type.out.data.DtoGameDetails;
+import dto.type.out.data.DtoGameEndResult;
+import dto.type.out.data.DtoGuessResult;
 import engine.EngineInterface;
-import engine.board.card.GroupTeam;
-import engine.data.Identification;
-import engine.exception.CodeNameException;
-import engine.response.GuesserResponse;
-import engine.response.IdentificationResponse;
-import engine.response.LoadXmlResponse;
-import engine.response.Response;
+import dto.type.out.data.DtoIdentification;
+import exception.CodeNameException;
+import dto.type.in.response.ingame.GuesserResponse;
+import dto.type.in.response.ingame.IdentificationResponse;
+import dto.type.in.response.load.LoadXmlResponse;
+import dto.type.in.response.Response;
 import ui.interfaces.UiViewInterface;
 import ui.save.FileLocationResponse;
 import ui.save.SaveObject;
@@ -83,7 +82,7 @@ public class Controller{
 
         if(xmlResponse.receivedResponse()){
             try {
-                Engine.loadXml(xmlResponse);
+                Engine.loadFiles(xmlResponse);
                 Ui.addFileData();
             } catch (CodeNameException e) {
                 Ui.exceptionHandler(e, false);
@@ -106,8 +105,8 @@ public class Controller{
     private void playTurn(){
         IdentificationResponse response;
         boolean loopContinue;
-        Identification currentIdentification = null;
-        GroupTeam playingTeam = ((DtoGroupTeam)Engine.getActiveTeam()).getPlayingTeam();
+        DtoIdentification currentIdentification = null;
+        DtoGroupTeam playingTeam = (DtoGroupTeam)Engine.getActiveTeam();
         DtoBoard playingBoard = (DtoBoard)Engine.getActiveBoard();
 
         Ui.showTeam(playingTeam);
@@ -129,10 +128,10 @@ public class Controller{
         playGuesserTurn(currentIdentification);
     }
 
-    private void playGuesserTurn(Identification i_Identification){
+    private void playGuesserTurn(DtoIdentification i_Identification){
         boolean loopContinue = false;
         GuesserResponse response;
-        GroupTeam playingTeam = ((DtoGroupTeam)Engine.getActiveTeam()).getPlayingTeam();
+        DtoGroupTeam playingTeam = ((DtoGroupTeam)Engine.getActiveTeam());
         Dto engineResult;
         DtoGuessResult guessResult;
         boolean gameEnded = false;
@@ -142,16 +141,16 @@ public class Controller{
         Ui.showBoard((DtoBoard)Engine.getActiveBoard(), false);
         do{
             response = new GuesserResponse();
-            Ui.showIdentification(i_Identification);
+            Ui.showIdentification(i_Identification, guessCount);
             Ui.getResponse(response);
 
             if(response.getCardId() == EndGuessId){
                 loopContinue = false;
-                Ui.showTeam(((DtoGroupTeam) Engine.getActiveTeam()).getPlayingTeam());
+                Ui.showTeam(((DtoGroupTeam) Engine.getActiveTeam()));
             }
             else {
                 try {
-                    engineResult = Engine.playTurnGuessers(i_Identification, response);
+                    engineResult = Engine.playTurnGuessers(response);
                     if (engineResult instanceof DtoGameEndResult) {
                         guessResult = ((DtoGameEndResult) engineResult).getGuessResult();
                         gameEnded = true;
@@ -159,6 +158,7 @@ public class Controller{
                         guessResult = (DtoGuessResult) engineResult;
                         engineResult = null;
                     }
+                    playingTeam = ((DtoGroupTeam)Engine.getActiveTeam());
                     loopContinue = guessResultHandler(guessResult, (DtoGameEndResult) engineResult,
                             guessCount, playingTeam);
                     guessCount--;
@@ -176,7 +176,7 @@ public class Controller{
     }
 
     private boolean guessResultHandler(DtoGuessResult i_GuessResult, DtoGameEndResult i_EndResult,
-                                       int i_GuessLeft, GroupTeam i_CurrentTeam){
+                                       int i_GuessLeft, DtoGroupTeam i_CurrentTeam){
         boolean gameEnded = i_EndResult != null;
         boolean loopContinue = false;
 
@@ -186,7 +186,7 @@ public class Controller{
         }
         else if(i_GuessResult != DtoGuessResult.BLACK_HIT && i_GuessLeft > 1) {
                 loopContinue = true;
-                Ui.showTeam(((DtoGroupTeam) Engine.getActiveTeam()).getPlayingTeam());
+                Ui.showTeam(((DtoGroupTeam) Engine.getActiveTeam()));
         }
 
         return loopContinue;

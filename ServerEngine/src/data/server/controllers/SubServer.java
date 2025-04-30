@@ -1,0 +1,91 @@
+package data.server.controllers;
+
+import data.server.data.SubServerChat;
+import data.server.data.SubServerData;
+import data.user.UpdateContainer;
+import data.user.User;
+import dto.type.in.response.ingame.GuesserResponse;
+import dto.type.in.response.ingame.IdentificationResponse;
+import dto.type.out.data.DtoActiveGameStatus;
+import dto.type.out.data.DtoGameDetails;
+import dto.type.out.data.DtoGuessResult;
+import dto.type.out.data.DtoGuessResultWrapper;
+import dto.type.out.server.DtoServerInfo;
+import dto.type.out.server.DtoServerTeam;
+import dto.type.out.server.DtoSubServerStatus;
+import dto.type.out.server.chat.DtoServerChat;
+import engine.EngineInterface;
+import exception.server.InternalEngineErrorException;
+import exception.server.Unauthorized;
+import exception.server.mismatch.MismatchRole;
+import exception.server.mismatch.MismatchStage;
+import exception.server.mismatch.MismatchTeam;
+import exception.server.mismatch.MismatchUpdate;
+import exception.turn.CardFlippedException;
+import exception.turn.GuessOutOfRangeException;
+import exception.turn.IdentificationException;
+
+import java.util.List;
+
+public class SubServer {
+    private final SubServerData Data;
+    private final DtoSubServerStatus Status;
+    private final SubServerChat Chat = new SubServerChat();
+
+    public SubServer(EngineInterface engine, int id, DtoServerInfo dtoServerInfo) {
+        Data = new SubServerData(engine, id, dtoServerInfo);
+        DtoGameDetails details = (DtoGameDetails) engine.getStatus();
+        Status = new DtoSubServerStatus(dtoServerInfo, details);
+    }
+
+    public SubServerData getData() {
+        return Data;
+    }
+
+    public String getServerName() {
+        return Data.getName();
+    }
+
+    public DtoSubServerStatus getStatus() {
+        Status.setActive(Data.getActive());
+        Status.setServerTeams(Data.getTeams());
+        return Status;
+    }
+
+    public List<DtoServerTeam> getServerTeams() {
+        return Data.getTeams();
+    }
+
+    public boolean getActiveState(){
+        return Data.getActive();
+    }
+
+    public int getUpdate(){
+        return Data.getGameUpdate();
+    }
+
+    public void playIdentification(User i_User, IdentificationResponse i_Identification)
+            throws MismatchUpdate, MismatchRole, MismatchStage, MismatchTeam,
+            IndexOutOfBoundsException , IdentificationException {
+        Data.playIdentification(i_User, i_Identification);
+    }
+
+    public DtoGuessResultWrapper playGuess(User i_User, GuesserResponse i_Guess)
+            throws MismatchUpdate, MismatchRole, MismatchStage, MismatchTeam,
+            IndexOutOfBoundsException, InternalEngineErrorException,
+            GuessOutOfRangeException, CardFlippedException {
+        return Data.playGuesser(i_User, i_Guess);
+    }
+
+    public DtoActiveGameStatus getActiveGameStatus() throws Unauthorized {
+        return Data.getActiveGameStatus();
+    }
+
+    public void addUserMessage(User i_User, String i_Message){
+        Data.addUserMessage(i_User, i_Message);
+    }
+
+    public DtoServerChat getNewMessages(UpdateContainer io_Container){
+        return Data.getNewMessages(io_Container);
+    }
+}

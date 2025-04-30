@@ -1,7 +1,7 @@
 package engine.data;
 
 import engine.board.Board;
-import engine.exception.loadxml.OutOfBoundLoad;
+import exception.loadxml.OutOfBoundLoad;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Set;
@@ -28,12 +28,15 @@ public class GameData implements Serializable{
     public void loadData
             (GameStatus i_Status, Integer i_NumOfColumns, Integer i_NumOfRows,
              Set<String> i_Words, Set<String> i_BlackWords) {
-        if(i_NumOfColumns * i_NumOfRows >= i_Status.getNumOfBlackCards() + i_Status.getNumOfWords()) {
+        if(i_NumOfColumns * i_NumOfRows < i_Status.getNumOfBlackCards() + i_Status.getNumOfCards()) {
             throw  new OutOfBoundLoad("Matrix Size",
-                    i_Status.getNumOfBlackCards() + i_Status.getNumOfWords(),
+                    i_Status.getNumOfBlackCards() + i_Status.getNumOfCards(),
                     i_NumOfColumns * i_NumOfRows, 0);
         }
-
+        int a = i_NumOfColumns * i_NumOfRows;
+        int b = i_Status.getNumOfBlackCards() + i_Status.getNumOfCards();
+        int c = a + b;
+        System.out.println(c);
         Status = i_Status;
         NumOfColumns = i_NumOfColumns;
         NumOfRows = i_NumOfRows;
